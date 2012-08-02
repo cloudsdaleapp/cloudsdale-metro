@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Package xmlns="http://schemas.microsoft.com/appx/2010/manifest">
+  <Identity Name="ConnorcpuSoftware.CloudsdaleMetro" Publisher="CN=Connor" Version="1.0.0.0" />
+  <Properties>
+    <DisplayName>Cloudsdale</DisplayName>
+    <PublisherDisplayName>Cloudsdale and Connorcpu Software</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+  </Properties>
+  <Prerequisites>
+    <OSMinVersion>6.2.0</OSMinVersion>
+    <OSMaxVersionTested>6.2.0</OSMaxVersionTested>
+  </Prerequisites>
+  <Resources>
+    <Resource Language="x-generate" />
+  </Resources>
+  <Applications>
+    <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="Cloudsdale_Metro.App">
+      <VisualElements DisplayName="Cloudsdale Metro" Logo="Assets\LargeLogo.png" SmallLogo="Assets\SmallLogo.png" Description="An application to use the Cloudsdale.org chat service from your Windows 8 computer" ForegroundText="light" BackgroundColor="#464646">
+        <DefaultTile ShowName="allLogos" />
+        <SplashScreen Image="Assets\Splash.png" BackgroundColor="#4992FF" />
+        <InitialRotationPreference>
+          <Rotation Preference="landscape" />
+        </InitialRotationPreference>
+      </VisualElements>
+    </Application>
+  </Applications>
+  <Capabilities>
+    <Capability Name="internetClient" />
+  </Capabilities>
+</Package>

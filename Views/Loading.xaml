@@ -1,0 +1,40 @@
+﻿<Page
+    x:Class="Cloudsdale.Views.Loading"
+    IsTabStop="false"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Cloudsdale.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d" FontSize="72">
+
+    <Page.Resources>
+        <Storyboard x:Name="JoinAnimation">
+            <DoubleAnimation Storyboard.TargetName="RootProjection" Storyboard.TargetProperty="RotationY"
+                             To="0" Duration="0:0:0.2" AutoReverse="False" RepeatBehavior="1x"/>
+        </Storyboard>
+        <Storyboard x:Name="LeaveAnimation">
+            <DoubleAnimation Storyboard.TargetName="RootProjection" Storyboard.TargetProperty="RotationY"
+                             To="180" Duration="0:0:0.2" AutoReverse="False" RepeatBehavior="1x"/>
+        </Storyboard>
+    </Page.Resources>
+    
+    <Grid>
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                <GradientStop Color="#FF3AB1FB" Offset="0.00" />
+                <GradientStop Color="#FF4AA5DB" Offset="0.33" />
+                <GradientStop Color="#FF3A95DB" Offset="0.66" />
+                <GradientStop Color="#FF3A85CB" Offset="1.00" />
+            </LinearGradientBrush>
+        </Grid.Background>
+        <StackPanel Name="LayoutRoot" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <StackPanel.Projection>
+                <PlaneProjection x:Name="RootProjection" CenterOfRotationX="2" RotationY="180" />
+            </StackPanel.Projection>
+            <TextBlock HorizontalAlignment="Center">Connecting to Cloudsdale</TextBlock>
+            <ProgressRing Foreground="White" IsActive="True" Width="200" Height="200" 
+                          Margin="50" HorizontalAlignment="Center" />
+        </StackPanel>
+    </Grid>
+</Page>

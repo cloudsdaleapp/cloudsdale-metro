@@ -1,0 +1,63 @@
+﻿<Page
+    x:Class="Cloudsdale.Views.Home"
+    IsTabStop="false"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:Json="using:Cloudsdale.Models.Json" 
+    xmlns:Common="using:Cloudsdale.Common" 
+    mc:Ignorable="d" FontSize="24" 
+    d:DataContext="{d:DesignInstance Json:LoggedInUser}">
+
+    <Page.Resources>
+        <DataTemplate x:Name="CloudsTemplate">
+            <StackPanel Orientation="Horizontal" Width="500" Height="150" Background="CornflowerBlue"
+                        RightTapped="CloudViewRightTapped">
+                <Image Source="{Binding Avatar.Normal}" Width="100" Height="100" Margin="25" />
+                <TextBlock Text="{Binding Path=Name}" Foreground="White" FontSize="36" TextWrapping="Wrap" 
+                           Margin="25" Width="300" />
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate x:Name="CloudItemAppBarContent" d:DataContext="{d:DesignInstance Json:Cloud}">
+            <Button Style="{StaticResource DiscardAppBarButtonStyle}"
+                    AutomationProperties.Name="Leave Cloud" />
+        </DataTemplate>
+    </Page.Resources>
+
+    <Grid>
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                <GradientStop Offset="0" Color="#FFE0E0E0" />
+                <GradientStop Offset="1" Color="#FFD0D0D0" />
+            </LinearGradientBrush>
+        </Grid.Background>
+        <ScrollViewer VerticalScrollMode="Disabled" VerticalScrollBarVisibility="Hidden"
+                      HorizontalScrollMode="Enabled" HorizontalScrollBarVisibility="Visible"
+                      ZoomMode="Enabled">
+            <StackPanel Orientation="Horizontal" Margin="25">
+                <StackPanel Background="CornflowerBlue" VerticalAlignment="Stretch" Width="400" Margin="0,0,25,0">
+                    <StackPanel Orientation="Horizontal" Margin="25" VerticalAlignment="Stretch">
+                        <Grid>
+                            <Image Source="{Binding Path=Avatar.Normal}" Width="100" Height="100" Margin="5" />
+                        </Grid>
+                        <StackPanel>
+                            <Button Click="LogoutClick" FontSize="24">Logout</Button>
+                        </StackPanel>
+                    </StackPanel>
+                    <RichTextBlock TextWrapping="Wrap" Margin="25">
+                        <Paragraph FontSize="48">
+                            Welcome back,
+                            <Run Text="{Binding Path=Name}" />
+                        </Paragraph>
+                    </RichTextBlock>
+                </StackPanel>
+                <GridView ItemTemplate="{StaticResource CloudsTemplate}"
+                              Name="CloudView" CanReorderItems="True"
+                              CanDragItems="True" SelectionMode="None"
+                              AllowDrop="True" ItemClick="CloudViewItemClick"
+                              IsItemClickEnabled="True"/>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>

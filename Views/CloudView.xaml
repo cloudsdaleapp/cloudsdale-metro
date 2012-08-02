@@ -1,0 +1,60 @@
+﻿<Page
+    x:Class="Cloudsdale.Views.CloudView"
+    IsTabStop="false"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Cloudsdale.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d">
+
+    <Page.Resources>
+        <DataTemplate x:Name="ChatTemplate">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="110" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Image Grid.Column="0" Source="{Binding Path=User.Avatar.Normal}" Margin="5" />
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Name="DropTemplate">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="130" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Image Grid.Column="0" Source="{Binding Path=Preview}" Margin="5" />
+            </Grid>
+        </DataTemplate>
+    </Page.Resources>
+
+    <Grid>
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                <GradientStop Offset="0" Color="#FFE0E0E0" />
+                <GradientStop Offset="1" Color="#FFD0D0D0" />
+            </LinearGradientBrush>
+        </Grid.Background>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="400" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="100" />
+        </Grid.ColumnDefinitions>
+        <ScrollViewer Width="400">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Image Width="100" Height="100" Source="{Binding Path=Avatar.Normal}" />
+                </StackPanel>
+                <ItemsControl Name="DropItems" />
+            </StackPanel>
+        </ScrollViewer>
+        <ScrollViewer Grid.Column="1" HorizontalAlignment="Stretch">
+            <ItemsControl ItemTemplate="{StaticResource ChatTemplate}" Name="ChatItems" />
+        </ScrollViewer>
+        <ScrollViewer Grid.Column="2" Width="100" VerticalAlignment="Stretch">
+            <StackPanel>
+                <Button Style="{StaticResource BackButtonStyle}" Margin="25"  />
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>
