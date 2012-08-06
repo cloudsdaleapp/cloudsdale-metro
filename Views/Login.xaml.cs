@@ -27,9 +27,7 @@ namespace Cloudsdale.Views {
         /// <param name="e">Event data that describes how this page was reached.  The Parameter
         /// property is typically used to configure the page.</param>
         protected override async void OnNavigatedTo(NavigationEventArgs e) {
-            if (await Helpers.DataFileExists("CurrentUser.json")) {
-                ConnectionController.CurrentUser = await Helpers.ReadGZippedJson<LoggedInUser>(
-                    await Helpers.GetDataFileAsync("CurrentUser.json"));
+            if (await ConnectionController.LoadUserAsync()) {
                 Frame.Navigate(typeof(Loading));
             } else {
                 LayoutRoot.Visibility = Visibility.Visible;
@@ -81,11 +79,6 @@ namespace Cloudsdale.Views {
                 LoginButton.IsEnabled = true;
             } else {
                 ConnectionController.CurrentUser = user;
-                if (ConnectionController.CloudOrder == null) {
-                    var order = from cloud in user.Clouds
-                                select cloud.Id;
-                    ConnectionController.CloudOrder = order.ToList();
-                }
                 await ConnectionController.SaveUserAsync();
                 Navigate(typeof(Loading));
             }

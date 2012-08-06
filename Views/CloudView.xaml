@@ -9,12 +9,14 @@
 
     <Page.Resources>
         <DataTemplate x:Name="ChatTemplate">
-            <Grid>
+            <Grid Margin="0,0,15,0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="110" />
+                    <ColumnDefinition Width="60" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <Image Grid.Column="0" Source="{Binding Path=User.Avatar.Normal}" Margin="5" />
+                <Image Grid.Column="0" Source="{Binding Path=User.Avatar.Normal}" 
+                       Margin="5" Width="50" Height="50" VerticalAlignment="Top" />
+                <ItemsControl Grid.Column="1" ItemsSource="{Binding Path=Lines}" VerticalAlignment="Top" />
             </Grid>
         </DataTemplate>
         <DataTemplate x:Name="DropTemplate">
@@ -28,33 +30,46 @@
         </DataTemplate>
     </Page.Resources>
 
-    <Grid>
-        <Grid.Background>
-            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                <GradientStop Offset="0" Color="#FFE0E0E0" />
-                <GradientStop Offset="1" Color="#FFD0D0D0" />
-            </LinearGradientBrush>
-        </Grid.Background>
+    <Grid Background="CornflowerBlue">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="400" />
+            <ColumnDefinition Width="320" />
             <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="100" />
+            <ColumnDefinition Width="240" />
+            <ColumnDefinition Width="100" x:Name="cloudColumn" />
         </Grid.ColumnDefinitions>
-        <ScrollViewer Width="400">
+        <ScrollViewer>
             <StackPanel>
+                <Button Style="{StaticResource BackButtonStyle}" Margin="25" Click="GoBack" />
                 <StackPanel Orientation="Horizontal">
                     <Image Width="100" Height="100" Source="{Binding Path=Avatar.Normal}" />
                 </StackPanel>
                 <ItemsControl Name="DropItems" />
             </StackPanel>
         </ScrollViewer>
-        <ScrollViewer Grid.Column="1" HorizontalAlignment="Stretch">
+        <ScrollViewer Grid.Column="1" HorizontalAlignment="Stretch" Name="ChatViewer">
+            <ScrollViewer.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Offset="0" Color="#FFE0E0E0" />
+                    <GradientStop Offset="1" Color="#FFD0D0D0" />
+                </LinearGradientBrush>
+            </ScrollViewer.Background>
             <ItemsControl ItemTemplate="{StaticResource ChatTemplate}" Name="ChatItems" />
         </ScrollViewer>
-        <ScrollViewer Grid.Column="2" Width="100" VerticalAlignment="Stretch">
-            <StackPanel>
-                <Button Style="{StaticResource BackButtonStyle}" Margin="25"  />
-            </StackPanel>
+        <ScrollViewer Grid.Column="2">
+
+        </ScrollViewer>
+        <ScrollViewer Grid.Column="3" DataContext="{StaticResource CurrentUser}">
+            <ItemsControl ItemsSource="{Binding Path=Clouds}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Padding="5" IsEnabled="{Binding Path=IsNotCurrentCloud}" 
+                                Width="85" Height="85">
+                            <Image Source="{Binding Path=Avatar.Normal}" Width="65" Height="65"
+                                   Stretch="FIll"/>
+                        </Button>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </ScrollViewer>
     </Grid>
 </Page>

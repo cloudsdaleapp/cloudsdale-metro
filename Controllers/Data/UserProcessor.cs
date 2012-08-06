@@ -8,16 +8,19 @@ using Cloudsdale.Models.Json;
 using Windows.UI.Core;
 
 namespace Cloudsdale.Controllers.Data {
-    public static class UserProcessor {
+    public class UserProcessor {
+        #region Static
         private static readonly Dictionary<string, CensusUser> Users =
                             new Dictionary<string, CensusUser>();
 
         public static User RegisterData(CloudsdaleItem user) {
+            if (user == null) return null;
             CensusUser cuser;
             if (Users.ContainsKey(user.Id)) {
                 cuser = Users[user.Id];
             } else {
-                Users[user.Id] = cuser = new CensusUser(user.Id);
+                cuser = new CensusUser(user.Id);
+                Users[user.Id] = cuser;
             }
 
             #region ListUser
@@ -26,7 +29,9 @@ namespace Cloudsdale.Controllers.Data {
                 if (luser.Name != null && cuser.Name != luser.Name) {
                     cuser.Name = luser.Name;
                 }
-                if (luser.Avatar != null) {
+                if (cuser.Avatar == null) {
+                    cuser.Avatar = luser.Avatar;
+                } else if (luser.Avatar != null) {
                     if (luser.Avatar.Chat != null && cuser.Avatar.Chat != luser.Avatar.Chat) {
                         cuser.Avatar.Chat = luser.Avatar.Chat;
                     }
@@ -85,6 +90,13 @@ namespace Cloudsdale.Controllers.Data {
 
             return cuser;
         }
+        #endregion
+
+        #region Member
+        public void Heartbeat(ListUser user) {
+            
+        }
+        #endregion
     }
 
     public class CensusUser : User, INotifyPropertyChanged {

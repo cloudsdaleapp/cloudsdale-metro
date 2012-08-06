@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using Cloudsdale.Controllers.Data;
 using Newtonsoft.Json;
 using Windows.UI;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Media;
 
 namespace Cloudsdale.Models.Json {
@@ -20,7 +22,7 @@ namespace Cloudsdale.Models.Json {
         }
 
         [JsonProperty("timestamp")]
-        public DateTime TimeStamp { get; set; }
+        public DateTime? TimeStamp { get; set; }
         [JsonProperty("content")]
         public string Content;
         [JsonProperty("user")]
@@ -33,20 +35,22 @@ namespace Cloudsdale.Models.Json {
         [JsonProperty("topic")]
         public Topic Topic;
 
-        public ChatLine[] Lines {
+        public RichTextBlock[] Lines {
             get {
-                var lines = new List<ChatLine>();
+                var block = new RichTextBlock {
+                    Foreground = new SolidColorBrush(Colors.Black),
+                    FontSize = 24,
+                };
                 foreach (var msg in _subMessages) {
+                    var para = new Paragraph();
                     var txt = Helpers.ParseLiteral(msg.Content);
                     var split = txt.Replace("\r", "").Split('\n');
                     foreach (var line in split) {
-                        lines.Add(new ChatLine(line, 
-                            line.StartsWith(">") ? 
-                            new SolidColorBrush(Colors.Green) : 
-                            new SolidColorBrush(Colors.Black)));
+                        para.Inlines.Add(new Run{Text = line});
                     }
+                    block.Blocks.Add(para);
                 }
-                return lines.ToArray();
+                return new[] {block};
             }
         }
 
@@ -64,20 +68,8 @@ namespace Cloudsdale.Models.Json {
             if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public struct ChatLine {
-            public ChatLine(string text, Brush brush) {
-                _text = text;
-                _brush = brush;
-            }
-
-            private readonly string _text;
-            public string Text { get { return _text; } }
-            private readonly Brush _brush;
-            public Brush Brush {get { return _brush; }}
-        }
-
         public int CompareTo(Message other) {
-            return other == null ? 1 : TimeStamp.CompareTo(other.TimeStamp);
+            return other == null ? 1 : (TimeStamp ?? new DateTime(0)).CompareTo(other.TimeStamp ?? new DateTime(0));
         }
     }
 

@@ -11,6 +11,10 @@ namespace Cloudsdale.Models.Web {
 
         [JsonProperty("result")]
         public T Data;
+
+        public static implicit operator T(WebJsonResponse<T> data) {
+            return data.Data;
+        }
     }
 
     [JsonObject(MemberSerialization.OptIn)]

@@ -17,14 +17,14 @@ namespace Cloudsdale.Controllers.Data {
 
         private void InternalAdd(Message message) {
             var i = 0;
-            while (i < _messages.Count && message.CompareTo(_messages[i]) < 1) ++i;
+            while (i < _messages.Count && message.CompareTo(_messages[i]) >= 0) ++i;
 
             if (i > 0 && _messages[i - 1].User.Id == message.User.Id) {
                 _messages[i - 1].AddSubMessage(message);
-            } else if (_messages[i].User.Id == message.User.Id) {
+            } else if (_messages.Count > 0 && i < _messages.Count && _messages[i].User.Id == message.User.Id) {
                 _messages[i].AddSubMessage(message);
             } else {
-                _messages.Insert(0, message);
+                _messages.Insert(i, message);
                 while (_messages.Count > 50) {
                     _messages.RemoveAt(0);
                 }

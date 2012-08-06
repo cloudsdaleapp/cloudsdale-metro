@@ -98,7 +98,7 @@ namespace Cloudsdale.Models.Json {
         public bool? NeedsToConfirmRegistration;
         [JsonProperty("clouds")]
         public Cloud[] JsonClouds {
-            get { 
+            get {
                 var clouds = new Cloud[_clouds.Count];
                 _clouds.CopyTo(clouds, 0);
                 return clouds;
@@ -109,13 +109,18 @@ namespace Cloudsdale.Models.Json {
                     for (var x = 0; x < value.Length; ++x) {
                         var set = false;
                         for (var y = 0; y < ConnectionController.CloudOrder.Count; ++y) {
-                            if (ConnectionController.CloudOrder[y] == value[x].Id) {
-                                indices[y] = x;
-                                set = true;
-                                break;
-                            }
+                            if (ConnectionController.CloudOrder[y] != value[x].Id) continue;
+                            indices[y] = x;
+                            set = true;
+                            break;
                         }
                         if (!set) unadded.Add(x);
+                    }
+                    foreach (var index in indices) {
+                        _clouds.Add(value[index.Value]);
+                    }
+                    foreach (var index in unadded) {
+                        _clouds.Add(value[index]);
                     }
                 } else {
                     foreach (var cloud in value) {

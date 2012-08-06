@@ -1,4 +1,5 @@
 ﻿using System;
+using Cloudsdale.Controllers.Data;
 using Newtonsoft.Json;
 using Windows.UI.Xaml;
 
@@ -34,6 +35,10 @@ namespace Cloudsdale.Models.Json {
 
         public User FullOwner {
             get { return null; }
+        }
+
+        public bool IsNotCurrentCloud {
+            get { return ConnectionController.CurrentCloud.Id != Id; }
         }
     }
 }

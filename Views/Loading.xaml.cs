@@ -29,8 +29,11 @@ namespace Cloudsdale.Views {
             JoinAnimation.Begin();
             var tryagain = true;
             while (tryagain) {
-                var response = await ConnectionController.Faye.ConnectAsync(new Uri(PushUrl));
+                var response = await ConnectionController.Connect();
                 if (response != null && (response.Successful ?? false)) {
+                    foreach (var cloud in ConnectionController.CurrentUser.Clouds) {
+                        ConnectionController.Subscribe(cloud.Id);
+                    }
                     await Navigate(typeof(Home));
                     tryagain = false;
                 } else {
