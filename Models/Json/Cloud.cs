@@ -1,11 +1,12 @@
 ﻿using System;
+using System.ComponentModel;
 using Cloudsdale.Controllers.Data;
 using Newtonsoft.Json;
 using Windows.UI.Xaml;
 
 namespace Cloudsdale.Models.Json {
     [JsonObject(MemberSerialization.OptIn)]
-    public class Cloud : CloudsdaleItem {
+    public class Cloud : CloudsdaleItem, INotifyPropertyChanged {
         [JsonProperty("name")]
         public string Name { get; set; }
         [JsonProperty("description")]
@@ -33,12 +34,27 @@ namespace Cloudsdale.Models.Json {
             public DateTime? LastMessageAt;
         }
 
+        public void UpdateIsCurrent() {
+            OnPropertyChanged("IsNotCurrentCloud");
+        }
+
         public User FullOwner {
             get { return null; }
         }
 
         public bool IsNotCurrentCloud {
             get { return ConnectionController.CurrentCloud.Id != Id; }
+        }
+
+        public CloudProcessor Processor {
+            get { return ConnectionController.GetProcessor(this); }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged(string propertyName) {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

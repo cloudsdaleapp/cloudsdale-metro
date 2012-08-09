@@ -16,11 +16,13 @@ namespace Cloudsdale.Controllers.Data {
         public static User RegisterData(CloudsdaleItem user) {
             if (user == null) return null;
             CensusUser cuser;
-            if (Users.ContainsKey(user.Id)) {
-                cuser = Users[user.Id];
-            } else {
-                cuser = new CensusUser(user.Id);
-                Users[user.Id] = cuser;
+            lock (Users) {
+                if (Users.ContainsKey(user.Id)) {
+                    cuser = Users[user.Id];
+                } else {
+                    cuser = new CensusUser(user.Id);
+                    Users[user.Id] = cuser;
+                }
             }
 
             #region ListUser
@@ -94,7 +96,7 @@ namespace Cloudsdale.Controllers.Data {
 
         #region Member
         public void Heartbeat(ListUser user) {
-            
+
         }
         #endregion
     }

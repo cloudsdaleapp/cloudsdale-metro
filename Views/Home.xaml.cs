@@ -38,7 +38,9 @@ namespace Cloudsdale.Views {
         }
 
         private async void LogoutClick(object sender, RoutedEventArgs e) {
-            await Helpers.DeleteDataFileAsync("CurrentUser.json");
+            ConnectionController.Faye.Socket.Close(0, "");
+            ConnectionController.Faye = null;
+            await Helpers.DeleteDataFileAsync("CurrentUser.gzip");
             await Navigate(typeof(Login));
         }
 

@@ -29,23 +29,31 @@ namespace Cloudsdale.Views {
             JoinAnimation.Begin();
             var tryagain = true;
             while (tryagain) {
-                var response = await ConnectionController.Connect();
-                if (response != null && (response.Successful ?? false)) {
-                    foreach (var cloud in ConnectionController.CurrentUser.Clouds) {
-                        ConnectionController.Subscribe(cloud.Id);
+                bool fail = false;
+                try {
+                    var response = await ConnectionController.Connect();
+                    if (response != null && (response.Successful ?? false)) {
+                        foreach (var cloud in ConnectionController.CurrentUser.Clouds) {
+                            ConnectionController.Subscribe(cloud);
+                        }
+                        await Navigate(typeof (Home));
+                        tryagain = false;
+                    } else {
+                        fail = true;
                     }
-                    await Navigate(typeof(Home));
-                    tryagain = false;
-                } else {
-                    var dialog = new MessageDialog("There was an error connecting to cloudsdale.");
-                    dialog.Commands.Clear();
-                    dialog.Commands.Add(new UICommand("Retry"));
-                    dialog.Commands.Add(new UICommand("Quit"));
-                    dialog.DefaultCommandIndex = 0;
-                    dialog.CancelCommandIndex = 1;
-                    if ((await dialog.ShowAsync()).Label != "Retry") {
-                        Application.Current.Exit();
-                    }
+                } catch {
+                    fail = true;
+                }
+                if (!fail) continue;
+                var dialog = new MessageDialog("There was an error connecting to cloudsdale.");
+                dialog.Commands.Clear();
+                dialog.Commands.Add(new UICommand("Retry"));
+                dialog.Commands.Add(new UICommand("Quit"));
+                dialog.DefaultCommandIndex = 0;
+                dialog.CancelCommandIndex = 1;
+                if ((await dialog.ShowAsync()).Label != "Retry") {
+                    Application.Current.Exit();
+                    return;
                 }
             }
         }

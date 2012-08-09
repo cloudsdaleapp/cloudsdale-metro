@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using Cloudsdale.Models.Json;
 using Windows.UI.Core;
 
@@ -10,9 +11,13 @@ namespace Cloudsdale.Controllers.Data {
             get { return _messages; }
         }
 
-        public void Add(Message message) {
+        public async Task Add(Message message) {
+            foreach (var m in _messages) {
+                if (m.Id == message.Id) return;
+            }
+
             if (Helpers.UIAccess) InternalAdd(message);
-            else Helpers.RunInUI(() => InternalAdd(message), CoreDispatcherPriority.Low);
+            else await Helpers.RunInUI(() => InternalAdd(message), CoreDispatcherPriority.Low);
         }
 
         private void InternalAdd(Message message) {

@@ -9,14 +9,32 @@
 
     <Page.Resources>
         <DataTemplate x:Name="ChatTemplate">
-            <Grid Margin="0,0,15,0">
+            <Grid Margin="0,0,15,0" Loaded="ChatGridLoaded">
+                <Grid.Resources>
+                    <Storyboard x:Key="spinner">
+                        <DoubleAnimation Storyboard.TargetProperty="RotationY"
+                                         Storyboard.TargetName="imgproj"
+                                         From="0" To="360" RepeatBehavior="Forever" Duration="0:0:.1" />
+                    </Storyboard>
+                </Grid.Resources>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="60" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Image Grid.Column="0" Source="{Binding Path=User.Avatar.Normal}" 
-                       Margin="5" Width="50" Height="50" VerticalAlignment="Top" />
-                <ItemsControl Grid.Column="1" ItemsSource="{Binding Path=Lines}" VerticalAlignment="Top" />
+                       Margin="5" Width="50" Height="50" VerticalAlignment="Top">
+                    <Image.Projection>
+                        <PlaneProjection x:Name="imgproj" />
+                    </Image.Projection>
+                </Image>
+                <StackPanel Orientation="Horizontal" Grid.Column="1">
+                    <TextBlock Text="{Binding Path=User.Name}" Foreground="#ff404040"
+                               FontSize="20" Margin="0,0,5,0"/>
+                    <TextBlock Text="{Binding Path=User.RoleTag}" FontSize="20"
+                               Foreground="{Binding Path=User.RoleBrush}" />
+                </StackPanel>
+                <ItemsControl Grid.Column="1" ItemsSource="{Binding Path=Lines}" VerticalAlignment="Top"
+                              Margin="0,20,0,0"/>
             </Grid>
         </DataTemplate>
         <DataTemplate x:Name="DropTemplate">
@@ -46,7 +64,8 @@
                 <ItemsControl Name="DropItems" />
             </StackPanel>
         </ScrollViewer>
-        <ScrollViewer Grid.Column="1" HorizontalAlignment="Stretch" Name="ChatViewer">
+
+        <ScrollViewer Grid.Column="1" HorizontalAlignment="Stretch" Name="ChatViewer" Margin="0,0,0,75">
             <ScrollViewer.Background>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
                     <GradientStop Offset="0" Color="#FFE0E0E0" />
@@ -55,17 +74,20 @@
             </ScrollViewer.Background>
             <ItemsControl ItemTemplate="{StaticResource ChatTemplate}" Name="ChatItems" />
         </ScrollViewer>
+        <TextBox x:Name="SendBox" Height="75" VerticalAlignment="Bottom" Grid.Column="1" 
+                 KeyDown="SendBoxKeyDown" KeyUp="SendBoxKeyUp" />
+
         <ScrollViewer Grid.Column="2">
 
         </ScrollViewer>
+
         <ScrollViewer Grid.Column="3" DataContext="{StaticResource CurrentUser}">
             <ItemsControl ItemsSource="{Binding Path=Clouds}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Button Padding="5" IsEnabled="{Binding Path=IsNotCurrentCloud}" 
-                                Width="85" Height="85">
+                        <Button Padding="5" Width="85" Height="85" Click="CloudClick">
                             <Image Source="{Binding Path=Avatar.Normal}" Width="65" Height="65"
-                                   Stretch="FIll"/>
+                                   Stretch="Fill"/>
                         </Button>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>

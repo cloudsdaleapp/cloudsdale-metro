@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 using Cloudsdale.Models.Json;
 using MetroFayeClient;
 using MetroFayeClient.FayeObjects;
-using Windows.Storage;
-using Windows.Storage.Streams;
+using Newtonsoft.Json;
 using Windows.UI.Xaml;
 
 namespace Cloudsdale.Controllers.Data {
@@ -17,7 +19,7 @@ namespace Cloudsdale.Controllers.Data {
         private static LoggedInUser _currentUser;
         public static LoggedInUser CurrentUser {
             get { return _currentUser; }
-            set { 
+            set {
                 _currentUser = value;
                 Application.Current.Resources["CurrentUser"] = value;
             }
@@ -35,12 +37,12 @@ namespace Cloudsdale.Controllers.Data {
         }
 
         static async void FayeMessageReceived(FayeConnector sender, FayeMessageEventArgs e) {
-            var chansplit = e.Channel.Split(new[] {'/'}, StringSplitOptions.RemoveEmptyEntries);
+            var chansplit = e.Channel.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
             if (chansplit.Length < 3) return;
             if (chansplit[0] != "clouds") return;
             CloudProcessor processor;
             if (CloudProcessors.ContainsKey(chansplit[1])) {
-                processor = GetProcessor(chansplit[1]);
+                processor = CloudProcessors[chansplit[1]];
             } else {
                 return;
             }
@@ -53,7 +55,9 @@ namespace Cloudsdale.Controllers.Data {
                     var user = await Helpers.DeserializeAsync<ChannelMessage<User>>(e.Data);
                     processor.UserProcessor.Heartbeat(UserProcessor.RegisterData(user.Data));
                     break;
-                default:
+                case "drops":
+                    var drop = await Helpers.DeserializeAsync<ChannelMessage<Drop>>(e.Data);
+                    processor.DropProcessor.Add(drop.Data);
                     break;
             }
         }
@@ -89,30 +93,69 @@ namespace Cloudsdale.Controllers.Data {
         #endregion
 
         #region Messages, Drops, And Subscription
-        public static async Task<CloudProcessor> Subscribe(string cloud) {
+        public static async Task<CloudProcessor> Subscribe(Cloud cloud) {
             CloudProcessor processor;
-            if (CloudProcessors.ContainsKey(cloud)) {
-                processor = CloudProcessors[cloud];
+            if (CloudProcessors.ContainsKey(cloud.Id)) {
+                processor = CloudProcessors[cloud.Id];
             } else {
-                processor = CloudProcessors[cloud] = new CloudProcessor();
+                processor = CloudProcessors[cloud.Id] = new CloudProcessor(cloud);
             }
-            if (Faye.IsSubscribed(("/clouds/{id}/users".Replace("{id}", cloud)))) {
+            if (Faye.IsSubscribed(("/clouds/{id}/users".Replace("{id}", cloud.Id)))) {
                 return processor;
             }
             Debug.WriteLine("Starting subscribe of chat");
-            await Faye.Subscribe("/clouds/{id}/chat/messages".Replace("{id}", cloud));
+            await Faye.Subscribe("/clouds/{id}/chat/messages".Replace("{id}", cloud.Id));
             Debug.WriteLine("Starting subscribe of drops");
-            await Faye.Subscribe("/clouds/{id}/drops".Replace("{id}", cloud));
+            await Faye.Subscribe("/clouds/{id}/drops".Replace("{id}", cloud.Id));
             Debug.WriteLine("Starting subscribe of users");
-            await Faye.Subscribe("/clouds/{id}/users".Replace("{id}", cloud));
-            var messages = await WebData.GetDataAsync<Message[]>(WebserviceItem.Messages, cloud);
-            foreach (var message in messages.Data) processor.MessageProcessor.Add(message);
+            await Faye.Subscribe("/clouds/{id}/users".Replace("{id}", cloud.Id));
+            var messages = await WebData.GetDataAsync<Message[]>(WebserviceItem.Messages, cloud.Id);
+            foreach (var message in messages.Data) await processor.MessageProcessor.Add(message);
+            var drops = await WebData.GetDataAsync<Drop[]>(WebserviceItem.Drops, cloud.Id);
             return processor;
         }
 
-        public static CloudProcessor GetProcessor(string cloud) {
-            return CloudProcessors[cloud];
+        public static CloudProcessor GetProcessor(Cloud cloud) {
+            return CloudProcessors.ContainsKey(cloud.Id) ? CloudProcessors[cloud.Id] :
+                CloudProcessors[cloud.Id] = new CloudProcessor(cloud);
+        }
+
+        public static async Task SendMessage(Cloud cloud, string message) {
+            var data = Encoding.UTF8.GetBytes(await Helpers.SerializeAsync(new SendMessageData {
+                Content = message,
+                ClientID = Faye.ClientID
+            }));
+            var request =
+                WebRequest.CreateHttp("http://cloudsdale.org/v1/clouds/{id}/chat/messages"
+                .Replace("{id}", cloud.Id));
+            request.Accept = "application/json";
+            request.Method = "POST";
+            request.ContentType = "application/json";
+            request.Headers["X-Auth-Token"] = CurrentUser.AuthToken;
+            try {
+                using (var requestStream = await Task<Stream>.Factory.FromAsync(
+                           request.BeginGetRequestStream,
+                           request.EndGetRequestStream,
+                           null)) {
+                    await requestStream.WriteAsync(data, 0, data.Length);
+                    await requestStream.FlushAsync();
+                }
+                var response = await Task<WebResponse>.Factory.FromAsync(
+                    request.BeginGetResponse,
+                    request.EndGetResponse, null);
+                response.GetResponseStream().Dispose();
+            } catch (Exception e) {
+                Debugger.Break();
+            }
         }
         #endregion
+
+        [JsonObject]
+        public class SendMessageData {
+            [JsonProperty("content")]
+            public string Content;
+            [JsonProperty("client_id")]
+            public string ClientID;
+        }
     }
 }

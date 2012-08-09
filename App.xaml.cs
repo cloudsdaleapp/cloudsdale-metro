@@ -1,7 +1,9 @@
 ﻿using System;
 using Cloudsdale.Controllers.Data;
+using Cloudsdale.Views;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -34,8 +36,15 @@ namespace Cloudsdale {
 
             // Do not repeat app initialization when already running, just ensure that
             // the window is active
+
             if (args.PreviousExecutionState == ApplicationExecutionState.Running) {
                 Window.Current.Activate();
+                if (ConnectionController.Faye != null &&
+                    !ConnectionController.Faye.Connected &&
+                    ConnectionController.CurrentUser != null &&
+                    Window.Current.Content is Frame) {
+                    (Window.Current.Content as Frame).Navigate(typeof(Loading));
+                }
                 return;
             }
 
@@ -45,7 +54,12 @@ namespace Cloudsdale {
 
             // Create a Frame to act navigation context and navigate to the first page
             var rootFrame = new Frame();
-            if (!rootFrame.Navigate(typeof(Views.Login))) {
+
+            if (ConnectionController.Faye != null &&
+                !ConnectionController.Faye.Connected &&
+                ConnectionController.CurrentUser != null) {
+                rootFrame.Navigate(typeof(Loading));
+            } else if (!rootFrame.Navigate(typeof(Login))) {
                 throw new Exception("Failed to create initial page");
             }
 

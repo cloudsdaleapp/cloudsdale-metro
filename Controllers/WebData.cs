@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Cloudsdale.Controllers.Data;
 using Cloudsdale.Models.Web;
 
 namespace Cloudsdale.Controllers {
@@ -89,6 +91,7 @@ namespace Cloudsdale.Controllers {
                 using (var responseReader = new StreamReader(responseStream)) {
                     responseString = await responseReader.ReadToEndAsync();
                 }
+                if (typeof(T) == typeof(ConnectionController.SendMessageData)) Debugger.Break();
                 var responseData = await Helpers.DeserializeAsync<WebJsonResponse<T>>(responseString);
                 return responseData;
             } catch (Exception e) {

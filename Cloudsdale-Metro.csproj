@@ -112,6 +112,7 @@
     <Compile Include="Common\SuspensionManager.cs" />
     <Compile Include="Controllers\Data\CloudProcessor.cs" />
     <Compile Include="Controllers\Data\ConnectionController.cs" />
+    <Compile Include="Controllers\Data\DropProcessor.cs" />
     <Compile Include="Controllers\Data\UserProcessor.cs" />
     <Compile Include="Controllers\Login\EmailLogin.cs" />
     <Compile Include="Controllers\Login\ILoginProcessor.cs" />

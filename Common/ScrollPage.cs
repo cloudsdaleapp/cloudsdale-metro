@@ -95,6 +95,10 @@ namespace Cloudsdale.Common {
             Timer.Start();
         }
 
+        public void Stop() {
+            Timer.Stop();
+        }
+
         void TimerTick(object sender, object o) {
             CurrentVerticalOffset += VerticalOffsetIncrement;
             if (VerticalOffsetIncrement > 0 && CurrentVerticalOffset > NewVerticalOffset ||

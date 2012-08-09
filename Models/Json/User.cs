@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using Cloudsdale.Controllers.Data;
 using Newtonsoft.Json;
 using Windows.UI;
+using Windows.UI.Core;
 using Windows.UI.Xaml.Media;
 
 namespace Cloudsdale.Models.Json {
@@ -85,7 +87,7 @@ namespace Cloudsdale.Models.Json {
     }
 
     [JsonObject(MemberSerialization.OptIn)]
-    public class LoggedInUser : User {
+    public class LoggedInUser : User, INotifyPropertyChanged {
         [JsonProperty("auth_token")]
         public string AuthToken;
         [JsonProperty("email")]
@@ -141,6 +143,22 @@ namespace Cloudsdale.Models.Json {
         private readonly ObservableCollection<Cloud> _clouds = new ObservableCollection<Cloud>();
         public ObservableCollection<Cloud> Clouds {
             get { return _clouds; }
-        } 
+        }
+
+        public void CloudsChanged() {
+            if (Helpers.UIAccess) CloudsChangedInternal();
+            else Helpers.RunInUI(CloudsChangedInternal, CoreDispatcherPriority.Normal);
+        }
+
+        private void CloudsChangedInternal() {
+            OnPropertyChanged("Clouds");
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged(string propertyName) {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 }
