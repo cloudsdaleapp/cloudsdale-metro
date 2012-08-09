@@ -189,6 +189,12 @@
       <HintPath>Common\Newtonsoft.Json.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MetroFayeClient\MetroFayeClient.csproj">
+      <Project>{eeec699a-198c-4766-8016-a964f8cfa814}</Project>
+      <Name>MetroFayeClient</Name>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '11.0' ">
     <VisualStudioVersion>11.0</VisualStudioVersion>
   </PropertyGroup>
