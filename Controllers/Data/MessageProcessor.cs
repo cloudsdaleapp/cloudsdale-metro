@@ -26,8 +26,10 @@ namespace Cloudsdale.Controllers.Data {
 
             if (i > 0 && _messages[i - 1].User.Id == message.User.Id) {
                 _messages[i - 1].AddSubMessage(message);
+                _messages[i - 1] = _messages[i - 1];
             } else if (_messages.Count > 0 && i < _messages.Count && _messages[i].User.Id == message.User.Id) {
                 _messages[i].AddSubMessage(message);
+                _messages[i] = _messages[i];
             } else {
                 _messages.Insert(i, message);
                 while (_messages.Count > 50) {

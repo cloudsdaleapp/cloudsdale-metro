@@ -34,6 +34,7 @@ namespace Cloudsdale.Views {
         }
 
         private async Task Navigate(Type t) {
+            await Task.Delay(0);
             Frame.Navigate(t);
         }
 

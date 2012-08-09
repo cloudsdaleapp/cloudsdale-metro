@@ -31,7 +31,7 @@ namespace Cloudsdale.Views {
             SetCloud(ConnectionController.CurrentCloud);
         }
 
-        public void SetCloud(Cloud cloud) {
+        public async Task SetCloud(Cloud cloud) {
 
             if (ThisCloud != null) {
                 ThisCloud.Processor.MessageProcessor.Messages.CollectionChanged -= MessageReceived;
@@ -40,10 +40,24 @@ namespace Cloudsdale.Views {
             ThisCloud = cloud;
             DataContext = cloud;
             var controller = cloud.Processor;
+
+            if (!cloud.IsDataPreloaded) {
+                ShowCover();
+                ChatItems.ItemsSource = new Message[0];
+                DropItems.ItemsSource = new Drop[0];
+                UserItems.ItemsSource = new CensusUser[0];
+
+                await cloud.PreloadData();
+
+                HideCover();
+            }
+
             ChatItems.ItemsSource = controller.MessageProcessor.Messages;
+            DropItems.ItemsSource = controller.DropProcessor.Drops;
+            UserItems.ItemsSource = controller.UserProcessor.UserList;
             ThreadPool.RunAsync(async o => {
                 await Task.Delay(100);
-                Helpers.RunInUI(() => ChatScroller.Bottom(), CoreDispatcherPriority.Low);
+                Helpers.RunInUI(() => ChatViewer.ScrollToVerticalOffset(double.PositiveInfinity), CoreDispatcherPriority.Low);
             });
             ConnectionController.CurrentUser.CloudsChanged();
 
@@ -72,43 +86,37 @@ namespace Cloudsdale.Views {
             ChatScroller.Bottom();
         }
 
-        private void CloudClick(object sender, RoutedEventArgs e) {
+        private async void CloudClick(object sender, RoutedEventArgs e) {
             var button = (Button)sender;
             var cloud = (Cloud)button.DataContext;
-            SetCloud(cloud);
+            await SetCloud(cloud);
         }
 
         private static readonly Random Rand = new Random();
         private void ChatGridLoaded(object sender, RoutedEventArgs e) {
-            var grid = (Grid) sender;
+            var grid = (Grid)sender;
             var anim = (Storyboard)grid.Resources["spinner"];
             anim.Children[0].Duration = new Duration(new TimeSpan(Rand.Next(5000000, 10000000)));
             //anim.Begin();
         }
 
-        private bool _shiftpressed;
         private async void SendBoxKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e) {
-            switch (e.Key) {
-                case VirtualKey.Shift:
-                    _shiftpressed = true;
-                    break;
-                case VirtualKey.Enter:
-                    if (!_shiftpressed) {
-                        e.Handled = true;
-                        SendBox.IsEnabled = false;
-                        var text = SendBox.Text;
-                        SendBox.Text = "";
-                        await ConnectionController.SendMessage(ThisCloud, text);
-                        SendBox.IsEnabled = true;
-                    } else {
-                        SendBox.Text += "\n";
-                    }
-                    break;
-            }
+            if (e.Key != VirtualKey.Enter) return;
+            e.Handled = true;
+            SendBox.IsEnabled = false;
+            var text = SendBox.Text;
+            SendBox.Text = "";
+            await ConnectionController.SendMessage(ThisCloud, text);
+            SendBox.IsEnabled = true;
         }
 
-        private void SendBoxKeyUp(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e) {
-            if (e.Key == VirtualKey.Shift) _shiftpressed = false;
+        void ShowCover() {
+            coverBGB.Width = Window.Current.Bounds.Width;
+            coverBGB.Height = Window.Current.Bounds.Height;
+            coverBG.IsOpen = true;
+        }
+        void HideCover() {
+            coverBG.IsOpen = false;
         }
     }
 }

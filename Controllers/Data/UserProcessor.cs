@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Cloudsdale.Models.Json;
 using Windows.UI.Core;
@@ -13,7 +12,7 @@ namespace Cloudsdale.Controllers.Data {
         private static readonly Dictionary<string, CensusUser> Users =
                             new Dictionary<string, CensusUser>();
 
-        public static User RegisterData(CloudsdaleItem user) {
+        public static CensusUser RegisterData(CloudsdaleItem user) {
             if (user == null) return null;
             CensusUser cuser;
             lock (Users) {
@@ -96,7 +95,48 @@ namespace Cloudsdale.Controllers.Data {
 
         #region Member
         public void Heartbeat(ListUser user) {
+            var cuser = RegisterData(user);
+            _lastCheckIn[cuser.Id] = DateTime.Now;
+            if (!_users.Contains(cuser)) {
+                AddUser(cuser);
+            }
+            Timeout(cuser);
+        }
 
+        public ObservableCollection<CensusUser> UserList {
+            get { return _users; }
+        } 
+
+        private readonly ObservableCollection<CensusUser> _users = new ObservableCollection<CensusUser>();
+        private readonly Dictionary<string, DateTime> _lastCheckIn = new Dictionary<string, DateTime>();
+        private readonly TimeSpan _maxHeartbeatTime = new TimeSpan(0, 0, 45);
+
+        private async void Timeout(CensusUser user) {
+            await Task.Delay(45000);
+
+            if (!_users.Contains(user)) return;
+
+            if (!_lastCheckIn.ContainsKey(user.Id)) {
+                RemUser(user);
+                return;
+            }
+
+            if (DateTime.Now - _lastCheckIn[user.Id] > _maxHeartbeatTime) {
+                RemUser(user);
+                return;
+            }
+
+            Timeout(user);
+        }
+
+        void AddUser(CensusUser user) {
+            if (Helpers.UIAccess) _users.Add(user);
+            else Helpers.RunInUI(() => _users.Add(user), CoreDispatcherPriority.Low);
+        }
+
+        void RemUser(CensusUser user) {
+            if (Helpers.UIAccess) _users.Remove(user);
+            else Helpers.RunInUI(() => _users.Remove(user), CoreDispatcherPriority.Low);
         }
         #endregion
     }

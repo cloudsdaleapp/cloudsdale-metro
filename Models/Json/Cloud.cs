@@ -1,12 +1,17 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Threading.Tasks;
+using Cloudsdale.Controllers;
 using Cloudsdale.Controllers.Data;
 using Newtonsoft.Json;
-using Windows.UI.Xaml;
 
 namespace Cloudsdale.Models.Json {
     [JsonObject(MemberSerialization.OptIn)]
     public class Cloud : CloudsdaleItem, INotifyPropertyChanged {
+        public Cloud() {
+            IsDataPreloaded = false;
+        }
+
         [JsonProperty("name")]
         public string Name { get; set; }
         [JsonProperty("description")]
@@ -48,6 +53,22 @@ namespace Cloudsdale.Models.Json {
 
         public CloudProcessor Processor {
             get { return ConnectionController.GetProcessor(this); }
+        }
+
+        public bool IsDataPreloaded { get; private set; }
+
+        private bool _inloading;
+        public async Task PreloadData() {
+            if (_inloading) return;
+            _inloading = true;
+            var messages = await WebData.GetDataAsync<Message[]>(WebserviceItem.Messages, Id);
+            foreach (var message in messages.Data) {
+                Processor.MessageProcessor.Add(message);
+            }
+            var drops = await WebData.GetDataAsync<Drop[]>(WebserviceItem.Drops, Id);
+            Processor.DropProcessor.Backload(drops.Data);
+            IsDataPreloaded = true;
+            _inloading = false;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

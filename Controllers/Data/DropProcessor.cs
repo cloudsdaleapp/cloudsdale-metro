@@ -30,7 +30,7 @@ namespace Cloudsdale.Controllers.Data {
                 return false;
             }
             var drops = result.Data;
-            Backload(drops);
+            await Backload(drops);
             return true;
         }
 

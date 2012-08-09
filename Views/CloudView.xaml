@@ -34,7 +34,9 @@
                                Foreground="{Binding Path=User.RoleBrush}" />
                 </StackPanel>
                 <ItemsControl Grid.Column="1" ItemsSource="{Binding Path=Lines}" VerticalAlignment="Top"
-                              Margin="0,20,0,0"/>
+                              Margin="0,25,0,5"/>
+                <TextBlock Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top"
+                           Text="{Binding Path=TimeString}"  Foreground="#ff4f4f4f"/>
             </Grid>
         </DataTemplate>
         <DataTemplate x:Name="DropTemplate">
@@ -65,7 +67,7 @@
             </StackPanel>
         </ScrollViewer>
 
-        <ScrollViewer Grid.Column="1" HorizontalAlignment="Stretch" Name="ChatViewer" Margin="0,0,0,75">
+        <ScrollViewer Grid.Column="1" HorizontalAlignment="Stretch" Name="ChatViewer" Margin="0,0,0,40">
             <ScrollViewer.Background>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
                     <GradientStop Offset="0" Color="#FFE0E0E0" />
@@ -74,11 +76,21 @@
             </ScrollViewer.Background>
             <ItemsControl ItemTemplate="{StaticResource ChatTemplate}" Name="ChatItems" />
         </ScrollViewer>
-        <TextBox x:Name="SendBox" Height="75" VerticalAlignment="Bottom" Grid.Column="1" 
-                 KeyDown="SendBoxKeyDown" KeyUp="SendBoxKeyUp" />
+        <TextBox x:Name="SendBox" Height="40" VerticalAlignment="Bottom" Grid.Column="1" 
+                 KeyDown="SendBoxKeyDown" FontSize="20" />
 
         <ScrollViewer Grid.Column="2">
-
+            <ItemsControl Name="UserItems">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="{Binding Path=Avatar.Thumb}"
+                                   Width="25" Height="25"/>
+                            <TextBlock Foreground="#ff4f4f4f" FontSize="14" Text="{Binding Path=Name}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </ScrollViewer>
 
         <ScrollViewer Grid.Column="3" DataContext="{StaticResource CurrentUser}">
@@ -93,5 +105,10 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </ScrollViewer>
+        <Popup x:Name="coverBG">
+            <Border Background="#4f000000" x:Name="coverBGB">
+                <ProgressRing Width="200" Height="200" IsActive="True" />
+            </Border>
+        </Popup>
     </Grid>
 </Page>

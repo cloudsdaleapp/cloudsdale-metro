@@ -50,7 +50,8 @@ namespace Cloudsdale.Models.Json {
                     var para = new Paragraph();
                     var txt = Helpers.ParseLiteral(msg.Content);
                     var split = txt.Replace("\r", "").Split('\n');
-                    foreach (var line in split) {
+                    for (var i = 0; i < split.Length; i++) {
+                        var line = split[i];
                         var thislinecolor = new SolidColorBrush(
                             line.StartsWith(">") ? Colors.Green : Colors.Black);
                         if (LinkRegex.IsMatch(line)) {
@@ -72,13 +73,21 @@ namespace Cloudsdale.Models.Json {
                                 para.Inlines.Add(new InlineUIContainer {
                                     Child = link,
                                 });
-                                
+
                                 remaining = remaining.Substring(match.Length + match.Index);
                             }
-                            para.Inlines.Add(new Run { Text = remaining, Foreground = thislinecolor });
+                            para.Inlines.Add(new Run {
+                                Text = remaining,
+                                Foreground = thislinecolor
+                            });
                         } else {
-                            para.Inlines.Add(new Run { Text = line, Foreground = thislinecolor });
+                            para.Inlines.Add(new Run {
+                                Text = line,
+                                Foreground = thislinecolor
+                            });
                         }
+                        if (i < split.Length - 1)
+                            para.Inlines.Add(new LineBreak());
                     }
                     block.Blocks.Add(para);
                 }
@@ -102,6 +111,10 @@ namespace Cloudsdale.Models.Json {
 
         public int CompareTo(Message other) {
             return other == null ? 1 : (TimeStamp ?? new DateTime(0)).CompareTo(other.TimeStamp ?? new DateTime(0));
+        }
+
+        public string TimeString {
+            get { return (TimeStamp ?? new DateTime(0)).ToString("t"); }
         }
     }
 

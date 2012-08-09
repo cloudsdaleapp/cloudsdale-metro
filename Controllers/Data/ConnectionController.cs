@@ -52,8 +52,8 @@ namespace Cloudsdale.Controllers.Data {
                     processor.MessageProcessor.Add(message.Data);
                     break;
                 case "users":
-                    var user = await Helpers.DeserializeAsync<ChannelMessage<User>>(e.Data);
-                    processor.UserProcessor.Heartbeat(UserProcessor.RegisterData(user.Data));
+                    var user = await Helpers.DeserializeAsync<ChannelMessage<ListUser>>(e.Data);
+                    processor.UserProcessor.Heartbeat(user.Data);
                     break;
                 case "drops":
                     var drop = await Helpers.DeserializeAsync<ChannelMessage<Drop>>(e.Data);
@@ -109,9 +109,6 @@ namespace Cloudsdale.Controllers.Data {
             await Faye.Subscribe("/clouds/{id}/drops".Replace("{id}", cloud.Id));
             Debug.WriteLine("Starting subscribe of users");
             await Faye.Subscribe("/clouds/{id}/users".Replace("{id}", cloud.Id));
-            var messages = await WebData.GetDataAsync<Message[]>(WebserviceItem.Messages, cloud.Id);
-            foreach (var message in messages.Data) await processor.MessageProcessor.Add(message);
-            var drops = await WebData.GetDataAsync<Drop[]>(WebserviceItem.Drops, cloud.Id);
             return processor;
         }
 
@@ -126,24 +123,21 @@ namespace Cloudsdale.Controllers.Data {
                 ClientID = Faye.ClientID
             }));
             var request =
-                WebRequest.CreateHttp("http://cloudsdale.org/v1/clouds/{id}/chat/messages"
+                WebRequest.CreateHttp("http://www.cloudsdale.org/v1/clouds/{id}/chat/messages"
                 .Replace("{id}", cloud.Id));
             request.Accept = "application/json";
             request.Method = "POST";
             request.ContentType = "application/json";
             request.Headers["X-Auth-Token"] = CurrentUser.AuthToken;
             try {
-                using (var requestStream = await Task<Stream>.Factory.FromAsync(
-                           request.BeginGetRequestStream,
-                           request.EndGetRequestStream,
-                           null)) {
+                using (var requestStream = await request.GetRequestStreamAsync()) {
                     await requestStream.WriteAsync(data, 0, data.Length);
                     await requestStream.FlushAsync();
                 }
-                var response = await Task<WebResponse>.Factory.FromAsync(
-                    request.BeginGetResponse,
-                    request.EndGetResponse, null);
-                response.GetResponseStream().Dispose();
+                using (var response = await request.GetResponseAsync()) {
+                    response.GetResponseStream().Dispose();
+                }
+
             } catch (Exception e) {
                 Debugger.Break();
             }
