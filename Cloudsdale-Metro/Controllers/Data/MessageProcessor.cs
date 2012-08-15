@@ -20,9 +20,10 @@ namespace Cloudsdale.Controllers.Data {
             else await Helpers.RunInUI(() => InternalAdd(message), CoreDispatcherPriority.Low);
         }
 
+        readonly Message.BaseComparer _comparer = new Message.BaseComparer();
         private void InternalAdd(Message message) {
             var i = 0;
-            while (i < _messages.Count && message.CompareTo(_messages[i]) >= 0) ++i;
+            while (i < _messages.Count && _comparer.Compare(message, _messages[i]) >= 0) ++i;
 
             if (i > 0 && _messages[i - 1].User.Id == message.User.Id) {
                 _messages[i - 1].AddSubMessage(message);

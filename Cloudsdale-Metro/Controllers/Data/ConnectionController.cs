@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -10,6 +9,7 @@ using Cloudsdale.Models.Json;
 using MetroFayeClient;
 using MetroFayeClient.FayeObjects;
 using Newtonsoft.Json;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
 
 namespace Cloudsdale.Controllers.Data {
@@ -17,6 +17,8 @@ namespace Cloudsdale.Controllers.Data {
         #region Members
         public static FayeConnector Faye;
         private static LoggedInUser _currentUser;
+        private static DateTime _lastMessage = DateTime.Now;
+        public static event Action LostConnection;
         public static LoggedInUser CurrentUser {
             get { return _currentUser; }
             set {
@@ -36,7 +38,51 @@ namespace Cloudsdale.Controllers.Data {
             return await Faye.ConnectAsync(new Uri("ws://push01.cloudsdale.org/push"));
         }
 
+        public static async void ReceiveTimeout() {
+            await Task.Delay(10000);
+            if (_lastMessage < DateTime.Now.AddSeconds(-30)) {
+                if (CurrentUser == null) return;
+                if (CurrentUser.Clouds.Any(cloud => cloud.IsDataPreloaded)) {
+                    if (LostConnection != null)
+                        LostConnection();
+                }
+            }
+        }
+
+        public static async Task<bool> HandledUIConnect() {
+            var tryagain = true;
+            while (tryagain) {
+                var fail = false;
+                try {
+                    var response = await Connect();
+                    if (response != null && (response.Successful ?? false)) {
+                        foreach (var cloud in CurrentUser.Clouds) {
+                            Subscribe(cloud);
+                        }
+                        tryagain = false;
+                    } else {
+                        fail = true;
+                    }
+                } catch {
+                    fail = true;
+                }
+                if (!fail) continue;
+                var dialog = new MessageDialog("There was an error connecting to cloudsdale.");
+                dialog.Commands.Clear();
+                dialog.Commands.Add(new UICommand("Retry"));
+                dialog.Commands.Add(new UICommand("Quit"));
+                dialog.DefaultCommandIndex = 0;
+                dialog.CancelCommandIndex = 1;
+                if ((await dialog.ShowAsync()).Label != "Retry") {
+                    Application.Current.Exit();
+                    return false;
+                }
+            }
+            return true;
+        }
+
         static async void FayeMessageReceived(FayeConnector sender, FayeMessageEventArgs e) {
+            _lastMessage = DateTime.Now;
             var chansplit = e.Channel.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
             if (chansplit.Length < 3) return;
             if (chansplit[0] != "clouds") return;
@@ -108,8 +154,33 @@ namespace Cloudsdale.Controllers.Data {
             Debug.WriteLine("Starting subscribe of drops");
             await Faye.Subscribe("/clouds/{id}/drops".Replace("{id}", cloud.Id));
             Debug.WriteLine("Starting subscribe of users");
-            await Faye.Subscribe("/clouds/{id}/users".Replace("{id}", cloud.Id));
+
+            Broadcast(cloud);
+
             return processor;
+        }
+
+        public static bool IsSubscribed(string cloudid) {
+            return Faye.IsSubscribed(("/clouds/{id}/users".Replace("{id}", cloudid)));
+        }
+
+        /// <summary>
+        /// Begins broadcasting the user's presence into the cloud until the user is no longer subscribed
+        /// </summary>
+        static async void Broadcast(Cloud cloud) {
+            // If the faye service is no longer connected, or if we are no longer subscribed stop the broadcast
+            if (Faye == null || !Faye.Connected || !IsSubscribed(cloud.Id)) return;
+
+            // Broadcasts the user's Id, Name, and Avatar into the users channel
+            await Faye.Publish("/clouds/" + cloud.Id + "/users", new ListUser {
+                Id = CurrentUser.Id,
+                Name = CurrentUser.Name,
+                Avatar = CurrentUser.Avatar,
+            });
+
+            // Waits 30 seconds and broadcasts again
+            await Task.Delay(30000);
+            Broadcast(cloud);
         }
 
         public static CloudProcessor GetProcessor(Cloud cloud) {

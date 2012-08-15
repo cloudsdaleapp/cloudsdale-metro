@@ -19,7 +19,7 @@ namespace Cloudsdale.Models.Json {
     }
 
     [JsonObject(MemberSerialization.OptIn)]
-    public class ChatUser : ListUser {
+    public class ChatUser : ListUser, INotifyPropertyChanged {
         [JsonProperty("role")]
         public string Role;
 
@@ -58,6 +58,13 @@ namespace Cloudsdale.Models.Json {
             get { return new SolidColorBrush(RoleColor); }
         }
         #endregion
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged(string propertyName) {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 
     [JsonObject(MemberSerialization.OptIn)]
@@ -104,7 +111,8 @@ namespace Cloudsdale.Models.Json {
                 var clouds = new Cloud[_clouds.Count];
                 _clouds.CopyTo(clouds, 0);
                 return clouds;
-            } set {
+            }
+            set {
                 if (_clouds.Count < 1) {
                     var indices = new SortedDictionary<int, int>();
                     var unadded = new List<int>();

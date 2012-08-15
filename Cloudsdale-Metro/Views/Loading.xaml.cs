@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Cloudsdale.Controllers.Data;
+using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Navigation;
@@ -28,33 +29,11 @@ namespace Cloudsdale.Views {
         protected override async void OnNavigatedTo(NavigationEventArgs e) {
             JoinAnimation.Begin();
             var tryagain = true;
-            while (tryagain) {
-                bool fail = false;
-                try {
-                    var response = await ConnectionController.Connect();
-                    if (response != null && (response.Successful ?? false)) {
-                        foreach (var cloud in ConnectionController.CurrentUser.Clouds) {
-                            ConnectionController.Subscribe(cloud);
-                        }
-                        await Navigate(typeof (Home));
-                        tryagain = false;
-                    } else {
-                        fail = true;
-                    }
-                } catch {
-                    fail = true;
-                }
-                if (!fail) continue;
-                var dialog = new MessageDialog("There was an error connecting to cloudsdale.");
-                dialog.Commands.Clear();
-                dialog.Commands.Add(new UICommand("Retry"));
-                dialog.Commands.Add(new UICommand("Quit"));
-                dialog.DefaultCommandIndex = 0;
-                dialog.CancelCommandIndex = 1;
-                if ((await dialog.ShowAsync()).Label != "Retry") {
-                    Application.Current.Exit();
-                    return;
-                }
+            if (await ConnectionController.HandledUIConnect()) {
+                ConnectionController.LostConnection += () => Helpers.RunInUI(async () => {
+                    await ConnectionController.HandledUIConnect();
+                }, CoreDispatcherPriority.Normal);
+                await Navigate(typeof(Home));
             }
         }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.IO;
 using System.Threading.Tasks;
 using Cloudsdale.Controllers;
 using Cloudsdale.Controllers.Data;
@@ -66,6 +67,7 @@ namespace Cloudsdale.Models.Json {
                 Processor.MessageProcessor.Add(message);
             }
             var drops = await WebData.GetDataAsync<Drop[]>(WebserviceItem.Drops, Id);
+            await ConnectionController.Faye.Subscribe("/clouds/{id}/users".Replace("{id}", Id));
             Processor.DropProcessor.Backload(drops.Data);
             IsDataPreloaded = true;
             _inloading = false;

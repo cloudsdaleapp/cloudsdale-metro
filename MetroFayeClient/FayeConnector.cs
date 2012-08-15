@@ -18,6 +18,7 @@ namespace MetroFayeClient {
         public event EventHandler<FayeConnector, FayeMessageEventArgs> MessageReceived;
         public event EventHandler<FayeConnector, HandshakeResponse> HandshakeComplete;
         public event EventHandler<FayeConnector, HandshakeResponse> HandshakeFailed;
+        public event EventHandler<FayeConnector, Exception> ClientDisconnected;
 
         public MessageWebSocket Socket { get { return _socket; } }
 
@@ -28,7 +29,10 @@ namespace MetroFayeClient {
             _asyncHandshake = false;
             _socket = new MessageWebSocket();
             _socket.MessageReceived += FayeMessageReceived;
-            _socket.Closed += (sender, args) => Connected = false;
+            _socket.Closed += (sender, args) => { 
+                Connected = false;
+                Event(ClientDisconnected, null);
+            };
             Connected = true;
             await _socket.ConnectAsync(address);
             Send(new HandshakeRequest());

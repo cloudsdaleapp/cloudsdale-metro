@@ -39,9 +39,10 @@ namespace Cloudsdale.Controllers.Data {
             else await Helpers.RunInUI(() => BackloadInternal(drops), CoreDispatcherPriority.Low);
         }
         private void BackloadInternal(IEnumerable<Drop> drops) {
-            foreach (var drop in drops) {
-                _drops.Add(drop);
-            }
+            lock (_drops)
+                foreach (var drop in drops) {
+                    _drops.Add(drop);
+                }
         }
 
         public async Task Add(Drop drop) {
@@ -50,13 +51,16 @@ namespace Cloudsdale.Controllers.Data {
         }
 
         private void AddInternal(Drop drop) {
-            foreach (var d in _drops.Where(d => d.Id == drop.Id)) {
-                _drops.Remove(d);
-            }
+            lock (_drops) {
+                var dtr = _drops.Where(d => d.Id == drop.Id).ToList();
+                foreach (var d in dtr) {
+                    _drops.Remove(d);
+                }
 
-            _drops.Insert(0, drop);
-            while (_drops.Count > _capacity * 10) {
-                _drops.RemoveAt(_drops.Count - 1);
+                _drops.Insert(0, drop);
+                while (_drops.Count > _capacity * 10) {
+                    _drops.RemoveAt(_drops.Count - 1);
+                }
             }
         }
     }
