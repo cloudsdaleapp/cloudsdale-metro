@@ -31,6 +31,7 @@ namespace Cloudsdale.Models.Json {
                         return "founder";
                     case "moderator":
                         return "mod";
+                    case "developer":
                     case "admin":
                     case "donor":
                         return Role;
@@ -50,6 +51,8 @@ namespace Cloudsdale.Models.Json {
                         return Color.FromArgb(0xFF, 0xFF, 0xAF, 0x1F);
                     case "donor":
                         return Color.FromArgb(0xFF, 0x66, 0x00, 0xCC);
+                    case "developer":
+                        return Color.FromArgb(0xFF, 0xCC, 0x66, 0x99);
                 }
                 return default(Color);
             }
@@ -162,10 +165,10 @@ namespace Cloudsdale.Models.Json {
             OnPropertyChanged("Clouds");
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public new event PropertyChangedEventHandler PropertyChanged;
 
-        protected virtual void OnPropertyChanged(string propertyName) {
-            PropertyChangedEventHandler handler = PropertyChanged;
+        protected new virtual void OnPropertyChanged(string propertyName) {
+            var handler = PropertyChanged;
             if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
         }
     }

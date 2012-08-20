@@ -116,7 +116,10 @@
                     </StackPanel>
                 </ScrollViewer>
 
-                <ScrollViewer Grid.Column="5">
+                <TextBlock Grid.Column="5" Foreground="Black" FontSize="20">
+                    Users (<Run Text="{Binding Path=Processor.UserProcessor.UserList.Count}" />)
+                </TextBlock>
+                <ScrollViewer Grid.Column="5" Margin="0,25,0,25">
                     <ItemsControl Name="UserItems">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>

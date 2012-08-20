@@ -25,8 +25,8 @@ namespace Cloudsdale.Views {
 
         public CloudView() {
             InitializeComponent();
-            ChatScroller = new ScrollPage(ChatViewer, .5);
-            ChatScroller2 = new ScrollPage(ChatViewer2, .5);
+            ChatScroller = new ScrollPage(ChatViewer, .2);
+            ChatScroller2 = new ScrollPage(ChatViewer2, .2);
 
             LayoutRoot.MaxHeight = Window.Current.Bounds.Height;
             ChatViewer.Height = Window.Current.Bounds.Height - 80;
@@ -41,6 +41,7 @@ namespace Cloudsdale.Views {
             }
 
             ThisCloud = cloud;
+            ConnectionController.CurrentCloud = cloud;
             DataContext = cloud;
             var controller = cloud.Processor;
 
@@ -71,8 +72,10 @@ namespace Cloudsdale.Views {
 
         public void Bottom(bool animated = true) {
             if (animated) {
-                ChatScroller.Bottom();
-                ChatScroller2.Bottom();
+                lock (ChatScroller) {
+                    ChatScroller.Bottom();
+                    ChatScroller2.Bottom();
+                }
             } else {
                 ChatViewer.ScrollToVerticalOffset(double.PositiveInfinity);
                 ChatViewer2.ScrollToVerticalOffset(double.PositiveInfinity);
@@ -130,8 +133,8 @@ namespace Cloudsdale.Views {
         }
 
         private void DropClick(object sender, RoutedEventArgs e) {
-            var button = (Button) sender;
-            var drop = (Drop) button.DataContext;
+            var button = (Button)sender;
+            var drop = (Drop)button.DataContext;
 
             Launcher.LaunchUriAsync(drop.Url);
         }

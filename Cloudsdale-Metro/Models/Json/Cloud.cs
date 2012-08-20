@@ -1,6 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
-using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Cloudsdale.Controllers;
 using Cloudsdale.Controllers.Data;
@@ -63,8 +63,14 @@ namespace Cloudsdale.Models.Json {
             if (_inloading) return;
             _inloading = true;
             var messages = await WebData.GetDataAsync<Message[]>(WebserviceItem.Messages, Id);
+            var mProcessor = Processor.MessageProcessor;
+            var backlog = mProcessor.Messages.ToList();
+            mProcessor.Messages.Clear();
             foreach (var message in messages.Data) {
-                Processor.MessageProcessor.Add(message);
+                mProcessor.Add(message);
+            }
+            foreach (var message in backlog) {
+                mProcessor.Add(message);
             }
             var drops = await WebData.GetDataAsync<Drop[]>(WebserviceItem.Drops, Id);
             await ConnectionController.Faye.Subscribe("/clouds/{id}/users".Replace("{id}", Id));
@@ -76,7 +82,7 @@ namespace Cloudsdale.Models.Json {
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected virtual void OnPropertyChanged(string propertyName) {
-            PropertyChangedEventHandler handler = PropertyChanged;
+            var handler = PropertyChanged;
             if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
         }
     }
