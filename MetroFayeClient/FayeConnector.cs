@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using MetroFayeClient.FayeObjects;
+using Newtonsoft.Json.Linq;
 using Windows.Networking.Sockets;
 using System.Threading;
 
@@ -29,7 +30,7 @@ namespace MetroFayeClient {
             _asyncHandshake = false;
             _socket = new MessageWebSocket();
             _socket.MessageReceived += FayeMessageReceived;
-            _socket.Closed += (sender, args) => { 
+            _socket.Closed += (sender, args) => {
                 Connected = false;
                 Event(ClientDisconnected, null);
             };
@@ -138,6 +139,14 @@ namespace MetroFayeClient {
 
         public ChannelMessage<T> Deserialize<T>() {
             return Helpers.Deserialize<ChannelMessage<T>>(Data);
+        }
+
+        public JObject AsJLinq {
+            get { return JObject.Parse(Data); }
+        }
+
+        public static explicit operator JObject(FayeMessageEventArgs e) {
+            return e.AsJLinq;
         }
     }
 

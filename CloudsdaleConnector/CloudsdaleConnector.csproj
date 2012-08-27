@@ -104,6 +104,7 @@
     <Compile Include="DataModels\User.cs" />
     <Compile Include="DataModels\WebResponse.cs" />
     <Compile Include="Helpers.cs" />
+    <Compile Include="Negotiation\EmailLogin.cs" />
     <Compile Include="Negotiation\LoginHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
