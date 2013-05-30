@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Windows.Foundation;
@@ -15,13 +14,16 @@ using Windows.UI.Xaml.Navigation;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
-namespace Cloudsdale_Metro {
+namespace Cloudsdale_Metro.Views
+{
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class MainPage {
-        public MainPage() {
-            InitializeComponent();
+    public sealed partial class Connecting : Page
+    {
+        public Connecting()
+        {
+            this.InitializeComponent();
         }
 
         /// <summary>
@@ -29,7 +31,8 @@ namespace Cloudsdale_Metro {
         /// </summary>
         /// <param name="e">Event data that describes how this page was reached.  The Parameter
         /// property is typically used to configure the page.</param>
-        protected override void OnNavigatedTo(NavigationEventArgs e) {
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
         }
     }
 }
