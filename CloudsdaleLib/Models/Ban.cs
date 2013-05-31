@@ -20,6 +20,8 @@ namespace CloudsdaleLib.Models {
         public string OffenderId { get; set; }
         [JsonProperty("enforcer_id")]
         public string EnforcerId { get; set; }
+        [JsonProperty("jurisdiction_type")]
+        public string JurisdictionType { get; set; }
         [JsonProperty("jurisdiction_id")]
         public string JurisdictionId { get; set; }
 
@@ -28,6 +30,10 @@ namespace CloudsdaleLib.Models {
 
         [JsonProperty("revoke")]
         public bool? Revoked { get; set; }
+        [JsonProperty("has_expired")]
+        public bool? Expired { get; set; }
+        [JsonProperty("is_active")]
+        public bool? Active { get; set; }
 
         public override bool CanValidate() {
             return false;
