@@ -20,6 +20,7 @@ namespace MetroFaye {
         public abstract string ClientId { get; }
         public abstract bool IsConnecting { get; }
         public abstract bool IsConnected { get; }
+        public IMessageReciever PrimaryReciever { get; set; }
 
         internal Uri Address;
 
@@ -66,6 +67,9 @@ namespace MetroFaye {
                 PublishCallback((JObject)message);
             }
 
+            if (PrimaryReciever != null) {
+                PrimaryReciever.OnMessage((JObject)message);
+            }
             OnReceive((JObject)message);
         }
 

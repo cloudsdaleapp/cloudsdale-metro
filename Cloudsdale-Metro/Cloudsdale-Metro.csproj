@@ -101,6 +101,10 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
+    <ProjectReference Include="..\CloudsdaleLib\CloudsdaleLib.csproj">
+      <Project>{BF953D44-8A84-424F-987D-46AD5881E04C}</Project>
+      <Name>CloudsdaleLib</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MetroFaye\MetroFaye.csproj">
       <Project>{E16213E4-AF4E-4CA9-B3F8-5113FC5B8AB2}</Project>
       <Name>MetroFaye</Name>
@@ -111,13 +115,20 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Assets\Endpoints.cs" />
+    <Compile Include="Controllers\CloudController.cs" />
     <Compile Include="Controllers\ConnectionController.cs" />
+    <Compile Include="Controllers\MessageController.cs" />
     <Compile Include="Controllers\SessionController.cs" />
+    <Compile Include="Helpers\FileHelpers.cs" />
+    <Compile Include="Models\SessionModels.cs" />
     <Compile Include="Views\Connecting.xaml.cs">
       <DependentUpon>Connecting.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Controls\CloudCanvas.cs" />
     <Compile Include="Views\Controls\RootGrid.cs" />
+    <Compile Include="Views\LoggingIn.xaml.cs">
+      <DependentUpon>LoggingIn.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
@@ -152,6 +163,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\LoggingIn.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\MainPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -163,6 +178,7 @@
       <HintPath>..\packages\Newtonsoft.Json.5.0.6\lib\netcore45\Newtonsoft.Json.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '11.0' ">
     <VisualStudioVersion>11.0</VisualStudioVersion>
   </PropertyGroup>
