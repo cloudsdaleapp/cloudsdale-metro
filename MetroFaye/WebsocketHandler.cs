@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Windows.Networking.Sockets;
@@ -32,12 +31,20 @@ namespace MetroFaye {
         }
 
         public override async Task ConnectAsync() {
+            var handshakeWaiter = new EventWaiter();
+            Handshaked += handshakeWaiter.Callback;
+
             await Connect(Address);
+            await handshakeWaiter.Wait();
+
+            Handshaked -= handshakeWaiter.Callback;
         }
         public override async void Connect() {
             await Connect(Address);
         }
         private async Task Connect(Uri address) {
+            InitState();
+
             var wait = _state.socket.ConnectAsync(address);
             _state.connecting = true;
             await wait;
@@ -180,6 +187,18 @@ namespace MetroFaye {
             public bool closed;
 
             public List<string> subbedChannels;
+        }
+
+        internal class EventWaiter {
+            private readonly ManualResetEvent waiter = new ManualResetEvent(false);
+
+            public async Task Wait() {
+                await Task.Run(() => waiter.WaitOne());
+            }
+
+            public void Callback(MessageHandler handler, JObject response) {
+                waiter.Set();
+            }
         }
     }
 }

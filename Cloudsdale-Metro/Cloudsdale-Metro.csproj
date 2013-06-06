@@ -101,11 +101,18 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
+    <ProjectReference Include="..\MetroFaye\MetroFaye.csproj">
+      <Project>{E16213E4-AF4E-4CA9-B3F8-5113FC5B8AB2}</Project>
+      <Name>MetroFaye</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Assets\Endpoints.cs" />
+    <Compile Include="Controllers\ConnectionController.cs" />
+    <Compile Include="Controllers\SessionController.cs" />
     <Compile Include="Views\Connecting.xaml.cs">
       <DependentUpon>Connecting.xaml</DependentUpon>
     </Compile>
@@ -121,10 +128,12 @@
       <SubType>Designer</SubType>
     </AppxManifest>
     <None Include="Cloudsdale-Metro_TemporaryKey.pfx" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\BackgroundClouds.png" />
     <Content Include="Assets\cloudsdale-thin-bright-logo.png" />
+    <Content Include="Assets\icon_white.png" />
     <Content Include="Assets\Logo.png" />
     <Content Include="Assets\SmallLogo.png" />
     <Content Include="Assets\SplashScreen.png" />
@@ -147,6 +156,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.5.0.6\lib\netcore45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '11.0' ">
     <VisualStudioVersion>11.0</VisualStudioVersion>
