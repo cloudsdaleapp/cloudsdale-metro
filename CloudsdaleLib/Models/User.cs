@@ -44,7 +44,6 @@ namespace CloudsdaleLib.Models {
         #endregion
 
         public class CloudSpecificData {
-            public 
         }
     }
 }

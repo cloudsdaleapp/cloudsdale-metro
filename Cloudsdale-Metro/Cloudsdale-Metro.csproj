@@ -109,6 +109,8 @@
     <Compile Include="Views\Connecting.xaml.cs">
       <DependentUpon>Connecting.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Controls\CloudCanvas.cs" />
+    <Compile Include="Views\Controls\RootGrid.cs" />
     <Compile Include="Views\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
@@ -121,6 +123,7 @@
     <None Include="Cloudsdale-Metro_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\BackgroundClouds.png" />
     <Content Include="Assets\cloudsdale-thin-bright-logo.png" />
     <Content Include="Assets\Logo.png" />
     <Content Include="Assets\SmallLogo.png" />
