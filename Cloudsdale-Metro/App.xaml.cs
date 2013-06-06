@@ -1,20 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using Cloudsdale_Metro.Controllers;
+﻿using Cloudsdale_Metro.Controllers;
 using Cloudsdale_Metro.Views;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
 
 // The Blank Application template is documented at http://go.microsoft.com/fwlink/?LinkId=234227
 
@@ -22,11 +10,11 @@ namespace Cloudsdale_Metro {
     /// <summary>
     /// Provides application-specific behavior to supplement the default Application class.
     /// </summary>
-    sealed partial class App : Application {
+    sealed partial class App {
         public readonly ConnectionController ConnectionController = new ConnectionController();
 
         public static ConnectionController Connection {
-            get { return ((App)Application.Current).ConnectionController; }
+            get { return ((App)Current).ConnectionController; }
         }
 
         /// <summary>
