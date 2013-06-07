@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using WinRTXamlToolkit.AwaitableUI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
@@ -26,19 +27,20 @@ namespace Cloudsdale_Metro.Views.Controls {
         private static readonly Random Random = new Random();
         public async void StartLoop() {
             var cloudCount = CloudCount;
-            while (ActualWidth < 1) {
-                await Task.Delay(25);
-            }
+
+            await this.WaitForNonZeroSizeAsync();
 
             for (var i = 0; i < cloudCount; ++i) {
                 SpawnCloudLoop();
-                await Task.Delay((BaseTime + RandomTime / 2) * 1000 / cloudCount);
+                //await Task.Delay((BaseTime + RandomTime / 2) * 1000 / cloudCount);
             }
         }
 
         private async void SpawnCloudLoop() {
+            await Task.Delay(await CreateCloud(true));
+
             while (isActive) {
-                await Task.Delay(await CreateCloud());
+                await Task.Delay(await CreateCloud(false));
             }
         }
 
@@ -51,7 +53,7 @@ namespace Cloudsdale_Metro.Views.Controls {
             }
         }
 
-        public async Task<int> CreateCloud() {
+        public async Task<int> CreateCloud(bool isInitial) {
             var cloud = new Image {
                 Source = new BitmapImage(new Uri("ms-appx:/Assets/BackgroundClouds.png")),
                 Width = Random.Next(800, 2000),
@@ -61,18 +63,19 @@ namespace Cloudsdale_Metro.Views.Controls {
 
             Children.Add(cloud);
 
-            while (cloud.ActualHeight < 1) {
-                await Task.Delay(20);
-            }
+            await cloud.WaitForNonZeroSizeAsync();
 
-            var cloudY = Random.Next(TopMargin, (int)(ActualHeight - cloud.ActualHeight / 2));
+            var cloudYMax = (int)(ActualHeight - cloud.ActualHeight / 2);
+            var cloudY = TopMargin > cloudYMax
+                ? TopMargin
+                : Random.Next(TopMargin, cloudYMax);
 
             SetTop(cloud, cloudY);
             SetZIndex(cloud, (int)cloud.Width);
 
             var time = BaseTime * 1000 + (int)(Random.NextDouble() * RandomTime * 1000);
 
-            var from = (int)(-cloud.Width) - 200;
+            var from = (int)(-cloud.Width);
             var to = (int)ActualWidth;
 
             SetLeft(cloud, from);
@@ -96,6 +99,10 @@ namespace Cloudsdale_Metro.Views.Controls {
             Resources.Add(Guid.NewGuid().ToString(), storyboard);
 
             storyboard.Begin();
+
+            if (isInitial) {
+                storyboard.Seek(TimeSpan.FromMilliseconds(Random.Next(0, time)));
+            }
 
             cloud.Visibility = Visibility.Visible;
 

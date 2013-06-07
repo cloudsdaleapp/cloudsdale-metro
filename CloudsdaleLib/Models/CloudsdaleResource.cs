@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Net;
@@ -14,7 +15,9 @@ using Newtonsoft.Json.Linq;
 using Windows.UI.Core;
 
 namespace CloudsdaleLib.Models {
+    [JsonObject(MemberSerialization.OptIn)]
     public class CloudsdaleModel : INotifyPropertyChanged {
+        private UIMetadata _uiMetadata = new UIMetadata();
 
         public virtual void CopyTo(CloudsdaleModel other) {
             var properties = GetType().GetRuntimeProperties();
@@ -27,6 +30,11 @@ namespace CloudsdaleLib.Models {
                     property.SetValue(other, value);
                 }
             }
+        }
+
+        public UIMetadata UIMetadata {
+            get { return _uiMetadata; }
+            set { _uiMetadata = value; }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -65,8 +73,14 @@ namespace CloudsdaleLib.Models {
 
         protected virtual void OnValidationError(WebException exception) { }
 
-        public async Task<bool> Validate() {
-            if (!Invalidated) return true;
+        public Task<bool> Validate() {
+            return Validate(false);
+        }
+        public Task<bool> ForceValidate() {
+            return Validate(true);
+        }
+        public async Task<bool> Validate(bool force) {
+            if (!Invalidated && !force) return true;
             if (!CanValidate()) return false;
 
             var modelType = GetType().GetTypeInfo();
@@ -86,12 +100,16 @@ namespace CloudsdaleLib.Models {
                 }
 
                 var responseObject = JObject.Parse(responseData);
-                var responseModel = (CloudsdaleModel)responseObject.ToObject(GetType());
+                var responseModel = (CloudsdaleModel)ObjectFromWebResult(responseObject).ToObject(GetType());
                 responseModel.CopyTo(this);
             } catch (WebException exception) {
                 OnValidationError(exception);
             }
             return true;
+        }
+
+        protected virtual JToken ObjectFromWebResult(JToken response) {
+            return response["result"];
         }
 
 #pragma warning disable 1998

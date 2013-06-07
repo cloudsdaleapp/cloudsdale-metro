@@ -7,7 +7,8 @@ using Newtonsoft.Json;
 namespace CloudsdaleLib.Helpers {
     public static class WebHelpers {
         public static async Task<WebResponse<T>> PerformRequest<T>(this HttpWebRequest request) {
-            return await JsonConvert.DeserializeObjectAsync<WebResponse<T>>(await request.ReadResponse());
+            var result = await request.ReadResponse();
+            return await JsonConvert.DeserializeObjectAsync<WebResponse<T>>(result);
         }
 
         public static async Task<string> ReadResponse(this HttpWebRequest request) {
@@ -41,9 +42,10 @@ namespace CloudsdaleLib.Helpers {
         [JsonProperty("errors")]
         public Error[] Errors {
             get {
-                foreach (var error in _errors) {
-                    error.Response = this;
-                }
+                if (_errors != null)
+                    foreach (var error in _errors) {
+                        error.Response = this;
+                    }
                 return _errors;
             }
             set { _errors = value; }

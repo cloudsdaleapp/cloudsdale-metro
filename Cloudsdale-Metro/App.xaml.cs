@@ -1,9 +1,16 @@
 ﻿using System;
+using Callisto.Controls;
 using Cloudsdale_Metro.Controllers;
 using Cloudsdale_Metro.Views;
+using Cloudsdale_Metro.Views.Controls;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
+using Windows.UI;
+using Windows.UI.ApplicationSettings;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
 
 // The Blank Application template is documented at http://go.microsoft.com/fwlink/?LinkId=234227
 
@@ -37,7 +44,34 @@ namespace Cloudsdale_Metro {
         /// <param name="args">Details about the launch request and process.</param>
         protected override async void OnLaunched(LaunchActivatedEventArgs args) {
             await ConnectionController.EnsureAppActivated();
-            ConnectionController.Navigate(typeof(MainPage));
+            if (args.PreviousExecutionState != ApplicationExecutionState.Running &&
+                args.PreviousExecutionState != ApplicationExecutionState.Suspended) {
+                ConnectionController.Navigate(typeof(LoginPage));
+            }
+
+            SettingsPane.GetForCurrentView().CommandsRequested += OnCommandsRequested;
+        }
+
+        private void OnCommandsRequested(SettingsPane sender, SettingsPaneCommandsRequestedEventArgs args) {
+            var accountSettings = new SettingsCommand("AccountSettings", "Account settings", command => {
+                var settings = new SettingsFlyout {
+                    HeaderBrush = new SolidColorBrush(Color.FromArgb(0x7F, 0x1A, 0x91, 0xDB)),
+                    HeaderText = "Account settings",
+                    Background = new SolidColorBrush(Colors.Transparent),
+                    Content = new AccountSettings()
+                };
+
+                var avatar = new BitmapImage(Connection.Session.CurrentSession.Avatar.Preview);
+                settings.SmallLogoImageSource = avatar;
+
+                settings.ContentBackgroundBrush = new SolidColorBrush(Color.FromArgb(0x7F, 0xF0, 0xF0, 0xF0));
+
+                settings.IsOpen = true;
+            });
+
+            if (Connection.Session.CurrentSession != null && !(Connection.MainFrame.Content is LoggingIn)) {
+                args.Request.ApplicationCommands.Add(accountSettings);
+            }
         }
 
         /// <summary>

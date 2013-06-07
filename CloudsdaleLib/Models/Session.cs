@@ -111,6 +111,10 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        protected override Newtonsoft.Json.Linq.JToken ObjectFromWebResult(Newtonsoft.Json.Linq.JToken response) {
+            return base.ObjectFromWebResult(response)["user"];
+        }
+
         protected override async Task ValidationRequest(HttpWebRequest request) {
             request.Method = "POST";
             request.ContentType = "application/json";

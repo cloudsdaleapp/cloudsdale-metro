@@ -9,8 +9,8 @@ namespace CloudsdaleLib {
         public const string Base = "https://www.cloudsdale.org/";
         public const string ApiVersion = "v1";
 
-        public const string SessionEndpoint = Base + ApiVersion + "/session";
-        public const string UserEndpoint = Base + ApiVersion + "/user/[:id]";
+        public const string SessionEndpoint = Base + ApiVersion + "/sessions";
+        public const string UserEndpoint = Base + ApiVersion + "/users/[:id]";
         public const string CloudEndpoint = Base + ApiVersion + "/clouds/[:id]";
     }
 }

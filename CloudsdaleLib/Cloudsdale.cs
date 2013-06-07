@@ -1,4 +1,5 @@
-﻿using CloudsdaleLib.Providers;
+﻿using System.Collections.Generic;
+using CloudsdaleLib.Providers;
 
 namespace CloudsdaleLib {
     public class Cloudsdale {
@@ -9,6 +10,7 @@ namespace CloudsdaleLib {
         private static ISessionProvider _sessionProvider;
         private static ICloudServicesProvider _cloudServicesProvider;
         private static IModelErrorProvider _modelErrorProvider;
+        private static IMetadataProviderStore _metadataProviders = new MetadataProviderStore();
 
         public static ISessionProvider SessionProvider {
             get { return _sessionProvider ?? DefaultSessionProvider; }
@@ -23,6 +25,11 @@ namespace CloudsdaleLib {
         public static IModelErrorProvider ModelErrorProvider {
             get { return _modelErrorProvider ?? DefaultModelErrorProvider; }
             set { _modelErrorProvider = value; }
+        }
+
+        public static IMetadataProviderStore MetadataProviders {
+            get { return _metadataProviders; }
+            set { _metadataProviders = value; }
         }
     }
 }

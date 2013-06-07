@@ -1,0 +1,67 @@
+﻿using System.Threading.Tasks;
+using System.Linq;
+using CloudsdaleLib.Models;
+using Cloudsdale_Metro.Models;
+using WinRTXamlToolkit.AwaitableUI;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Navigation;
+
+namespace Cloudsdale_Metro.Views {
+    public sealed partial class LoginPage {
+        private static readonly LoginForm LoginForm = new LoginForm();
+
+        public LoginPage() {
+            InitializeComponent();
+            DataContext = LoginForm;
+
+            SessionGrid.ItemsSource = App.Connection.Session.PastSessions;
+        }
+
+        protected override async void OnNavigatedTo(NavigationEventArgs e) {
+            CloudCanvas.StartLoop();
+            await DoLastLogin();
+            LoginForm.Session = App.Connection.Session.CurrentSession;
+        }
+
+        private async Task DoLastLogin() {
+            if (App.Connection.Session.LastSession == null) return;
+            var session = App.Connection.Session.PastSessions.FirstOrDefault(
+                user => user.Id == App.Connection.Session.LastSession);
+            if (session == null) return;
+            LoginForm.Session = session;
+            await this.WaitForLoadedAsync();
+
+            await DoLogin();
+        }
+
+        protected override void OnNavigatedFrom(NavigationEventArgs e) {
+            CloudCanvas.Stop();
+        }
+
+        private async void LoginClick(object sender, RoutedEventArgs e) {
+            await DoLogin();
+        }
+
+        private void SessionGrid_OnSelectionChanged(object sender, SelectionChangedEventArgs e) {
+            foreach (CloudsdaleModel item in e.AddedItems) {
+                item.UIMetadata["Selected"].Value = true;
+            }
+            foreach (CloudsdaleModel item in e.RemovedItems) {
+                item.UIMetadata["Selected"].Value = false;
+            }
+
+            var grid = (GridView)sender;
+            if (grid.SelectedIndex == -1) {
+                LoginForm.Session = null;
+            } else {
+                LoginForm.Session = (Session)grid.SelectedItem;
+            }
+        }
+
+        async Task DoLogin() {
+            Frame.Navigate(typeof(LoggingIn));
+            await App.Connection.Session.LogIn(LoginForm);
+        }
+    }
+}

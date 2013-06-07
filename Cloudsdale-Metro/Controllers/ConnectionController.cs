@@ -1,30 +1,37 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Cloudsdale_Metro.Assets;
+using CloudsdaleLib;
+using Cloudsdale_Metro.Models;
 using Cloudsdale_Metro.Views;
 using MetroFaye;
-using Windows.UI;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
+using Endpoints = Cloudsdale_Metro.Assets.Endpoints;
 
 namespace Cloudsdale_Metro.Controllers {
     public class ConnectionController {
-        private Frame frame;
         private Frame connectView;
 
-        public Frame MainFrame { get { return frame; } }
+        public Frame MainFrame { get; private set; }
 
         public readonly SessionController Session = new SessionController();
+        public readonly ErrorController ErrorController = new ErrorController();
+        public readonly MessageController MessageController = new MessageController();
+
+        public ConnectionController() {
+            Cloudsdale.SessionProvider = Session;
+            Cloudsdale.ModelErrorProvider = ErrorController;
+            Cloudsdale.CloudServicesProvider = MessageController;
+            Cloudsdale.MetadataProviders["Selected"] = new BooleanMetadataProvider();
+        }
+
         public MessageHandler Faye;
 
         public async Task EnsureAppActivated() {
-            frame = Window.Current.Content as Frame;
+            MainFrame = Window.Current.Content as Frame;
 
             if (connectView == null) {
                 connectView = new Frame {
@@ -37,10 +44,10 @@ namespace Cloudsdale_Metro.Controllers {
 
             await Session.LoadSession();
 
-            if (frame == null) {
-                frame = new Frame {
+            if (MainFrame == null) {
+                MainFrame = new Frame {
                     Transitions = new TransitionCollection {
-                        new EdgeUIThemeTransition { Edge = EdgeTransitionLocation.Bottom }
+                        new EdgeUIThemeTransition { Edge = EdgeTransitionLocation.Right }
                     }
                 };
             }
@@ -53,25 +60,32 @@ namespace Cloudsdale_Metro.Controllers {
         }
 
         public void Navigate(Type pageType) {
-            frame.Navigate(pageType);
+            MainFrame.Navigate(pageType);
         }
 
         public async Task EnsureFayeConnection() {
             if (Faye == null || !Faye.IsConnected) {
-                frame.Content = connectView;
+                MainFrame.Content = connectView;
 
                 Faye = MetroFaye.Faye.CreateClient(new Uri(Endpoints.PushAddress));
+                Faye.PrimaryReciever = MessageController;
 
-                var startTime = DateTime.Now;
-                await Faye.ConnectAsync();
-                var endTime = DateTime.Now;
-                var pauseTime = 1.5 - (endTime - startTime).TotalSeconds;
-                if (pauseTime > 0) {
-                    await Task.Delay((int)(pauseTime * 1000));
+                var error = false;
+                try {
+                    await Faye.ConnectAsync();
+                } catch {
+                    error = true;
+                }
+                if (error) {
+                    var dialog = new MessageDialog("Couldn't connect to cloudsdale " +
+                                                   "(are you connected to the internet?)",
+                                                   "Connection Error");
+                    await dialog.ShowAsync();
+                    Window.Current.Close();
                 }
             }
 
-            Window.Current.Content = frame;
+            Window.Current.Content = MainFrame;
         }
     }
 }

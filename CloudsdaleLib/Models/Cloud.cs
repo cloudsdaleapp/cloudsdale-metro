@@ -6,5 +6,10 @@ namespace CloudsdaleLib.Models {
     public class Cloud : CloudsdaleResource {
         [JsonConstructor]
         public Cloud(string id) : base(id) { }
+
+        [JsonProperty("avatar")]
+        public Avatar Avatar { get; set; }
+        [JsonProperty("name")]
+        public string Name { get; set; }
     }
 }

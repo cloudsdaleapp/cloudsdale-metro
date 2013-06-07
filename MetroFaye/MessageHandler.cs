@@ -8,6 +8,7 @@ using Newtonsoft.Json.Linq;
 namespace MetroFaye {
     public delegate void FayeCallback(MessageHandler handler, JObject response);
     public abstract class MessageHandler {
+        private readonly JObject extensionData = new JObject();
 
         public event FayeCallback Handshaked;
         public event FayeCallback Subscribed;
@@ -16,7 +17,7 @@ namespace MetroFaye {
         public event FayeCallback MessageReceived;
         public event Action Disconnected;
 
-        public virtual JObject ExtensionData { get; set; }
+        public virtual JObject ExtensionData { get { return extensionData; } }
         public abstract string ClientId { get; }
         public abstract bool IsConnecting { get; }
         public abstract bool IsConnected { get; }
