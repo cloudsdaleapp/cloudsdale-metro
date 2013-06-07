@@ -1,15 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Net;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Threading.Tasks;
 using CloudsdaleLib.Annotations;
-using CloudsdaleLib.Controllers;
+using CloudsdaleLib.Helpers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
 using Windows.UI.Core;
 
 namespace CloudsdaleLib.Models {
@@ -96,14 +97,11 @@ namespace CloudsdaleLib.Models {
 #pragma warning disable 1998
         protected virtual async Task ValidationRequest(HttpWebRequest request) {
             request.Method = "GET";
-            if (Cloudsdale.Instance.Session != null) {
-                request.Headers["X-Auth-Token"] = Cloudsdale.Instance.Session.AuthToken;
+            if (Cloudsdale.SessionProvider.CurrentSession != null) {
+                request.Headers["X-Auth-Token"] = Cloudsdale.SessionProvider.CurrentSession.AuthToken;
             }
         }
 #pragma warning restore 1998
-
-        [JsonIgnore]
-        public CloudsdaleController Controller { get; protected internal set; }
 
         [JsonIgnore]
         protected DateTime LastUpdated { get; set; }
@@ -111,6 +109,34 @@ namespace CloudsdaleLib.Models {
         public override void CopyTo(CloudsdaleModel other) {
             base.CopyTo(other);
             LastUpdated = DateTime.Now;
+        }
+
+        public async Task UpdateProperty<T>(params KeyValuePair<string, JToken>[] properties) where T : CloudsdaleResource {
+            var endpoint = GetType().GetTypeInfo().GetCustomAttribute<ResourceEndpointAttribute>();
+            var model = new JObject();
+            model[endpoint.RestModelType] = new JObject();
+            model[endpoint.RestModelType]["id"] = Id;
+            foreach (var property in properties) {
+                model[endpoint.RestModelType][property.Key] = property.Value;
+            }
+            var requestData = Encoding.UTF8.GetBytes(model.ToString(Formatting.None));
+
+            var request = WebRequest.CreateHttp(endpoint.UpdateEndpoint);
+            request.Accept = "application/json";
+            request.ContentType = "application/json";
+
+            using (var requestStream = await request.GetRequestStreamAsync()) {
+                await requestStream.WriteAsync(requestData, 0, requestData.Length);
+                await requestStream.FlushAsync();
+            }
+
+            var response = await request.PerformRequest<T>();
+            if (response.Flash != null) {
+                await Cloudsdale.ModelErrorProvider.OnError(response);
+                return;
+            }
+
+            response.Result.CopyTo(this);
         }
     }
 

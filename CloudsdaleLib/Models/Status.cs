@@ -4,7 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CloudsdaleLib.Controllers {
-    public class CloudsdaleController {
+namespace CloudsdaleLib.Models {
+    public enum Status {
+        Online,
+        Away,
+        Busy,
+        Offline
     }
 }

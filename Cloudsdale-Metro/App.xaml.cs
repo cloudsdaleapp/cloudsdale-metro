@@ -1,4 +1,5 @@
-﻿using Cloudsdale_Metro.Controllers;
+﻿using System;
+using Cloudsdale_Metro.Controllers;
 using Cloudsdale_Metro.Views;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
@@ -22,8 +23,8 @@ namespace Cloudsdale_Metro {
         /// executed, and as such is the logical equivalent of main() or WinMain().
         /// </summary>
         public App() {
-            this.InitializeComponent();
-            this.Suspending += OnSuspending;
+            InitializeComponent();
+            Suspending += OnSuspending;
 
             RequestedTheme = ApplicationTheme.Light;
         }
@@ -48,7 +49,7 @@ namespace Cloudsdale_Metro {
         /// <param name="e">Details about the suspend request.</param>
         private void OnSuspending(object sender, SuspendingEventArgs e) {
             var deferral = e.SuspendingOperation.GetDeferral();
-            //TODO: Save application state and stop any background activity
+            CloudsdaleLib.ModelSettings.AppLastSuspended = DateTime.Now;
             deferral.Complete();
         }
     }

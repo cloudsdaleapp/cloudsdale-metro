@@ -120,6 +120,7 @@
     <Compile Include="Controllers\MessageController.cs" />
     <Compile Include="Controllers\SessionController.cs" />
     <Compile Include="Helpers\FileHelpers.cs" />
+    <Compile Include="Helpers\ModelHelpers.cs" />
     <Compile Include="Models\SessionModels.cs" />
     <Compile Include="Views\Connecting.xaml.cs">
       <DependentUpon>Connecting.xaml</DependentUpon>
