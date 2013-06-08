@@ -115,12 +115,12 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Assets\AssetList.cs" />
-    <Compile Include="Assets\Endpoints.cs" />
     <Compile Include="Common\BindableBase.cs" />
     <Compile Include="Common\BooleanNegationConverter.cs" />
     <Compile Include="Common\BooleanToVisibilityConverter.cs" />
     <Compile Include="Common\DoubleToggleConverter.cs" />
     <Compile Include="Common\LayoutAwarePage.cs" />
+    <Compile Include="Common\NonZeroToVisibility.cs" />
     <Compile Include="Common\RichTextColumns.cs" />
     <Compile Include="Common\SuspensionManager.cs" />
     <Compile Include="Controllers\CloudController.cs" />
@@ -128,11 +128,21 @@
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\MessageController.cs" />
     <Compile Include="Controllers\SessionController.cs" />
+    <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Helpers\FileHelpers.cs" />
     <Compile Include="Helpers\ModelHelpers.cs" />
     <Compile Include="Models\BooleanMetadata.cs" />
+    <Compile Include="Models\CloudControllerMetadata.cs" />
     <Compile Include="Models\LoginForm.cs" />
+    <Compile Include="Models\ModelCache.cs" />
     <Compile Include="Models\SessionModels.cs" />
+    <Compile Include="Views\ChatConverters\CloudNameColorConverter.cs" />
+    <Compile Include="Views\CloudPage.xaml.cs">
+      <DependentUpon>CloudPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Controls\MessageTextControl.xaml.cs">
+      <DependentUpon>MessageTextControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\LoadPages\Connecting.xaml.cs">
       <DependentUpon>Connecting.xaml</DependentUpon>
     </Compile>
@@ -181,6 +191,14 @@
     <Page Include="Common\StandardStyles.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\CloudPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Controls\MessageTextControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\LoadPages\Connecting.xaml">
       <SubType>Designer</SubType>

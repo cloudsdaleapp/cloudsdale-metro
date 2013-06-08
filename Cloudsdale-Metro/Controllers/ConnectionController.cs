@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Threading.Tasks;
 using CloudsdaleLib;
+using CloudsdaleLib.Models;
 using Cloudsdale_Metro.Models;
-using Cloudsdale_Metro.Views;
+using Cloudsdale_Metro.Views.LoadPages;
 using MetroFaye;
+using Newtonsoft.Json.Linq;
+using WinRTXamlToolkit.AwaitableUI;
+using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Media.Animation;
-using Endpoints = Cloudsdale_Metro.Assets.Endpoints;
 
 namespace Cloudsdale_Metro.Controllers {
     public class ConnectionController {
@@ -20,12 +23,14 @@ namespace Cloudsdale_Metro.Controllers {
         public readonly SessionController Session = new SessionController();
         public readonly ErrorController ErrorController = new ErrorController();
         public readonly MessageController MessageController = new MessageController();
+        public readonly UserController UserController = new UserController();
 
         public ConnectionController() {
             Cloudsdale.SessionProvider = Session;
             Cloudsdale.ModelErrorProvider = ErrorController;
             Cloudsdale.CloudServicesProvider = MessageController;
             Cloudsdale.MetadataProviders["Selected"] = new BooleanMetadataProvider();
+            Cloudsdale.MetadataProviders["CloudController"] = new CloudControllerMetadataProvider();
         }
 
         public MessageHandler Faye;
@@ -52,7 +57,7 @@ namespace Cloudsdale_Metro.Controllers {
                 };
             }
 
-            Window.Current.Content = connectView;
+            Window.Current.Content = MainFrame;
 
             Window.Current.Activate();
 
@@ -65,10 +70,11 @@ namespace Cloudsdale_Metro.Controllers {
 
         public async Task EnsureFayeConnection() {
             if (Faye == null || !Faye.IsConnected) {
-                MainFrame.Content = connectView;
+                Window.Current.Content = connectView;
 
                 Faye = MetroFaye.Faye.CreateClient(new Uri(Endpoints.PushAddress));
                 Faye.PrimaryReciever = MessageController;
+                Faye.Disconnected += FayeOnDisconnected;
 
                 var error = false;
                 try {
@@ -86,6 +92,26 @@ namespace Cloudsdale_Metro.Controllers {
             }
 
             Window.Current.Content = MainFrame;
+        }
+
+        private async void FayeOnDisconnected() {
+            Faye = null;
+            await MainFrame.Dispatcher.RunAsync(CoreDispatcherPriority.Low, async delegate {
+                await EnsureFayeConnection();
+                if (Session.CurrentSession == null) return;
+                ConnectSession(Session.CurrentSession);
+                if (MessageController.CurrentCloud == null) return;
+                await MessageController.CurrentCloud.EnsureLoaded();
+            });
+        }
+
+        public void ConnectSession(Session session) {
+            Faye.Subscribe("/users/" + session.Id + "/private");
+
+            foreach (var cloud in session.Clouds) {
+                Faye.Subscribe("/clouds/" + cloud.Id);
+                Faye.Subscribe("/clouds/" + cloud.Id + "/chat/messages");
+            }
         }
     }
 }

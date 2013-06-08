@@ -108,6 +108,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Cloudsdale.cs" />
+    <Compile Include="CloudsdaleEscaper.cs" />
     <Compile Include="Endpoints.cs" />
     <Compile Include="Helpers\WebHelpers.cs" />
     <Compile Include="ModelSettings.cs" />
@@ -115,6 +116,11 @@
     <Compile Include="Models\Ban.cs" />
     <Compile Include="Models\Cloud.cs" />
     <Compile Include="Models\CloudsdaleResource.cs" />
+    <Compile Include="Models\Drop.cs" />
+    <Compile Include="Models\IAvatarUploadTarget.cs" />
+    <Compile Include="Models\IMergable.cs" />
+    <Compile Include="Models\IPreProcessable.cs" />
+    <Compile Include="Models\Message.cs" />
     <Compile Include="Models\Session.cs" />
     <Compile Include="Models\Status.cs" />
     <Compile Include="Models\UIMetadata.cs" />

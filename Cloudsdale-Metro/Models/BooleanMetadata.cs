@@ -6,18 +6,23 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using CloudsdaleLib.Annotations;
+using CloudsdaleLib.Models;
 using CloudsdaleLib.Providers;
 using Windows.UI.Xaml;
 
 namespace Cloudsdale_Metro.Models {
     public class BooleanMetadataProvider : IMetadataProvider {
-        public IMetadataObject CreateNew() {
-            return new BooleanMetadata();
+        public IMetadataObject CreateNew(CloudsdaleModel model) {
+            return new BooleanMetadata(model);
         }
 
         public class BooleanMetadata : IMetadataObject, INotifyPropertyChanged {
             private bool _value;
             public event PropertyChangedEventHandler PropertyChanged;
+
+            public BooleanMetadata(CloudsdaleModel model) {
+                Model = model;
+            }
 
             public object Value {
                 get { return _value; }
@@ -27,6 +32,8 @@ namespace Cloudsdale_Metro.Models {
                     OnPropertyChanged();
                 }
             }
+
+            public CloudsdaleModel Model { get; private set; }
 
             [NotifyPropertyChangedInvocator]
             protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) {

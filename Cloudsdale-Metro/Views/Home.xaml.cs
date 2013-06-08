@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using CloudsdaleLib.Models;
+using Cloudsdale_Metro.Controllers;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -45,6 +47,14 @@ namespace Cloudsdale_Metro.Views {
         protected override void OnNavigatedFrom(NavigationEventArgs e) {
             CloudCanvas.Stop();
             base.OnNavigatedFrom(e);
+        }
+
+        private void CloudItemClicked(object sender, ItemClickEventArgs e) {
+            var cloud = (Cloud)e.ClickedItem;
+            var controller = (CloudController)cloud.UIMetadata["CloudController"].Value;
+
+            App.Connection.MessageController.CurrentCloud = controller;
+            App.Connection.MainFrame.Navigate(typeof(CloudPage));
         }
     }
 }

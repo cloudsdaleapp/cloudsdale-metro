@@ -2,6 +2,7 @@
 using System.Linq;
 using CloudsdaleLib.Models;
 using Cloudsdale_Metro.Models;
+using Cloudsdale_Metro.Views.LoadPages;
 using WinRTXamlToolkit.AwaitableUI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;

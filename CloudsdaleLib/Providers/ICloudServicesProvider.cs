@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CloudsdaleLib.Models;
 
 namespace CloudsdaleLib.Providers {
     public interface ICloudServicesProvider {
         IStatusProvider StatusProvider(string cloudId);
+        User GetBackedUser(string userId);
     }
 
     internal class DefaultCloudServicesProvider : ICloudServicesProvider {
@@ -14,6 +11,10 @@ namespace CloudsdaleLib.Providers {
 
         public IStatusProvider StatusProvider(string cloudId) {
             return DefaultStatusProvider;
+        }
+
+        public User GetBackedUser(string userId) {
+            return new User(userId);
         }
     }
 }

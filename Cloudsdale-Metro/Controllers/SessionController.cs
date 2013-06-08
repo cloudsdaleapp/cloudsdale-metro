@@ -13,12 +13,15 @@ using CloudsdaleLib.Providers;
 using Cloudsdale_Metro.Helpers;
 using Cloudsdale_Metro.Models;
 using Cloudsdale_Metro.Views;
+using Cloudsdale_Metro.Views.LoadPages;
+using MetroFaye;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Windows.Storage;
 using Windows.UI.Popups;
 
 namespace Cloudsdale_Metro.Controllers {
-    public class SessionController : ISessionProvider {
+    public class SessionController : ISessionProvider, IMessageReciever {
         private LastSession lastSession;
         private readonly List<Session> pastSessions = new List<Session>();
         private readonly Regex userSessionPattern = new Regex(@"^session_([0-9a-f]+)\.json$", RegexOptions.IgnoreCase);
@@ -94,6 +97,8 @@ namespace Cloudsdale_Metro.Controllers {
                 lastSession.LastLogins[CurrentSession.Id] = DateTime.Now;
                 await SaveSession();
 
+                App.Connection.ConnectSession(CurrentSession);
+
                 App.Connection.MainFrame.Navigate(typeof(Home));
                 return;
             }
@@ -131,6 +136,8 @@ namespace Cloudsdale_Metro.Controllers {
 
             await SaveSession();
 
+            App.Connection.ConnectSession(CurrentSession);
+
             App.Connection.MainFrame.Navigate(typeof(Home));
         }
 
@@ -148,6 +155,11 @@ namespace Cloudsdale_Metro.Controllers {
         public class SessionWrapper {
             public string ClientID { get; set; }
             public Session User { get; set; }
+        }
+
+        public void OnMessage(JObject message) {
+            var user = message["data"].ToObject<Session>();
+            user.CopyTo(CurrentSession);
         }
     }
 }

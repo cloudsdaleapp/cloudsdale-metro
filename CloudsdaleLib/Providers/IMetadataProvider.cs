@@ -7,14 +7,16 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using CloudsdaleLib.Annotations;
+using CloudsdaleLib.Models;
 
 namespace CloudsdaleLib.Providers {
     public interface IMetadataProvider {
-        IMetadataObject CreateNew();
+        IMetadataObject CreateNew(CloudsdaleModel model);
     }
 
     public interface IMetadataObject {
         object Value { get; set; }
+        CloudsdaleModel Model { get; }
     }
 
     public interface IMetadataProviderStore {
@@ -33,12 +35,16 @@ namespace CloudsdaleLib.Providers {
     }
 
     internal class DefaultMetadataProvider : IMetadataProvider {
-        public IMetadataObject CreateNew() {
-            return new DefaultMetadataObject();
+        public IMetadataObject CreateNew(CloudsdaleModel model) {
+            return new DefaultMetadataObject(model);
         }
     }
 
     internal class DefaultMetadataObject : IMetadataObject, INotifyPropertyChanged {
+        public DefaultMetadataObject(CloudsdaleModel model) {
+            Model = model;
+        }
+
         private object _value;
         public object Value {
             get { return _value; }
@@ -48,6 +54,8 @@ namespace CloudsdaleLib.Providers {
                 OnPropertyChanged();
             }
         }
+
+        public CloudsdaleModel Model { get; private set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 

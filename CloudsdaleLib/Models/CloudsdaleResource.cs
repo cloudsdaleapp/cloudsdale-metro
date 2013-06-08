@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Net;
@@ -17,7 +16,9 @@ using Windows.UI.Core;
 namespace CloudsdaleLib.Models {
     [JsonObject(MemberSerialization.OptIn)]
     public class CloudsdaleModel : INotifyPropertyChanged {
-        private UIMetadata _uiMetadata = new UIMetadata();
+        public CloudsdaleModel() {
+            UIMetadata = new UIMetadata(this);
+        }
 
         public virtual void CopyTo(CloudsdaleModel other) {
             var properties = GetType().GetRuntimeProperties();
@@ -32,10 +33,7 @@ namespace CloudsdaleLib.Models {
             }
         }
 
-        public UIMetadata UIMetadata {
-            get { return _uiMetadata; }
-            set { _uiMetadata = value; }
-        }
+        public UIMetadata UIMetadata { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -139,7 +137,7 @@ namespace CloudsdaleLib.Models {
             }
             var requestData = Encoding.UTF8.GetBytes(model.ToString(Formatting.None));
 
-            var request = WebRequest.CreateHttp(endpoint.UpdateEndpoint);
+            var request = WebRequest.CreateHttp(endpoint.UpdateEndpoint.Replace("[:id]", Id));
             request.Accept = "application/json";
             request.ContentType = "application/json";
 

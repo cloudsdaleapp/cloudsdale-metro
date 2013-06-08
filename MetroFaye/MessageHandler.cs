@@ -9,6 +9,7 @@ namespace MetroFaye {
     public delegate void FayeCallback(MessageHandler handler, JObject response);
     public abstract class MessageHandler {
         private readonly JObject extensionData = new JObject();
+        private readonly DateTime creationDate = new DateTime();
 
         public event FayeCallback Handshaked;
         public event FayeCallback Subscribed;
@@ -17,11 +18,18 @@ namespace MetroFaye {
         public event FayeCallback MessageReceived;
         public event Action Disconnected;
 
+        public event EventHandler<JObject> HandshakedEvent;
+        public event EventHandler<JObject> SubscribedEvent;
+        public event EventHandler<JObject> UnsubscribedEvent;
+        public event EventHandler<JObject> PublishedEvent;
+        public event EventHandler<JObject> MessageReceivedEvent;
+
         public virtual JObject ExtensionData { get { return extensionData; } }
         public abstract string ClientId { get; }
         public abstract bool IsConnecting { get; }
         public abstract bool IsConnected { get; }
         public IMessageReciever PrimaryReciever { get; set; }
+        public DateTime CreationDate { get { return creationDate; } }
 
         internal Uri Address;
 
@@ -76,27 +84,37 @@ namespace MetroFaye {
 
         protected void OnHandshaked(JObject data) {
             var handler = Handshaked;
-            if (handler != null) Handshaked(this, data);
+            if (handler != null) handler(this, data);
+            var handlerE = HandshakedEvent;
+            if (handlerE != null) handlerE(this, data);
         }
         protected void OnSubscribed(JObject data) {
             var handler = Subscribed;
-            if (handler != null) Handshaked(this, data);
+            if (handler != null) handler(this, data);
+            var handlerE = SubscribedEvent;
+            if (handlerE != null) handlerE(this, data);
         }
         protected void OnUnsubscribed(JObject data) {
             var handler = Unsubscribed;
-            if (handler != null) Handshaked(this, data);
+            if (handler != null) handler(this, data);
+            var handlerE = UnsubscribedEvent;
+            if (handlerE != null) handlerE(this, data);
         }
         protected void OnPublished(JObject data) {
             var handler = Published;
-            if (handler != null) Handshaked(this, data);
+            if (handler != null) handler(this, data);
+            var handlerE = PublishedEvent;
+            if (handlerE != null) handlerE(this, data);
         }
         protected void OnReceive(JObject data) {
             var handler = MessageReceived;
-            if (handler != null) Handshaked(this, data);
+            if (handler != null) handler(this, data);
+            var handlerE = MessageReceivedEvent;
+            if (handlerE != null) handlerE(this, data);
         }
         protected void OnDisconnect() {
             var handler = Disconnected;
-            if (handler != null) Disconnected();
+            if (handler != null) handler();
         }
     }
 }

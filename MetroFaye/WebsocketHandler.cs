@@ -111,13 +111,19 @@ namespace MetroFaye {
             };
             _state.socket.Closed += (sender, args) => _state.closed = true;
             _state.socket.MessageReceived += (sender, args) => {
-                JArray messages;
-                using (var reader = args.GetDataReader()) {
-                    messages = JArray.Parse(reader.ReadString(reader.UnconsumedBufferLength));
-                }
+                try {
+                    JArray messages;
+                    using (var reader = args.GetDataReader()) {
+                        messages = JArray.Parse(reader.ReadString(reader.UnconsumedBufferLength));
+                    }
 
-                foreach (var message in messages) {
-                    ProcessMessage(message);
+                    foreach (var message in messages) {
+                        ProcessMessage(message);
+                    }
+                } catch {
+                    _state.socket.Dispose();
+                    _state.closed = true;
+                    OnDisconnect();
                 }
             };
         }

@@ -14,6 +14,7 @@
             <common:BooleanNegationConverter x:Key="BoolNegate" />
             <common:BooleanToVisibilityConverter x:Key="BoolVis" />
             <common:DoubleToggleConverter x:Key="DoubleToggle" />
+            <common:NonZeroToVisibility x:Key="NonZeroVis" />
 
             <Style TargetType="Button">
                 <Setter Property="Background" Value="#AFF0F0F0" />
