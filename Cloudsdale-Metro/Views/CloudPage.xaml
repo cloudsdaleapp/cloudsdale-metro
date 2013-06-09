@@ -8,43 +8,25 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:Cloudsdale_Metro.Views.Controls" 
     xmlns:views="using:Cloudsdale_Metro.Views" xmlns:chatConverters="using:Cloudsdale_Metro.Views.ChatConverters"
+    xmlns:callisto="using:Callisto.Controls"
     mc:Ignorable="d">
 
     <Page.Resources>
         <CollectionViewSource
             x:Name="ItemsViewSource"
             Source="{Binding Items}"/>
+        
         <views:MessageTemplateSelector x:Key="MessageTemplateSelector" />
         <chatConverters:CloudNameColorConverter x:Key="NameColor" />
+        <chatConverters:StatusColorConverter x:Key="StatusColor" />
+        <chatConverters:ShowTag x:Key="ShowTag" />
+        <chatConverters:TagText x:Key="TagText" />
+        <chatConverters:TagColor x:Key="TagColor" />
+        
         <DataTemplate x:Key="StandardChatTemplate">
-            <Grid Margin="5">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition />
-                </Grid.ColumnDefinitions>
-                <Border BorderBrush="#3a3a3a" BorderThickness="1" Margin="0,0,5,5" VerticalAlignment="Top">
-                    <Image Source="{Binding Path=User.Avatar.Normal}" Width="70" Height="70" />
-                </Border>
-                <Grid Grid.Column="1">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="1" Text="{Binding Path=User.Name}" Margin="3" FontSize="24" 
-                                   FontWeight="Bold" Foreground="{Binding Path=User, Converter={StaticResource NameColor}}"/>
-                    </Grid>
-                    <controls:MessageTextControl Messages="{Binding Path=Messages}" Grid.Row="1" FontSize="20" />
-                </Grid>
-            </Grid>
+            <controls:StandardMessageView DataContext="{Binding}" />
         </DataTemplate>
+        <Visibility x:Key="DropVisibility">Visible</Visibility>
     </Page.Resources>
 
     <controls:RootGrid>
@@ -53,17 +35,26 @@
                 <EdgeUIThemeTransition Edge="Right" />
             </TransitionCollection>
         </controls:RootGrid.Transitions>
-        <controls:CloudCanvas x:Name="CloudCanvas" CloudCount="10" BaseTime="10" RandomTime="110" />
-        <Grid Background="#F0F0F0F0">
+        <Grid Background="#F7F0F0F0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <Grid>
-                <Button Style="{StaticResource BackButtonStyle}" Click="GoBack" />
+            <Grid Background="#1A91DB">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Button Style="{StaticResource PortraitBackButtonStyle}" Click="GoBack" Margin="16" Padding="5" />
+                
+                <Button Grid.Column="2" FontSize="24" Margin="5" Width="100" Click="UsersListClick">Users</Button>
+                <Button Grid.Column="3" FontSize="24" Margin="5" Width="100">Drops</Button>
             </Grid>
-            <ScrollViewer Name="ChatScroll" SizeChanged="ChatScroll_OnSizeChanged" ZoomMode="Disabled" Grid.Row="1">
+            <ScrollViewer Name="ChatScroll" SizeChanged="ChatScroll_OnSizeChanged" 
+                          ZoomMode="Disabled" HorizontalScrollMode="Disabled" Grid.Row="1">
                 <ItemsControl ItemsSource="{Binding Source={StaticResource ItemsViewSource}}"
                               ItemTemplateSelector="{StaticResource MessageTemplateSelector}"
                               x:Name="ChatList"/>
@@ -71,27 +62,6 @@
 
             <TextBox Grid.Row="2" Margin="10" FontSize="20" IsTextPredictionEnabled="True" TextWrapping="Wrap" 
                      MaxHeight="200" IsSpellCheckEnabled="True" KeyUp="SendBoxKeyDown" />
-
-            <VisualStateManager.VisualStateGroups>
-
-                <!-- Visual states reflect the application's view state -->
-                <VisualStateGroup x:Name="ApplicationViewStates">
-                    <VisualState x:Name="FullScreenLandscape"/>
-                    <VisualState x:Name="Filled"/>
-
-                    <!-- The entire page respects the narrower 100-pixel margin convention for portrait -->
-                    <VisualState x:Name="FullScreenPortrait">
-                        <Storyboard>
-                        </Storyboard>
-                    </VisualState>
-
-                    <!-- The back button and title have different styles when snapped -->
-                    <VisualState x:Name="Snapped">
-                        <Storyboard>
-                        </Storyboard>
-                    </VisualState>
-                </VisualStateGroup>
-            </VisualStateManager.VisualStateGroups>
         </Grid>
     </controls:RootGrid>
 </common:LayoutAwarePage>

@@ -30,22 +30,95 @@ namespace Cloudsdale_Metro.Controllers {
 
         public ModelCache<Message> Messages { get { return messages; } }
 
+        public List<User> OnlineModerators {
+            get {
+                var list =
+                    userStatuses.Where(kvp => kvp.Value != Status.offline)
+                                .Where(kvp => Cloud.ModeratorIds.Contains(kvp.Key))
+                                .Select(kvp => App.Connection.UserController.GetUser(kvp.Key))
+                                .ToList();
+                list.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.Ordinal));
+                return list;
+            }
+        }
+
+        public List<User> AllModerators {
+            get {
+                var list =
+                    Cloud.ModeratorIds
+                                .Select(mid => App.Connection.UserController.GetUser(mid))
+                                .ToList();
+                list.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.Ordinal));
+                return list;
+            }
+        }
+
+        public List<User> OnlineUsers {
+            get {
+                var list =
+                    userStatuses.Where(kvp => kvp.Value != Status.offline)
+                                .Where(kvp => Cloud.UserIds.Contains(kvp.Key))
+                                .Where(kvp => !Cloud.ModeratorIds.Contains(kvp.Key))
+                                .Select(kvp => App.Connection.UserController.GetUser(kvp.Key))
+                                .ToList();
+                list.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.Ordinal));
+                return list;
+            }
+        }
+        public List<User> AllUsers {
+            get {
+                var list =
+                    userStatuses.Where(kvp => Cloud.UserIds.Contains(kvp.Key))
+                                .Where(kvp => !Cloud.ModeratorIds.Contains(kvp.Key))
+                                .Select(kvp => App.Connection.UserController.GetUser(kvp.Key))
+                                .ToList();
+                list.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.Ordinal));
+                return list;
+            }
+        }
+
         public async Task EnsureLoaded() {
             if (_validatedFayeClient == null || _validatedFayeClient < App.Connection.Faye.CreationDate) {
                 App.Connection.Faye.Subscribe("/clouds/" + Cloud.Id + "/users/*");
             }
 
             await Cloud.Validate();
+
             var client = new HttpClient { DefaultRequestHeaders = { { "Accept", "application/json" } } };
-            var response = await client.GetStringAsync(Endpoints.CloudMessagesEndpoint.Replace("[:id]", Cloud.Id));
-            var responseMessages = await JsonConvert.DeserializeObjectAsync<WebResponse<Message[]>>(response);
-            var newMessages = new List<Message>(messages.Where(message => message.Timestamp > responseMessages.Result.Last().Timestamp));
-            messages.Clear();
-            foreach (var message in responseMessages.Result) {
-                messages.AddToEnd(message);
+
+            // Load user list
+            {
+                var response = await client.GetStringAsync((
+                    Cloud.UserIds.Length > 100
+                    ? Endpoints.CloudOnlineUsersEndpoint
+                    : Endpoints.CloudUsersEndpoint)
+                    .Replace("[:id]", Cloud.Id));
+                var userData = await JsonConvert.DeserializeObjectAsync<WebResponse<User[]>>(response);
+                var users = new List<User>();
+                foreach (var user in userData.Result) {
+                    if (user.Status != null) {
+                        SetStatus(user.Id, (Status)user.Status);
+                    }
+                    users.Add(await App.Connection.UserController.UpdateDataAsync(user));
+                }
+
             }
-            foreach (var message in newMessages) {
-                messages.AddToEnd(message);
+
+            // Load messages
+            {
+                var response = await client.GetStringAsync(Endpoints.CloudMessagesEndpoint.Replace("[:id]", Cloud.Id));
+                var responseMessages = await JsonConvert.DeserializeObjectAsync<WebResponse<Message[]>>(response);
+                var newMessages = new List<Message>(messages
+                    .Where(message => message.Timestamp > responseMessages.Result.Last().Timestamp));
+                messages.Clear();
+                foreach (var message in responseMessages.Result) {
+                    StatusForUser(message.Author.Id);
+                    messages.AddToEnd(message);
+                }
+                foreach (var message in newMessages) {
+                    StatusForUser(message.Author.Id);
+                    messages.AddToEnd(message);
+                }
             }
 
             _validatedFayeClient = App.Connection.Faye.CreationDate;
@@ -55,6 +128,10 @@ namespace Cloudsdale_Metro.Controllers {
             var chanSplit = ((string)message["channel"]).Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
             if (chanSplit.Length == 4 && chanSplit[2] == "chat" && chanSplit[3] == "messages") {
                 OnChatMessage(message["data"]);
+            } else if (chanSplit.Length == 4 && chanSplit[2] == "users") {
+                OnUserMessage(chanSplit[3], message["data"]);
+            } else if (chanSplit.Length == 2) {
+                OnCloudData(message["data"]);
             }
         }
 
@@ -68,6 +145,19 @@ namespace Cloudsdale_Metro.Controllers {
             messages.AddToEnd(messageModel);
         }
 
+        private async void OnUserMessage(string id, JToken jUser) {
+            jUser["id"] = id;
+            var user = jUser.ToObject<User>();
+            if (user.Status != null) {
+                SetStatus(user.Id, (Status)user.Status);
+            }
+            await App.Connection.UserController.UpdateDataAsync(user);
+        }
+
+        private void OnCloudData(JToken cloudData) {
+            cloudData.ToObject<Cloud>().CopyTo(Cloud);
+        }
+
         private void AddUnread() {
             ++UnreadMessages;
             if (App.Connection.MessageController.CurrentCloud == this) {
@@ -77,15 +167,24 @@ namespace Cloudsdale_Metro.Controllers {
 
         public int UnreadMessages {
             get { return _unreadMessages; }
-            private set {
+            set {
                 if (value == _unreadMessages) return;
                 _unreadMessages = value;
                 OnPropertyChanged();
             }
         }
 
+        private Status SetStatus(string userId, Status status) {
+            userStatuses[userId] = status;
+            OnPropertyChanged("OnlineModerators");
+            OnPropertyChanged("AllModerators");
+            OnPropertyChanged("OnlineUsers");
+            OnPropertyChanged("AllUsers");
+            return status;
+        }
+
         public Status StatusForUser(string userId) {
-            return userStatuses.ContainsKey(userId) ? Status.Offline : userStatuses[userId] = Status.Offline;
+            return userStatuses.ContainsKey(userId) ? userStatuses[userId] : SetStatus(userId, Status.offline);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

@@ -5,20 +5,25 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Callisto.Controls;
 using CloudsdaleLib;
 using CloudsdaleLib.Helpers;
 using CloudsdaleLib.Models;
 using Cloudsdale_Metro.Common;
 using Cloudsdale_Metro.Controllers;
 using Cloudsdale_Metro.Views.ChatConverters;
+using Cloudsdale_Metro.Views.Controls;
 using Newtonsoft.Json;
 using WinRTXamlToolkit.AwaitableUI;
 using WinRTXamlToolkit.Controls.Extensions;
 using Windows.System;
+using Windows.UI;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
 
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234237
@@ -35,7 +40,6 @@ namespace Cloudsdale_Metro.Views {
         }
 
         protected override async void OnNavigatedTo(NavigationEventArgs e) {
-            CloudCanvas.StartLoop();
             cloudController = App.Connection.MessageController.CurrentCloud;
             await cloudController.EnsureLoaded();
             DefaultViewModel["Items"] = cloudController.Messages;
@@ -48,8 +52,12 @@ namespace Cloudsdale_Metro.Views {
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e) {
-            CloudCanvas.Stop();
             cloudController.Messages.CollectionChanged -= MessagesOnCollectionChanged;
+        }
+
+        protected override void GoBack(object sender, RoutedEventArgs e) {
+            cloudController.UnreadMessages = 0;
+            base.GoBack(sender, e);
         }
 
         private void SendBoxKeyDown(object sender, KeyRoutedEventArgs e) {
@@ -61,7 +69,7 @@ namespace Cloudsdale_Metro.Views {
                 var index = sendBox.SelectionStart;
                 var length = sendBox.SelectionLength;
 
-                sendBox.Text = text.Substring(0, index) + "\n" + text.Substring(index + length);
+                sendBox.Text = text.Substring(0, index) + "\r\n" + text.Substring(index + length);
                 sendBox.SelectionLength = 0;
                 sendBox.SelectionStart = index + 1;
 
@@ -122,6 +130,26 @@ namespace Cloudsdale_Metro.Views {
 
         private void ChatScroll_OnSizeChanged(object sender, SizeChangedEventArgs e) {
             ScrollChat();
+        }
+
+        private void UsersListClick(object sender, RoutedEventArgs e) {
+            var userList = new SettingsFlyout {
+                HeaderBrush = new SolidColorBrush(Color.FromArgb(0xFF, 0x1A, 0x91, 0xDB)),
+                HeaderText = cloudController.Cloud.Name + " users",
+                Background = new SolidColorBrush(Colors.Transparent),
+                ContentBackgroundBrush = new SolidColorBrush(Color.FromArgb(0xFF, 0xF0, 0xF0, 0xF0)),
+                Content = new UserList(cloudController),
+            };
+
+            userList.BackClicked += (o, args) => {
+                args.Cancel = true;
+                userList.IsOpen = false;
+            };
+
+            var cloudAvatar = cloudController.Cloud.Avatar.Preview;
+            userList.SmallLogoImageSource = new BitmapImage(cloudAvatar);
+
+            userList.IsOpen = true;
         }
     }
 

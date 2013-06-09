@@ -19,6 +19,9 @@ namespace CloudsdaleLib.Models {
         private string _role;
         private Avatar _avatar;
 
+        [JsonProperty("status")]
+        public Status? Status;
+
         [JsonConstructor]
         public User(string id) : base(id) {}
 

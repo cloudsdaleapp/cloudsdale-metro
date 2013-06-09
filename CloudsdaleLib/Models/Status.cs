@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿// ReSharper disable InconsistentNaming
 namespace CloudsdaleLib.Models {
     public enum Status {
-        Online,
-        Away,
-        Busy,
-        Offline
+        online = 0,
+        away = 1,
+        busy = 2,
+        offline = 3
     }
 }
+// ReSharper restore InconsistentNaming

@@ -21,10 +21,14 @@ namespace CloudsdaleLib {
 
             for (var i = 0; i < message.Length; ++i) {
                 if (message[i] == '\\') {
-                    if (ParseMappings.ContainsKey(message[++i])) {
-                        builder.Append(ParseMappings[message[i]]);
+                    if (++i < message.Length) {
+                        if (ParseMappings.ContainsKey(message[i])) {
+                            builder.Append(ParseMappings[message[i]]);
+                        } else {
+                            builder.Append('\\').Append(message[i]);
+                        }
                     } else {
-                        builder.Append('\\').Append(message[i]);
+                        builder.Append('\\');
                     }
                 } else {
                     builder.Append(message[i]);

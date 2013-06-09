@@ -13,6 +13,7 @@ namespace CloudsdaleLib.Models {
             Id = id;
         }
 
+        [JsonProperty("title")]
         public string Title {
             get { return _title; }
             set {
@@ -22,6 +23,7 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        [JsonProperty("url")]
         public Uri Url {
             get { return _url; }
             set {
@@ -31,6 +33,7 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        [JsonProperty("preview")]
         public Uri Preview {
             get { return _preview; }
             set {

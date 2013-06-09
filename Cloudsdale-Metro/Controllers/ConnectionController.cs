@@ -31,6 +31,8 @@ namespace Cloudsdale_Metro.Controllers {
             Cloudsdale.CloudServicesProvider = MessageController;
             Cloudsdale.MetadataProviders["Selected"] = new BooleanMetadataProvider();
             Cloudsdale.MetadataProviders["CloudController"] = new CloudControllerMetadataProvider();
+            Cloudsdale.MetadataProviders["Status"] = new UserStatusMetadataProvider();
+            Cloudsdale.MetadataProviders["IsOnline"] = new UserOnlineMetadataProvider();
         }
 
         public MessageHandler Faye;

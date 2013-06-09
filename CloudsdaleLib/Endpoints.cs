@@ -13,6 +13,8 @@ namespace CloudsdaleLib {
         public const string UserEndpoint = Base + ApiVersion + "/users/[:id]";
         public const string CloudEndpoint = Base + ApiVersion + "/clouds/[:id]";
         public const string CloudMessagesEndpoint = CloudEndpoint + "/chat/messages";
+        public const string CloudUsersEndpoint = CloudEndpoint + "/users";
+        public const string CloudOnlineUsersEndpoint = CloudUsersEndpoint + "/online";
 
         public const string PushAddress = "wss://push.cloudsdale.org/push";
     }

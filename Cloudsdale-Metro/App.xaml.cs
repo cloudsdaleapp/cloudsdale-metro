@@ -8,9 +8,7 @@ using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.UI;
 using Windows.UI.ApplicationSettings;
-using Windows.UI.Core;
 using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 
@@ -54,19 +52,18 @@ namespace Cloudsdale_Metro {
             SettingsPane.GetForCurrentView().CommandsRequested += OnCommandsRequested;
         }
 
-        private void OnCommandsRequested(SettingsPane sender, SettingsPaneCommandsRequestedEventArgs args) {
+        private static void OnCommandsRequested(SettingsPane sender, SettingsPaneCommandsRequestedEventArgs args) {
             var accountSettings = new SettingsCommand("AccountSettings", "Account settings", command => {
                 var settings = new SettingsFlyout {
                     HeaderBrush = new SolidColorBrush(Color.FromArgb(0x7F, 0x1A, 0x91, 0xDB)),
                     HeaderText = "Account settings",
                     Background = new SolidColorBrush(Colors.Transparent),
+                    ContentBackgroundBrush = new SolidColorBrush(Color.FromArgb(0xF0, 0xF0, 0xF0, 0xF0)),
                     Content = new AccountSettings()
                 };
 
                 var avatar = new BitmapImage(Connection.Session.CurrentSession.Avatar.Preview);
                 settings.SmallLogoImageSource = avatar;
-
-                settings.ContentBackgroundBrush = new SolidColorBrush(Color.FromArgb(0x7F, 0xF0, 0xF0, 0xF0));
 
                 settings.IsOpen = true;
             });
@@ -76,7 +73,7 @@ namespace Cloudsdale_Metro {
             }
         }
 
-        private void OnSuspending(object sender, SuspendingEventArgs e) {
+        private static void OnSuspending(object sender, SuspendingEventArgs e) {
             var deferral = e.SuspendingOperation.GetDeferral();
             CloudsdaleLib.ModelSettings.AppLastSuspended = DateTime.Now;
             deferral.Complete();

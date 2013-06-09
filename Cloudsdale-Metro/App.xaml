@@ -10,7 +10,11 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Common/StandardStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-            
+
+            <SolidColorBrush x:Key="BackButtonForegroundThemeBrush" Color="White" />
+            <SolidColorBrush x:Key="BackButtonPressedForegroundThemeBrush" Color="Black" />
+            <SolidColorBrush x:Key="BackButtonPointerOverForegroundThemeBrush" Color="White" />
+
             <common:BooleanNegationConverter x:Key="BoolNegate" />
             <common:BooleanToVisibilityConverter x:Key="BoolVis" />
             <common:DoubleToggleConverter x:Key="DoubleToggle" />

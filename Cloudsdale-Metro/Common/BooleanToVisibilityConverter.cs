@@ -18,11 +18,15 @@ namespace Cloudsdale_Metro.Common {
     /// </summary>
     public sealed class BooleanToVisibilityConverter : IValueConverter {
         public object Convert(object value, Type targetType, object parameter, string language) {
-            return (value is bool && (bool)value) ? Visibility.Visible : Visibility.Collapsed;
+            var val = (value is bool && (bool)value);
+            if (parameter is string && (parameter as string) == "Inverse") val = !val;
+            return val ? Visibility.Visible : Visibility.Collapsed;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language) {
-            return value is Visibility && (Visibility)value == Visibility.Visible;
+            var val = value is Visibility && (Visibility)value == Visibility.Visible;
+            if (parameter is string && (parameter as string) == "Inverse") val = !val;
+            return val;
         }
     }
 }

@@ -26,5 +26,15 @@ namespace Cloudsdale_Metro.Controllers {
             }
             return users[id];
         }
+
+        public async Task<User> UpdateDataAsync(User user) {
+            if (!users.ContainsKey(user.Id)) {
+                await user.ForceValidate();
+                users[user.Id] = user;
+            } else {
+                user.CopyTo(users[user.Id]);
+            }
+            return users[user.Id];
+        }
     }
 }

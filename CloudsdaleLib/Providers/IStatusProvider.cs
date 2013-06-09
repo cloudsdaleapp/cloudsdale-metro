@@ -12,7 +12,7 @@ namespace CloudsdaleLib.Providers {
 
     internal class DefaultStatusProvider : IStatusProvider {
         public Status StatusForUser(string userId) {
-            return Status.Offline;
+            return Status.offline;
         }
     }
 }

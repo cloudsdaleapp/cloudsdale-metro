@@ -42,6 +42,7 @@ namespace CloudsdaleLib.Models {
                 if (value.Equals(_timestamp)) return;
                 _timestamp = value;
                 OnPropertyChanged();
+                OnPropertyChanged("FinalTimestamp");
             }
         }
 
@@ -132,10 +133,20 @@ namespace CloudsdaleLib.Models {
             get { return Cloudsdale.CloudServicesProvider.GetBackedUser(Author.Id); }
         }
 
+        public DateTime FinalTimestamp {
+            get {
+                if (_messages.Count < 1) {
+                    return Timestamp;
+                }
+                return _messages.Last().Timestamp;
+            }
+        }
+
         public void Merge(CloudsdaleModel other) {
             _messages.Add((Message)other);
             OnPropertyChanged("Messages");
             OnPropertyChanged("AllDrops");
+            OnPropertyChanged("FinalTimestamp");
 
             other.PropertyChanged += (sender, args) => OnPropertyChanged(args.PropertyName);
         }
