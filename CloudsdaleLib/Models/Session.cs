@@ -10,7 +10,7 @@ namespace CloudsdaleLib.Models {
     public class Session : User {
         private string _authToken;
         private string _email;
-        private string _preferredStatus;
+        private Status _preferredStatus;
         private bool? _needsToConfirmRegistration;
         private bool? _needsPasswordChange;
         private bool? _needsNameChange;
@@ -42,7 +42,7 @@ namespace CloudsdaleLib.Models {
         }
 
         [JsonProperty("preferred_status")]
-        public string PreferredStatus {
+        public Status PreferredStatus {
             get { return _preferredStatus; }
             set {
                 if (value == _preferredStatus) return;

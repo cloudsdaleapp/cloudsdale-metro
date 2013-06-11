@@ -24,6 +24,8 @@ namespace Cloudsdale_Metro.Controllers {
 
         public CloudController(Cloud cloud) {
             Cloud = cloud;
+            userStatuses[App.Connection.Session.CurrentSession.Id] =
+                App.Connection.Session.CurrentSession.PreferredStatus;
         }
 
         public Cloud Cloud { get; private set; }

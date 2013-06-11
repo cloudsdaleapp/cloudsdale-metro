@@ -85,11 +85,8 @@ namespace Cloudsdale_Metro.Controllers {
                     error = true;
                 }
                 if (error) {
-                    var dialog = new MessageDialog("Couldn't connect to cloudsdale " +
-                                                   "(are you connected to the internet?)",
-                                                   "Connection Error");
-                    await dialog.ShowAsync();
-                    Window.Current.Close();
+                    await EnsureFayeConnection();
+                    return;
                 }
             }
 

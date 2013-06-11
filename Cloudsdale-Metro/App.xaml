@@ -26,6 +26,28 @@
             <Style TargetType="controls:RootGrid">
                 <Setter Property="Background" Value="#1A91DB" />
             </Style>
+            <DataTemplate x:Key="CloudSnappedTemplate">
+                <Grid Height="70" Width="280" Background="#7FF0F0F0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Border Background="#A7E0E0E0">
+                        <Grid>
+                            <Image Source="{Binding Path=Avatar.Preview}" Width="70" Height="70" />
+                            <Border Height="24" MinWidth="24" CornerRadius="3" Background="Navy" 
+                                HorizontalAlignment="Right" VerticalAlignment="Top"
+                                Visibility="{Binding Path=UIMetadata[CloudController].Value.UnreadMessages, 
+                                                Converter={StaticResource NonZeroVis}}">
+                                <TextBlock Text="{Binding Path=UIMetadata[CloudController].Value.UnreadMessages}" 
+                                   Foreground="White" FontWeight="ExtraBlack" FontSize="16"
+                                   HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8,0"/>
+                            </Border>
+                        </Grid>
+                    </Border>
+                    <TextBlock Margin="5,0,0,0" Text="{Binding Path=Name}" FontSize="24" TextWrapping="Wrap" Grid.Column="1" />
+                </Grid>
+            </DataTemplate>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

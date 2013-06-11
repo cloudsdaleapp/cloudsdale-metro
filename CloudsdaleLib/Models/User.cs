@@ -18,9 +18,7 @@ namespace CloudsdaleLib.Models {
         private string _skypeName;
         private string _role;
         private Avatar _avatar;
-
-        [JsonProperty("status")]
-        public Status? Status;
+        private string _username;
 
         [JsonConstructor]
         public User(string id) : base(id) {}
@@ -159,11 +157,19 @@ namespace CloudsdaleLib.Models {
             }
         }
 
-        #endregion
-
-        [JsonObject(MemberSerialization.OptIn)]
-        public class CloudContextInformation {
-            
+        [JsonProperty("username")]
+        public string Username {
+            get { return _username; }
+            set {
+                if (value == _username) return;
+                _username = value;
+                OnPropertyChanged();
+            }
         }
+
+        [JsonProperty("status")]
+        public Status? Status;
+
+        #endregion
     }
 }

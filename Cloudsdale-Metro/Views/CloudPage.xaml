@@ -15,14 +15,17 @@
         <CollectionViewSource
             x:Name="ItemsViewSource"
             Source="{Binding Items}"/>
-        
+        <CollectionViewSource
+            x:Name="CloudsItemsViewSource"
+            Source="{Binding Clouds}"/>
+
         <views:MessageTemplateSelector x:Key="MessageTemplateSelector" />
         <chatConverters:CloudNameColorConverter x:Key="NameColor" />
         <chatConverters:StatusColorConverter x:Key="StatusColor" />
         <chatConverters:ShowTag x:Key="ShowTag" />
         <chatConverters:TagText x:Key="TagText" />
         <chatConverters:TagColor x:Key="TagColor" />
-        
+
         <DataTemplate x:Key="StandardChatTemplate">
             <controls:StandardMessageView DataContext="{Binding}" />
         </DataTemplate>
@@ -35,7 +38,76 @@
                 <EdgeUIThemeTransition Edge="Right" />
             </TransitionCollection>
         </controls:RootGrid.Transitions>
-        <Grid Background="#F7F0F0F0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Grid.Resources>
+            <Storyboard x:Name="CloudListExpand">
+                <DoubleAnimation Storyboard.TargetName="CloudListTransform" 
+                                 Storyboard.TargetProperty="X"
+                                 From="-320" To="0" Duration="0:0:0.7">
+                    <DoubleAnimation.EasingFunction>
+                        <ElasticEase Oscillations="1" EasingMode="EaseOut" />
+                    </DoubleAnimation.EasingFunction>
+                </DoubleAnimation>
+                <DoubleAnimation Storyboard.TargetName="BackButtonProjection" 
+                                 Storyboard.TargetProperty="RotationZ" Duration="0:0:0.7"
+                                 From="-180" To="0">
+                    <DoubleAnimation.EasingFunction>
+                        <ElasticEase Oscillations="1" Springiness="2" EasingMode="EaseInOut" />
+                    </DoubleAnimation.EasingFunction>
+                </DoubleAnimation>
+                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="CloudGrid" Duration="0:0:0.7"
+                                               Storyboard.TargetProperty="Visibility">
+                    <DiscreteObjectKeyFrame KeyTime="0" Value="Visible" />
+                </ObjectAnimationUsingKeyFrames>
+            </Storyboard>
+            <Storyboard x:Name="CloudListCollapse">
+                <DoubleAnimation Storyboard.TargetName="CloudListTransform" 
+                                 Storyboard.TargetProperty="X"
+                                 From="0" To="-320" Duration="0:0:0.6">
+                    <DoubleAnimation.EasingFunction>
+                        <ElasticEase Oscillations="1" EasingMode="EaseIn" />
+                    </DoubleAnimation.EasingFunction>
+                </DoubleAnimation>
+                <DoubleAnimation Storyboard.TargetName="BackButtonProjection" 
+                                 Storyboard.TargetProperty="RotationZ" Duration="0:0:0.7"
+                                 From="0" To="-180">
+                    <DoubleAnimation.EasingFunction>
+                        <ElasticEase Oscillations="1" Springiness="2" EasingMode="EaseInOut" />
+                    </DoubleAnimation.EasingFunction>
+                </DoubleAnimation>
+                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="CloudGrid" 
+                                               Storyboard.TargetProperty="Visibility" Duration="0:0:0.7">
+                    <DiscreteObjectKeyFrame KeyTime="0:0:0.7" Value="Collapsed" />
+                </ObjectAnimationUsingKeyFrames>
+            </Storyboard>
+        </Grid.Resources>
+
+        <Grid Visibility="Collapsed" x:Name="CloudGrid">
+            <Grid.RenderTransform>
+                <TranslateTransform x:Name="CloudListTransform" X="-320" />
+            </Grid.RenderTransform>
+            <ListView
+                x:Name="CloudListView"
+                AutomationProperties.AutomationId="CloudListView"
+                AutomationProperties.Name="Clouds"
+                TabIndex="1"
+                Width="320"
+                Grid.Row="1"
+                Margin="0,0,0,0"
+                Padding="10,10,0,60"
+                ItemsSource="{Binding Source={StaticResource CloudsItemsViewSource}}"
+                ItemTemplate="{StaticResource CloudSnappedTemplate}"
+                SelectionChanged="CloudListView_OnSelectionChanged"
+                SelectionMode="Single"
+                IsSwipeEnabled="false"
+                ItemClick="CloudItemClicked"
+                IsItemClickEnabled="True"/>
+        </Grid>
+
+        <Grid Column="1" Background="#F7F0F0F0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition />
@@ -48,8 +120,13 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <Button Style="{StaticResource PortraitBackButtonStyle}" Click="GoBack" Margin="16" Padding="5" />
-                
+                <Button Style="{StaticResource PortraitBackButtonStyle}" Click="GoBack" Margin="16" Padding="5">
+                    <Button.Projection>
+                        <PlaneProjection x:Name="BackButtonProjection" CenterOfRotationX="0.5" 
+                                         CenterOfRotationY="0.5" RotationZ="180" />
+                    </Button.Projection>
+                </Button>
+
                 <Button Grid.Column="2" FontSize="24" Margin="5" Width="100" Click="UsersListClick">Users</Button>
                 <Button Grid.Column="3" FontSize="24" Margin="5" Width="100">Drops</Button>
             </Grid>
@@ -63,5 +140,18 @@
             <TextBox Grid.Row="2" Margin="10" FontSize="20" IsTextPredictionEnabled="True" TextWrapping="Wrap" 
                      MaxHeight="200" IsSpellCheckEnabled="True" KeyUp="SendBoxKeyDown" />
         </Grid>
+
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="ApplicationViewStates">
+                <VisualState x:Name="FullScreenLandscape"/>
+                <VisualState x:Name="Filled"/>
+                <VisualState x:Name="FullScreenPortrait" />
+
+                <VisualState x:Name="Snapped">
+                    <Storyboard>
+                    </Storyboard>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
     </controls:RootGrid>
 </common:LayoutAwarePage>

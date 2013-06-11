@@ -17,9 +17,33 @@
         <chatConverters:ShowTag x:Key="ShowTag" />
         <chatConverters:TagText x:Key="TagText" />
         <chatConverters:TagColor x:Key="TagColor" />
+        <chatConverters:TimestampConverter x:Key="TimestampConverter" />
+
+        <DataTemplate x:Key="DropTemplate">
+            <Border Background="White" BorderBrush="Gray"
+                                        BorderThickness="1" CornerRadius="1">
+                <Border BorderBrush="Gray" BorderThickness="1" Margin="4">
+                    <Image Source="{Binding Path=Preview}" Width="120" Height="90" />
+                </Border>
+            </Border>
+        </DataTemplate>
+        <Style TargetType="GridView">
+            <Setter Property="ItemsPanel">
+                <Setter.Value>
+                    <ItemsPanelTemplate>
+                        <WrapGrid Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="ItemTemplate" Value="{StaticResource DropTemplate}" />
+            <Setter Property="IsSwipeEnabled" Value="True" />
+            <Setter Property="IsItemClickEnabled" Value="True" />
+            <Setter Property="SelectionMode" Value="None" />
+            <Setter Property="ScrollViewer.HorizontalScrollMode" Value="Disabled" />
+        </Style>
     </UserControl.Resources>
 
-    <Grid Margin="5,0,5,3">
+    <Grid Margin="5,0,5,5">
         <Border HorizontalAlignment="Stretch" Height="1" x:Name="Separator"
                 VerticalAlignment="Top">
             <Border.Background>
@@ -30,7 +54,7 @@
                 </LinearGradientBrush>
             </Border.Background>
         </Border>
-        <Grid Margin="0,2,0,0">
+        <Grid Margin="0,5,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
@@ -59,6 +83,7 @@
             <Grid Grid.Column="2">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                     <RowDefinition />
                 </Grid.RowDefinitions>
                 <Grid>
@@ -74,34 +99,34 @@
                                Foreground="{Binding Path=User.UIMetadata[Status].Value,
                                                      Converter={StaticResource StatusColor}}"/>
                     </Grid>
-                    <TextBlock Grid.Column="1" Text="{Binding Path=User.Name}" Margin="3" FontSize="20" 
-                           Foreground="{Binding Path=User, Converter={StaticResource NameColor}}"
-                           FontWeight="SemiBold" />
+                    <TextBlock Margin="3" Grid.Column="1" >
+                        <Run Text="{Binding Path=User.Name}" FontSize="20" 
+                             Foreground="{Binding Path=User, Converter={StaticResource NameColor}}"
+                             FontWeight="SemiBold" />
+                        @<Run FontSize="16" Text="{Binding Path=User.Username}" Foreground="#6a6a6a" />
+                    </TextBlock>
+                    
+                    <TextBlock Grid.Column="3" Text="{Binding Path=FinalTimestamp, 
+                               Converter={StaticResource TimestampConverter}}"
+                               FontSize="16"/>
                 </Grid>
-                <local:MessageTextControl Messages="{Binding Path=Messages}" Grid.Row="1" FontSize="20" />
-            </Grid>
-            <Grid Grid.Column="3" x:Name="DropGrid" MaxWidth="300">
-                <GridView ItemsSource="{Binding Path=AllDrops}"
-                      ScrollViewer.HorizontalScrollMode="Disabled"
-                      FlowDirection="RightToLeft"
-                      SelectionMode="None"
-                      IsSwipeEnabled="False">
-                    <GridView.ItemTemplate>
-                        <DataTemplate>
-                            <Border Background="White" BorderBrush="Gray"
-                                BorderThickness="1" CornerRadius="1">
-                                <Border BorderBrush="Gray" BorderThickness="1" Margin="4">
-                                    <Image Source="{Binding Path=Preview}" Width="120" Height="90" />
-                                </Border>
-                            </Border>
-                        </DataTemplate>
-                    </GridView.ItemTemplate>
-                    <GridView.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapGrid Orientation="Horizontal" />
-                        </ItemsPanelTemplate>
-                    </GridView.ItemsPanel>
-                </GridView>
+                <Grid Grid.Row="1" Name="AltDropGrid" Visibility="Collapsed">
+                    <GridView ItemsSource="{Binding Path=AllDrops}"
+                              FlowDirection="LeftToRight"
+                              ItemClick="DropClicked" />
+                </Grid>
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <local:MessageTextControl Messages="{Binding Path=Messages}" FontSize="20" FontFamily="Verdana" />
+                    <Grid Grid.Column="1" x:Name="DropGrid">
+                        <GridView ItemsSource="{Binding Path=AllDrops}"
+                                  FlowDirection="RightToLeft"
+                              ItemClick="DropClicked" />
+                    </Grid>
+                </Grid>
             </Grid>
         </Grid>
     </Grid>

@@ -140,6 +140,7 @@
     <Compile Include="Views\ChatConverters\CloudNameColorConverter.cs" />
     <Compile Include="Views\ChatConverters\StatusColorConverter.cs" />
     <Compile Include="Views\ChatConverters\TagConverters.cs" />
+    <Compile Include="Views\ChatConverters\TimestampConverter.cs" />
     <Compile Include="Views\CloudPage.xaml.cs">
       <DependentUpon>CloudPage.xaml</DependentUpon>
     </Compile>

@@ -41,6 +41,10 @@ namespace Cloudsdale_Metro.Views {
 
         protected override async void OnNavigatedTo(NavigationEventArgs e) {
             cloudController = App.Connection.MessageController.CurrentCloud;
+            cloudController.UnreadMessages = 0;
+            DefaultViewModel["Clouds"] = App.Connection.Session.CurrentSession.Clouds;
+            await CloudListView.WaitForLayoutUpdateAsync();
+            CloudListView.SelectedItem = cloudController.Cloud;
             await cloudController.EnsureLoaded();
             DefaultViewModel["Items"] = cloudController.Messages;
             cloudController.Messages.CollectionChanged += MessagesOnCollectionChanged;
@@ -55,9 +59,14 @@ namespace Cloudsdale_Metro.Views {
             cloudController.Messages.CollectionChanged -= MessagesOnCollectionChanged;
         }
 
-        protected override void GoBack(object sender, RoutedEventArgs e) {
-            cloudController.UnreadMessages = 0;
-            base.GoBack(sender, e);
+        protected override async void GoBack(object sender, RoutedEventArgs e) {
+            if (CloudGrid.Visibility == Visibility.Collapsed) {
+                CloudListExpand.Begin();
+                await CloudListView.WaitForLayoutUpdateAsync();
+                CloudListView.ScrollIntoView(cloudController.Cloud);
+            } else {
+                CloudListCollapse.Begin();
+            }
         }
 
         private void SendBoxKeyDown(object sender, KeyRoutedEventArgs e) {
@@ -150,6 +159,26 @@ namespace Cloudsdale_Metro.Views {
             userList.SmallLogoImageSource = new BitmapImage(cloudAvatar);
 
             userList.IsOpen = true;
+        }
+
+        private void CloudItemClicked(object sender, ItemClickEventArgs e) {
+            if (e.ClickedItem == cloudController.Cloud) {
+                CloudListCollapse.Begin();
+                return;
+            }
+
+            App.Connection.MessageController.CurrentCloud = App.Connection.MessageController[(Cloud)e.ClickedItem];
+            App.Connection.MessageController.CurrentCloud.UnreadMessages = 0;
+            Frame.Navigate(typeof(CloudPage));
+        }
+
+        private void CloudListView_OnSelectionChanged(object sender, SelectionChangedEventArgs e) {
+            var view = (ListView)sender;
+// ReSharper disable RedundantCheckBeforeAssignment
+            if (view.SelectedItem != cloudController.Cloud) {
+                view.SelectedItem = cloudController.Cloud;
+            }
+// ReSharper restore RedundantCheckBeforeAssignment
         }
     }
 
