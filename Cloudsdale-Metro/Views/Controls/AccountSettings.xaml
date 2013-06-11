@@ -11,7 +11,7 @@
     </UserControl.Resources>
     
     <StackPanel>
-        <Button Background="Red" Click="LogoutClick" Margin="5">Log Out</Button>
+        <Button Background="#F74C49" Click="LogoutClick" Margin="5">Log Out</Button>
         
         <!-- Status panel -->
         <StackPanel>

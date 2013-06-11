@@ -23,12 +23,12 @@
                 <Border Background="#A7E0E0E0">
                     <Image Source="{Binding Path=Avatar.Normal}" />
                 </Border>
-                <TextBlock Grid.Row="1" FontSize="26" TextWrapping="Wrap" Margin="3">
+                <TextBlock Grid.Row="1" FontSize="24" TextWrapping="Wrap" Margin="3">
                     <Run Text="{Binding Path=Name}" />
                 </TextBlock>
                 <TextBlock Visibility="{Binding Path=UIMetadata[CloudController].Value.UnreadMessages, 
                                                 Converter={StaticResource NonZeroVis}}"
-                           Grid.Row="2" FontSize="24" Margin="5">
+                           Grid.Row="2" FontSize="20" Margin="2">
                     <Run Text="{Binding Path=UIMetadata[CloudController].Value.UnreadMessages}" 
                          Foreground="Red" FontWeight="ExtraBlack" /> unread
                 </TextBlock>
@@ -89,11 +89,14 @@
                         <ColumnDefinition />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <Image MaxWidth="400" Source="/Assets/cloudsdale-thin-bright-logo.png" />
+                    <StackPanel Orientation="Horizontal">
+                        <Image Height="50" Source="/Assets/icon_white_small.png" />
+                        <TextBlock Foreground="White" FontSize="48" Margin="15,0">cloudsdale</TextBlock>
+                    </StackPanel>
                 </Grid>
 
                 <StackPanel Name="VerticalTopButtons" Visibility="Collapsed">
-                    <Image Source="/Assets/cloudsdale-thin-bright-logo.png" />
+                    <Image Height="100" Source="/Assets/icon_white_small.png" />
                 </StackPanel>
             </Grid>
         </Grid>

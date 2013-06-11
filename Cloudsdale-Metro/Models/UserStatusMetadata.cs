@@ -17,9 +17,14 @@ namespace Cloudsdale_Metro.Models {
             public UserStatusMetadata(CloudsdaleModel model) {
                 Model = model;
                 CorrectController();
+
+                if (Model is Session) {
+                    Model.PropertyChanged += ControllerOnPropertyChanged;
+                }
             }
 
             void CorrectController() {
+
                 if (controller == App.Connection.MessageController.CurrentCloud) return;
                 if (controller != null) {
                     controller.PropertyChanged -= ControllerOnPropertyChanged;

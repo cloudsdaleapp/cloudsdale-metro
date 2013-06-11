@@ -187,6 +187,7 @@
     <Content Include="Assets\BackgroundClouds.png" />
     <Content Include="Assets\cloudsdale-thin-bright-logo.png" />
     <Content Include="Assets\icon_white.png" />
+    <Content Include="Assets\icon_white_small.png" />
     <Content Include="Assets\Logo.png" />
     <Content Include="Assets\SmallLogo.png" />
     <Content Include="Assets\SplashScreen.png" />
