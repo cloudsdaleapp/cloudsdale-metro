@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -70,8 +71,12 @@ namespace CloudsdaleLib.Helpers {
 
             public object NodeValue {
                 get {
-                    var property = typeof(T).GetTypeInfo().GetDeclaredProperty(Node);
-                    return property.GetValue(Response);
+                    return (from property in typeof(T).GetTypeInfo().DeclaredProperties
+                            let attribute = property.GetCustomAttribute<JsonPropertyAttribute>()
+                            where attribute != null
+                            where attribute.PropertyName == Node
+                            select property.GetValue(Response.Result))
+                            .FirstOrDefault();
                 }
             }
         }

@@ -11,5 +11,9 @@ namespace Cloudsdale_Metro.Helpers {
         public static CloudController GetController(this Cloud cloud) {
             return null;
         }
+
+        public static KeyValuePair<string, T> KeyOf<T>(this string key, T value) {
+            return new KeyValuePair<string, T>(key, value);
+        } 
     }
 }

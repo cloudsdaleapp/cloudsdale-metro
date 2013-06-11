@@ -5,5 +5,6 @@
     <UseAuthentication>True</UseAuthentication>
     <RemoteDebugEnabled>false</RemoteDebugEnabled>
     <UseSimulator>False</UseSimulator>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
 </Project>

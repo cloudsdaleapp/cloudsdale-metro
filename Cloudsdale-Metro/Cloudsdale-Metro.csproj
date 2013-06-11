@@ -122,6 +122,7 @@
     <Compile Include="Common\LayoutAwarePage.cs" />
     <Compile Include="Common\NonZeroToVisibility.cs" />
     <Compile Include="Common\RichTextColumns.cs" />
+    <Compile Include="Common\StatusIndexConverter.cs" />
     <Compile Include="Common\SuspensionManager.cs" />
     <Compile Include="Controllers\CloudController.cs" />
     <Compile Include="Controllers\ConnectionController.cs" />

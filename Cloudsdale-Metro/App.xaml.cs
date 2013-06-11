@@ -55,10 +55,9 @@ namespace Cloudsdale_Metro {
         private static void OnCommandsRequested(SettingsPane sender, SettingsPaneCommandsRequestedEventArgs args) {
             var accountSettings = new SettingsCommand("AccountSettings", "Account settings", command => {
                 var settings = new SettingsFlyout {
-                    HeaderBrush = new SolidColorBrush(Color.FromArgb(0x7F, 0x1A, 0x91, 0xDB)),
+                    Background = new SolidColorBrush(Colors.White),
+                    HeaderBrush = new SolidColorBrush(Color.FromArgb(0xAF, 0x1A, 0x91, 0xDB)),
                     HeaderText = "Account settings",
-                    Background = new SolidColorBrush(Colors.Transparent),
-                    ContentBackgroundBrush = new SolidColorBrush(Color.FromArgb(0xF0, 0xF0, 0xF0, 0xF0)),
                     Content = new AccountSettings()
                 };
 

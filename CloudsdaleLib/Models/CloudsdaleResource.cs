@@ -127,7 +127,11 @@ namespace CloudsdaleLib.Models {
             LastUpdated = DateTime.Now;
         }
 
-        public async Task UpdateProperty<T>(params KeyValuePair<string, JToken>[] properties) where T : CloudsdaleResource {
+        public async Task<WebResponse<T>> UpdateProperty<T>(
+            bool cancelError, 
+            params KeyValuePair<string, JToken>[] properties) 
+            where T : CloudsdaleResource {
+
             var endpoint = GetType().GetTypeInfo().GetCustomAttribute<ResourceEndpointAttribute>();
             var model = new JObject();
             model[endpoint.RestModelType] = new JObject();
@@ -138,8 +142,10 @@ namespace CloudsdaleLib.Models {
             var requestData = Encoding.UTF8.GetBytes(model.ToString(Formatting.None));
 
             var request = WebRequest.CreateHttp(endpoint.UpdateEndpoint.Replace("[:id]", Id));
+            request.Method = "PUT";
             request.Accept = "application/json";
             request.ContentType = "application/json";
+            request.Headers["X-Auth-Token"] = Cloudsdale.SessionProvider.CurrentSession.AuthToken;
 
             using (var requestStream = await request.GetRequestStreamAsync()) {
                 await requestStream.WriteAsync(requestData, 0, requestData.Length);
@@ -148,11 +154,13 @@ namespace CloudsdaleLib.Models {
 
             var response = await request.PerformRequest<T>();
             if (response.Flash != null) {
+                if (!cancelError)
                 await Cloudsdale.ModelErrorProvider.OnError(response);
-                return;
+                return response;
             }
 
             response.Result.CopyTo(this);
+            return response;
         }
     }
 

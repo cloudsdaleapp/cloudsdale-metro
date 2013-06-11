@@ -22,7 +22,7 @@ namespace Cloudsdale_Metro.Models {
             void CorrectController() {
                 if (controller == App.Connection.MessageController.CurrentCloud) return;
                 if (controller != null) {
-
+                    controller.PropertyChanged -= ControllerOnPropertyChanged;
                 }
                 controller = App.Connection.MessageController.CurrentCloud;
                 controller.PropertyChanged += ControllerOnPropertyChanged;
@@ -33,7 +33,12 @@ namespace Cloudsdale_Metro.Models {
             }
 
             public object Value {
-                get { return App.Connection.MessageController.CurrentCloud.StatusForUser(((User)Model).Id); }
+                get {
+                    if (Model is Session) {
+                        return (Model as Session).PreferredStatus;
+                    }
+                    return App.Connection.MessageController.CurrentCloud.StatusForUser(((User)Model).Id);
+                }
                 set { throw new NotSupportedException(); }
             }
 

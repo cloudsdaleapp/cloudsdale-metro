@@ -1,15 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using CloudsdaleLib.Models;
 
 namespace Cloudsdale_Metro.Controllers {
     public class UserController {
         private readonly Dictionary<string, User> users = new Dictionary<string, User>();
+        private SessionController sessionController { get { return App.Connection.Session; } }
 
         public async Task<User> GetUserAsync(string id) {
+            if (id == sessionController.CurrentSession.Id) {
+                return sessionController.CurrentSession;
+            }
+
             if (!users.ContainsKey(id)) {
                 var user = new User(id);
                 await user.ForceValidate();
@@ -19,6 +21,10 @@ namespace Cloudsdale_Metro.Controllers {
         }
 
         public User GetUser(string id) {
+            if (id == sessionController.CurrentSession.Id) {
+                return sessionController.CurrentSession;
+            }
+
             if (!users.ContainsKey(id)) {
                 var user = new User(id);
                 user.ForceValidate();
@@ -28,6 +34,12 @@ namespace Cloudsdale_Metro.Controllers {
         }
 
         public async Task<User> UpdateDataAsync(User user) {
+            if (user.Id == sessionController.CurrentSession.Id) {
+                var session = sessionController.CurrentSession;
+                user.CopyTo(session);
+                return session;
+            }
+
             if (!users.ContainsKey(user.Id)) {
                 await user.ForceValidate();
                 users[user.Id] = user;

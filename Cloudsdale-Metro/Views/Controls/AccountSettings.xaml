@@ -2,11 +2,53 @@
     x:Class="Cloudsdale_Metro.Views.Controls.AccountSettings"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Cloudsdale_Metro.Views.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:common="using:Cloudsdale_Metro.Common"
     mc:Ignorable="d">
+    
+    <UserControl.Resources>
+        <common:StatusIndexConverter x:Key="StatusIndex" />
+    </UserControl.Resources>
+    
     <StackPanel>
-        <Button Background="Red" Click="LogoutClick">Log Out</Button>
+        <Button Background="Red" Click="LogoutClick" Margin="5">Log Out</Button>
+        
+        <!-- Status panel -->
+        <StackPanel>
+            <TextBlock FontSize="18" Margin="5,5,5,0">Status</TextBlock>
+            <StackPanel Orientation="Horizontal">
+                <ProgressRing Foreground="Gray" IsActive="True" Visibility="Collapsed" Name="StatusProgress" />
+                <ComboBox SelectedIndex="{Binding Path=PreferredStatus, Converter={StaticResource StatusIndex}}" 
+                          SelectionChanged="Selector_OnSelectionChanged" Margin="5">
+                    <ComboBoxItem Content="Online" />
+                    <ComboBoxItem Content="Away" />
+                    <ComboBoxItem Content="Busy" />
+                    <ComboBoxItem Content="Invisible" />
+                </ComboBox>
+            </StackPanel>
+            <TextBlock Foreground="Red" FontSize="14" Name="StatusModelError" />
+        </StackPanel>
+
+        <!-- Change name panel -->
+        <StackPanel>
+            <TextBlock FontSize="18" Margin="5,5,5,0">Display Name</TextBlock>
+            <StackPanel Orientation="Horizontal">
+                <ProgressRing Foreground="Gray" IsActive="True" Visibility="Collapsed" Name="NameProgress" />
+                <TextBox Width="250" Text="{Binding Path=Name}" Margin="5" 
+                         LostFocus="NameBox_OnLostFocus" KeyDown="UIElement_OnKeyDown" />
+            </StackPanel>
+            <TextBlock Foreground="Red" FontSize="14" Name="NameModelError" />
+        </StackPanel>
+
+        <!-- Change skype panel -->
+        <StackPanel>
+            <TextBlock FontSize="18" Margin="5,5,5,0">Skype Name</TextBlock>
+            <StackPanel Orientation="Horizontal">
+                <ProgressRing Foreground="Gray" IsActive="True" Visibility="Collapsed" Name="SkypeProgress" />
+                <TextBox Width="250" Text="{Binding Path=SkypeName}" Margin="5" 
+                         LostFocus="SkypeBox_OnLostFocus" KeyDown="UIElement_OnKeyDown" />
+            </StackPanel>
+            <TextBlock Foreground="Red" FontSize="14" Name="SkypeModelError" />
+        </StackPanel>
     </StackPanel>
 </UserControl>
