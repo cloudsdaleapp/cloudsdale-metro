@@ -139,11 +139,15 @@
     <Compile Include="Models\SessionModels.cs" />
     <Compile Include="Models\UserStatusMetadata.cs" />
     <Compile Include="Views\ChatConverters\CloudNameColorConverter.cs" />
+    <Compile Include="Views\ChatConverters\MessageDeviceConverter.cs" />
     <Compile Include="Views\ChatConverters\StatusColorConverter.cs" />
     <Compile Include="Views\ChatConverters\TagConverters.cs" />
     <Compile Include="Views\ChatConverters\TimestampConverter.cs" />
     <Compile Include="Views\CloudPage.xaml.cs">
       <DependentUpon>CloudPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Controls\ActionMessageView.xaml.cs">
+      <DependentUpon>ActionMessageView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Controls\MessageTextControl.xaml.cs">
       <DependentUpon>MessageTextControl.xaml</DependentUpon>
@@ -154,6 +158,7 @@
     <Compile Include="Views\Controls\UserList.xaml.cs">
       <DependentUpon>UserList.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Controls\ViewboxPanel.cs" />
     <Compile Include="Views\LoadPages\Connecting.xaml.cs">
       <DependentUpon>Connecting.xaml</DependentUpon>
     </Compile>
@@ -205,6 +210,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\CloudPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Controls\ActionMessageView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
