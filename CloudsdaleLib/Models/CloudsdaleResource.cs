@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Reflection;
@@ -98,7 +99,7 @@ namespace CloudsdaleLib.Models {
                 }
 
                 var responseObject = JObject.Parse(responseData);
-                var responseModel = (CloudsdaleModel)ObjectFromWebResult(responseObject).ToObject(GetType());
+                var responseModel = (CloudsdaleModel) ObjectFromWebResult(responseObject).ToObject(GetType());
                 responseModel.CopyTo(this);
             } catch (WebException exception) {
                 OnValidationError(exception);

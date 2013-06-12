@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,7 +13,7 @@ namespace Cloudsdale_Metro.Views.ChatConverters {
     public class ShowTag : IValueConverter {
         public object Convert(object value, Type targetType, object parameter, string language) {
             var role = (string)value;
-            return role == "normal" ? Visibility.Collapsed : Visibility.Visible;
+            return role == "normal" || string.IsNullOrWhiteSpace(role) ? Visibility.Collapsed : Visibility.Visible;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language) {

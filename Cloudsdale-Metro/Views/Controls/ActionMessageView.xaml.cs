@@ -1,23 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+using CloudsdaleLib.Models;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
 namespace Cloudsdale_Metro.Views.Controls {
-    public sealed partial class ActionMessageView : UserControl {
+    public sealed partial class ActionMessageView {
         public ActionMessageView() {
-            this.InitializeComponent();
+            InitializeComponent();
+        }
+
+        private void ActionMessageView_OnSizeChanged(object sender, SizeChangedEventArgs e) {
+            Separator.Width = e.NewSize.Width;
         }
     }
 }

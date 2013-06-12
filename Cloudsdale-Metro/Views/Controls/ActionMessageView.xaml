@@ -7,16 +7,48 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:chatConverters="using:Cloudsdale_Metro.Views.ChatConverters"
     mc:Ignorable="d"
-    d:DesignHeight="300"
-    d:DesignWidth="400">
+    SizeChanged="ActionMessageView_OnSizeChanged">
     
     <UserControl.Resources>
         <chatConverters:CloudNameColorConverter x:Key="NameColor" />
         <chatConverters:TimestampConverter x:Key="TimestampConverter" />
         <chatConverters:MessageDeviceConverter x:Key="MessageDevice" />
+        <chatConverters:ActionMessagesConverter x:Key="ActionMessages" />
     </UserControl.Resources>
     
-    <Grid>
-        
+    <Grid Margin="5,0,5,5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Border HorizontalAlignment="Stretch" Height="1" x:Name="Separator"
+                VerticalAlignment="Top">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                    <GradientStop Offset="0" Color="#E7E7E7" />
+                    <GradientStop Offset="0.5" Color="LightGray" />
+                    <GradientStop Offset="1" Color="#E7E7E7" />
+                </LinearGradientBrush>
+            </Border.Background>
+        </Border>
+        <TextBlock FontSize="18" Margin="5" HorizontalAlignment="Center">
+            <Run Text="{Binding Path=FinalTimestamp, Converter={StaticResource TimestampConverter}}" />
+            <Run Text="{Binding Path=Device, Converter={StaticResource MessageDevice}}" />
+        </TextBlock>
+        <local:MessageTextControl Grid.Row="1" FontSize="20" FontFamily="Verdana" LinebreakHandling="Ignore"
+                                  Messages="{Binding Path=Messages, Converter={StaticResource ActionMessages}}"
+                                  HorizontalAlignment="Stretch" TextAlignment="Center">
+            <local:MessageTextControl.PrefixInline>
+                <Span>
+                    <!--<InlineUIContainer>
+                        <HyperlinkButton Content="{Binding Path=User.Name}" Margin="0,0,0,-10"
+                                         Click="UserNameClick" FontSize="22" Padding="0"
+                                         Foreground="{Binding Path=User.Role, Converter={StaticResource NameColor}}"/>
+                    </InlineUIContainer>-->
+                    <Run Text="{Binding Path=User.Name}" 
+                         Foreground="{Binding Path=User, Converter={StaticResource NameColor}}" />
+                </Span>
+            </local:MessageTextControl.PrefixInline>
+        </local:MessageTextControl>
     </Grid>
 </UserControl>

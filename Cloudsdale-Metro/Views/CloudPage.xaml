@@ -7,8 +7,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:Cloudsdale_Metro.Views.Controls" 
-    xmlns:views="using:Cloudsdale_Metro.Views" xmlns:chatConverters="using:Cloudsdale_Metro.Views.ChatConverters"
-    xmlns:callisto="using:Callisto.Controls"
+    xmlns:views="using:Cloudsdale_Metro.Views" 
+    xmlns:chatConverters="using:Cloudsdale_Metro.Views.ChatConverters"
     mc:Ignorable="d">
 
     <Page.Resources>
@@ -28,6 +28,9 @@
 
         <DataTemplate x:Key="StandardChatTemplate">
             <controls:StandardMessageView DataContext="{Binding}" />
+        </DataTemplate>
+        <DataTemplate x:Key="ActionChatTemplate">
+            <controls:ActionMessageView DataContext="{Binding}" />
         </DataTemplate>
         <Visibility x:Key="DropVisibility">Visible</Visibility>
     </Page.Resources>

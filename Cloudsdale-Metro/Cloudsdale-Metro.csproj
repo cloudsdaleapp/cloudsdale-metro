@@ -132,6 +132,8 @@
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Helpers\FileHelpers.cs" />
     <Compile Include="Helpers\ModelHelpers.cs" />
+    <Compile Include="Helpers\UICommands.cs" />
+    <Compile Include="Helpers\UIHelpers.cs" />
     <Compile Include="Models\BooleanMetadata.cs" />
     <Compile Include="Models\CloudControllerMetadata.cs" />
     <Compile Include="Models\LoginForm.cs" />
@@ -140,6 +142,7 @@
     <Compile Include="Models\UserStatusMetadata.cs" />
     <Compile Include="Views\ChatConverters\CloudNameColorConverter.cs" />
     <Compile Include="Views\ChatConverters\MessageDeviceConverter.cs" />
+    <Compile Include="Views\ChatConverters\ActionMessagesConverter.cs" />
     <Compile Include="Views\ChatConverters\StatusColorConverter.cs" />
     <Compile Include="Views\ChatConverters\TagConverters.cs" />
     <Compile Include="Views\ChatConverters\TimestampConverter.cs" />
@@ -148,6 +151,10 @@
     </Compile>
     <Compile Include="Views\Controls\ActionMessageView.xaml.cs">
       <DependentUpon>ActionMessageView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Controls\Hyperlink.cs" />
+    <Compile Include="Views\Controls\HyperRichTextBlock.xaml.cs">
+      <DependentUpon>HyperRichTextBlock.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Controls\MessageTextControl.xaml.cs">
       <DependentUpon>MessageTextControl.xaml</DependentUpon>
@@ -214,6 +221,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Controls\ActionMessageView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Controls\HyperRichTextBlock.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -89,6 +89,8 @@ namespace Cloudsdale_Metro.Views {
         }
 
         private async void SendMessage(string message) {
+            if (string.IsNullOrWhiteSpace(message)) return;
+
             var messageModel = new Message {
                 Content = message.EscapeMessage(),
                 Device = "desktop",
@@ -187,7 +189,7 @@ namespace Cloudsdale_Metro.Views {
             var message = (Message)item;
             var element = (FrameworkElement)container;
             if (Message.SlashMeFormat.IsMatch(message.Content)) {
-                return (DataTemplate)element.GetFirstAncestorOfType<LayoutAwarePage>().Resources["StandardChatTemplate"];
+                return (DataTemplate)element.GetFirstAncestorOfType<LayoutAwarePage>().Resources["ActionChatTemplate"];
             }
             return (DataTemplate)element.GetFirstAncestorOfType<LayoutAwarePage>().Resources["StandardChatTemplate"];
         }

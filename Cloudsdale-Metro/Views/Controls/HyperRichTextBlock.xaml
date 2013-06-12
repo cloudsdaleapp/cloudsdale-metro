@@ -1,5 +1,5 @@
 ﻿<UserControl
-    x:Class="Cloudsdale_Metro.Views.Controls.MessageTextControl"
+    x:Class="Cloudsdale_Metro.Views.Controls.HyperRichTextBlock"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Cloudsdale_Metro.Views.Controls"
@@ -10,6 +10,7 @@
     d:DesignWidth="400">
     
     <Grid>
-        <local:HyperRichTextBlock x:Name="RichText" />
+        <RichTextBlock x:Name="RichText" x:FieldModifier="public"
+                       Tapped="RichText_OnTapped" IsTextSelectionEnabled="False"/>
     </Grid>
 </UserControl>
