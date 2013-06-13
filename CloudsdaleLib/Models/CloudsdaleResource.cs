@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -87,19 +88,16 @@ namespace CloudsdaleLib.Models {
 
             try {
 
-                var request = WebRequest.CreateHttp(attribute.Endpoint.Replace("[:id]", Id));
-                request.Accept = "application/json";
-                await ValidationRequest(request);
+                var requestUrl = attribute.Endpoint.Replace("[:id]", Id);
+                var client = new HttpClient {
+                    DefaultRequestHeaders = {
+                        {"Accept", "application/json"}
+                    }
+                };
+                var response = await ValidationRequest(client, requestUrl);
 
-                string responseData;
-                using (var response = await request.GetResponseAsync())
-                using (var responseStream = response.GetResponseStream())
-                using (var responseReader = new StreamReader(responseStream)) {
-                    responseData = await responseReader.ReadToEndAsync();
-                }
-
-                var responseObject = JObject.Parse(responseData);
-                var responseModel = (CloudsdaleModel) ObjectFromWebResult(responseObject).ToObject(GetType());
+                var responseObject = JObject.Parse(await response.Content.ReadAsStringAsync());
+                var responseModel = (CloudsdaleModel)ObjectFromWebResult(responseObject).ToObject(GetType());
                 responseModel.CopyTo(this);
             } catch (WebException exception) {
                 OnValidationError(exception);
@@ -111,14 +109,13 @@ namespace CloudsdaleLib.Models {
             return response["result"];
         }
 
-#pragma warning disable 1998
-        protected virtual async Task ValidationRequest(HttpWebRequest request) {
-            request.Method = "GET";
+        protected virtual async Task<HttpResponseMessage> ValidationRequest(HttpClient client, string uri) {
             if (Cloudsdale.SessionProvider.CurrentSession != null) {
-                request.Headers["X-Auth-Token"] = Cloudsdale.SessionProvider.CurrentSession.AuthToken;
+                client.DefaultRequestHeaders.Add("X-Auth-Token", Cloudsdale.SessionProvider.CurrentSession.AuthToken);
             }
+
+            return await client.GetAsync(uri);
         }
-#pragma warning restore 1998
 
         [JsonIgnore]
         protected DateTime LastUpdated { get; set; }
@@ -129,8 +126,8 @@ namespace CloudsdaleLib.Models {
         }
 
         public async Task<WebResponse<T>> UpdateProperty<T>(
-            bool cancelError, 
-            params KeyValuePair<string, JToken>[] properties) 
+            bool cancelError,
+            params KeyValuePair<string, JToken>[] properties)
             where T : CloudsdaleResource {
 
             var endpoint = GetType().GetTypeInfo().GetCustomAttribute<ResourceEndpointAttribute>();
@@ -140,23 +137,22 @@ namespace CloudsdaleLib.Models {
             foreach (var property in properties) {
                 model[endpoint.RestModelType][property.Key] = property.Value;
             }
-            var requestData = Encoding.UTF8.GetBytes(model.ToString(Formatting.None));
 
-            var request = WebRequest.CreateHttp(endpoint.UpdateEndpoint.Replace("[:id]", Id));
-            request.Method = "PUT";
-            request.Accept = "application/json";
-            request.ContentType = "application/json";
-            request.Headers["X-Auth-Token"] = Cloudsdale.SessionProvider.CurrentSession.AuthToken;
+            var requestUrl = endpoint.UpdateEndpoint.Replace("[:id]", Id);
+            var client = new HttpClient {
+                DefaultRequestHeaders = {
+                    {"Accept", "application/json"},
+                    {"X-Auth-Token", Cloudsdale.SessionProvider.CurrentSession.AuthToken}
+                }
+            };
 
-            using (var requestStream = await request.GetRequestStreamAsync()) {
-                await requestStream.WriteAsync(requestData, 0, requestData.Length);
-                await requestStream.FlushAsync();
-            }
+            var responseMessage = await client.PutAsync(requestUrl, new JsonContent(model));
+            var responseData = await responseMessage.Content.ReadAsStringAsync();
+            var response = await JsonConvert.DeserializeObjectAsync<WebResponse<T>>(responseData);
 
-            var response = await request.PerformRequest<T>();
             if (response.Flash != null) {
                 if (!cancelError)
-                await Cloudsdale.ModelErrorProvider.OnError(response);
+                    await Cloudsdale.ModelErrorProvider.OnError(response);
                 return response;
             }
 

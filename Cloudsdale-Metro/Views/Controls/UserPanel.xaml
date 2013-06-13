@@ -1,6 +1,7 @@
 ﻿<UserControl
     x:Class="Cloudsdale_Metro.Views.Controls.UserPanel"
     DataContext="{Binding Path=DefaultViewModel, RelativeSource={RelativeSource Self}}"
+    Loaded="UserPanel_OnLoaded"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -11,20 +12,29 @@
     
     <UserControl.Resources>
         <DataTemplate x:Key="BanTemplate">
-            <Border Background="White" CornerRadius="5">
+            <Border Background="White" CornerRadius="5" BorderThickness="1" BorderBrush="LightGray" Margin="0,0,0,5">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <Border Background="Navy">
-                        <Grid>
+                        <Grid Margin="2">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition />
+                                <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
+                            <Image Source="/Assets/BanIconWhite.png" Width="16" Margin="4" VerticalAlignment="Top" />
+                            <TextBlock Grid.Column="1" Foreground="White" FontSize="16" TextWrapping="Wrap" Margin="0,5">
+                                <Run Text="{Binding Path=Reason}" />
+                            </TextBlock>
                         </Grid>
                     </Border>
+                    <Grid MinHeight="25" Grid.Row="1">
+                        <TextBlock FontSize="14" TextWrapping="Wrap" Margin="5">
+                            Issued on <Run Text="{Binding Path=Issued}" /> by <Run Text="{Binding Path=Enforcer.Name}" />
+                        </TextBlock>
+                    </Grid>
                 </Grid>
             </Border>
         </DataTemplate>
@@ -53,7 +63,11 @@
         </Border>
         
         <StackPanel Visibility="{Binding Path=IsModerator, Converter={StaticResource BoolVis}}">
-            
+            <TextBlock FontSize="24">Permanent Record</TextBlock>
+            <Grid>
+                <ItemsControl ItemsSource="{Binding Path=Bans}" ItemTemplate="{StaticResource BanTemplate}" />
+                <ProgressRing Foreground="RoyalBlue" IsActive="{Binding Path=BansLoading}" Width="50" Height="50" />
+            </Grid>
         </StackPanel>
     </StackPanel>
 </UserControl>

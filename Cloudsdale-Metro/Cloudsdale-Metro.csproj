@@ -118,6 +118,7 @@
     <Compile Include="Common\BindableBase.cs" />
     <Compile Include="Common\BooleanNegationConverter.cs" />
     <Compile Include="Common\BooleanToVisibilityConverter.cs" />
+    <Compile Include="Common\DateOnlyConverter.cs" />
     <Compile Include="Common\DoubleToggleConverter.cs" />
     <Compile Include="Common\LayoutAwarePage.cs" />
     <Compile Include="Common\NonZeroToVisibility.cs" />
@@ -129,7 +130,7 @@
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\MessageController.cs" />
     <Compile Include="Controllers\SessionController.cs" />
-    <Compile Include="Controllers\UserController.cs" />
+    <Compile Include="Controllers\ModelController.cs" />
     <Compile Include="Helpers\FileHelpers.cs" />
     <Compile Include="Helpers\ModelHelpers.cs" />
     <Compile Include="Helpers\UICommands.cs" />
@@ -197,6 +198,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\BackgroundClouds.png" />
+    <Content Include="Assets\BanIcon.png" />
+    <Content Include="Assets\BanIconWhite.png" />
     <Content Include="Assets\cloudsdale-thin-bright-logo.png" />
     <Content Include="Assets\icon_white.png" />
     <Content Include="Assets\icon_white_small.png" />

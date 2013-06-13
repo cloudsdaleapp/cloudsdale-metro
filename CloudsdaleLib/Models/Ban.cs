@@ -21,6 +21,10 @@ namespace CloudsdaleLib.Models {
         [JsonProperty("jurisdiction_id")]
         public string JurisdictionId { get; set; }
 
+        public User Offender { get { return Cloudsdale.UserProvider.GetUser(OffenderId); } }
+        public User Enforcer { get { return Cloudsdale.UserProvider.GetUser(EnforcerId); } }
+        public Cloud Jurisdiction { get { return Cloudsdale.CloudProvider.GetCloud(JurisdictionId); } }
+
         [JsonProperty("reason")]
         public string Reason { get; set; }
 

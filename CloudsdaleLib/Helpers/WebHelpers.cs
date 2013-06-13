@@ -1,33 +1,22 @@
 ﻿using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Reflection;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace CloudsdaleLib.Helpers {
-    public static class WebHelpers {
-        public static async Task<WebResponse<T>> PerformRequest<T>(this HttpWebRequest request) {
-            var result = await request.ReadResponse();
-            return await JsonConvert.DeserializeObjectAsync<WebResponse<T>>(result);
+    public class JsonContent : StringContent {
+        public JsonContent(string json)
+            : base(json) {
+            Headers.ContentType = new MediaTypeHeaderValue("application/json");
         }
 
-        public static async Task<string> ReadResponse(this HttpWebRequest request) {
-            HttpWebResponse response;
-            try {
-                response = (HttpWebResponse)(await request.GetResponseAsync());
-            } catch (WebException ex) {
-                response = (HttpWebResponse)ex.Response;
-            }
-            return await response.InternalReadResponse();
-        }
-
-        private static async Task<string> InternalReadResponse(this HttpWebResponse response) {
-            using (response)
-            using (var responseStream = response.GetResponseStream())
-            using (var responseReader = new StreamReader(responseStream)) {
-                return await responseReader.ReadToEndAsync();
-            }
+        public JsonContent(JToken json)
+            : this(json.ToString(Formatting.None)) {
         }
     }
 

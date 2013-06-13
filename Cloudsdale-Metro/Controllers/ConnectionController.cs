@@ -23,12 +23,15 @@ namespace Cloudsdale_Metro.Controllers {
         public readonly SessionController Session = new SessionController();
         public readonly ErrorController ErrorController = new ErrorController();
         public readonly MessageController MessageController = new MessageController();
-        public readonly UserController UserController = new UserController();
+        public readonly ModelController ModelController = new ModelController();
 
         public ConnectionController() {
             Cloudsdale.SessionProvider = Session;
             Cloudsdale.ModelErrorProvider = ErrorController;
             Cloudsdale.CloudServicesProvider = MessageController;
+            Cloudsdale.UserProvider = ModelController;
+            Cloudsdale.CloudProvider = ModelController;
+
             Cloudsdale.MetadataProviders["Selected"] = new BooleanMetadataProvider();
             Cloudsdale.MetadataProviders["CloudController"] = new CloudControllerMetadataProvider();
             Cloudsdale.MetadataProviders["Status"] = new UserStatusMetadataProvider();

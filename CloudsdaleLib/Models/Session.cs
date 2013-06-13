@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Net;
-using System.Text;
+using System.Net.Http;
 using System.Threading.Tasks;
+using CloudsdaleLib.Helpers;
 using Newtonsoft.Json;
 
 namespace CloudsdaleLib.Models {
@@ -96,6 +96,10 @@ namespace CloudsdaleLib.Models {
             get { return _clouds; }
             set {
                 if (Equals(value, _clouds)) return;
+                if (value != null)
+                    for (var i = 0; i < value.Count; ++i) {
+                        value[i] = Cloudsdale.CloudProvider.UpdateCloud(value[i]);
+                    }
                 _clouds = value;
                 OnPropertyChanged();
             }
@@ -115,24 +119,17 @@ namespace CloudsdaleLib.Models {
             return base.ObjectFromWebResult(response)["user"];
         }
 
-        protected override async Task ValidationRequest(HttpWebRequest request) {
-            request.Method = "POST";
-            request.ContentType = "application/json";
-
+        protected override async Task<HttpResponseMessage> ValidationRequest(HttpClient client, string requestUrl) {
             var requestModel = await JsonConvert.SerializeObjectAsync(new {
                 oauth = new {
-                    token = BCrypt.Net.BCrypt.HashPassword(Id + "cloudsdale", ModelSettings.InternalToken),
+                    token = BCrypt.Net.BCrypt.HashPassword(Id + "cloudsdale", Endpoints.InternalToken),
                     client_type = "WinRT",
                     provider = "cloudsdale",
                     uid = Id,
                 }
             }, Formatting.None);
-            var requestData = Encoding.UTF8.GetBytes(requestModel);
 
-            using (var requestStream = await request.GetRequestStreamAsync()) {
-                await requestStream.WriteAsync(requestData, 0, requestData.Length);
-                await requestStream.FlushAsync();
-            }
+            return await client.PostAsync(requestUrl, new JsonContent(requestModel));
         }
     }
 }

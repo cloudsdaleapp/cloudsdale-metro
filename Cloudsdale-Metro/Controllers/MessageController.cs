@@ -54,7 +54,7 @@ namespace Cloudsdale_Metro.Controllers {
         }
 
         public User GetBackedUser(string userId) {
-            return App.Connection.UserController.GetUser(userId);
+            return App.Connection.ModelController.GetUser(userId);
         }
     }
 }

@@ -37,7 +37,7 @@ namespace Cloudsdale_Metro.Controllers {
                 var list =
                     userStatuses.Where(kvp => kvp.Value != Status.offline)
                                 .Where(kvp => Cloud.ModeratorIds.Contains(kvp.Key))
-                                .Select(kvp => App.Connection.UserController.GetUser(kvp.Key))
+                                .Select(kvp => App.Connection.ModelController.GetUser(kvp.Key))
                                 .ToList();
                 list.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.Ordinal));
                 return list;
@@ -48,7 +48,7 @@ namespace Cloudsdale_Metro.Controllers {
             get {
                 var list =
                     Cloud.ModeratorIds
-                                .Select(mid => App.Connection.UserController.GetUser(mid))
+                                .Select(mid => App.Connection.ModelController.GetUser(mid))
                                 .ToList();
                 list.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.Ordinal));
                 return list;
@@ -61,7 +61,7 @@ namespace Cloudsdale_Metro.Controllers {
                     userStatuses.Where(kvp => kvp.Value != Status.offline)
                                 .Where(kvp => Cloud.UserIds.Contains(kvp.Key))
                                 .Where(kvp => !Cloud.ModeratorIds.Contains(kvp.Key))
-                                .Select(kvp => App.Connection.UserController.GetUser(kvp.Key))
+                                .Select(kvp => App.Connection.ModelController.GetUser(kvp.Key))
                                 .ToList();
                 list.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.Ordinal));
                 return list;
@@ -72,7 +72,7 @@ namespace Cloudsdale_Metro.Controllers {
                 var list =
                     userStatuses.Where(kvp => Cloud.UserIds.Contains(kvp.Key))
                                 .Where(kvp => !Cloud.ModeratorIds.Contains(kvp.Key))
-                                .Select(kvp => App.Connection.UserController.GetUser(kvp.Key))
+                                .Select(kvp => App.Connection.ModelController.GetUser(kvp.Key))
                                 .ToList();
                 list.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.Ordinal));
                 return list;
@@ -101,7 +101,7 @@ namespace Cloudsdale_Metro.Controllers {
                     if (user.Status != null) {
                         SetStatus(user.Id, (Status)user.Status);
                     }
-                    users.Add(await App.Connection.UserController.UpdateDataAsync(user));
+                    users.Add(await App.Connection.ModelController.UpdateDataAsync(user));
                 }
 
             }
@@ -153,7 +153,7 @@ namespace Cloudsdale_Metro.Controllers {
             if (user.Status != null) {
                 SetStatus(user.Id, (Status)user.Status);
             }
-            await App.Connection.UserController.UpdateDataAsync(user);
+            await App.Connection.ModelController.UpdateDataAsync(user);
         }
 
         private void OnCloudData(JToken cloudData) {
