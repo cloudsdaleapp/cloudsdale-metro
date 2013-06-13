@@ -62,7 +62,7 @@ namespace Cloudsdale_Metro.Views.Controls {
                 User.Id != Session.Id
                 && !User.IsModerator() || Session.IsOwner();
             DefaultViewModel["TrollBan"] =
-                User.Role == "founder" && User.Role == "developer";
+                User.Role == "founder" || User.Role == "developer";
         }
 
         private async void SkypeChatClick(object sender, RoutedEventArgs e) {

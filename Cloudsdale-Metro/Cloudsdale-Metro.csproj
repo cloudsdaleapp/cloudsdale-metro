@@ -150,31 +150,31 @@
     <Compile Include="Views\CloudPage.xaml.cs">
       <DependentUpon>CloudPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Controls\ActionMessageView.xaml.cs">
+    <Compile Include="Views\Controls\View Controls\ActionMessageView.xaml.cs">
       <DependentUpon>ActionMessageView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Controls\Hyperlink.cs" />
-    <Compile Include="Views\Controls\MessageTextControl.xaml.cs">
+    <Compile Include="Views\Controls\UI Helpers\Hyperlink.cs" />
+    <Compile Include="Views\Controls\View Controls\MessageTextControl.xaml.cs">
       <DependentUpon>MessageTextControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Controls\StandardMessageView.xaml.cs">
+    <Compile Include="Views\Controls\View Controls\StandardMessageView.xaml.cs">
       <DependentUpon>StandardMessageView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Controls\UserList.xaml.cs">
+    <Compile Include="Views\Controls\Flyout Panels\UserList.xaml.cs">
       <DependentUpon>UserList.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Controls\UserPanel.xaml.cs">
+    <Compile Include="Views\Controls\Flyout Panels\UserPanel.xaml.cs">
       <DependentUpon>UserPanel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Controls\ViewboxPanel.cs" />
+    <Compile Include="Views\Controls\UI Helpers\ViewboxPanel.cs" />
     <Compile Include="Views\LoadPages\Connecting.xaml.cs">
       <DependentUpon>Connecting.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Controls\AccountSettings.xaml.cs">
+    <Compile Include="Views\Controls\Flyout Panels\AccountSettings.xaml.cs">
       <DependentUpon>AccountSettings.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Controls\CloudCanvas.cs" />
-    <Compile Include="Views\Controls\RootGrid.cs" />
+    <Compile Include="Views\Controls\UI Helpers\CloudCanvas.cs" />
+    <Compile Include="Views\Controls\UI Helpers\RootGrid.cs" />
     <Compile Include="Views\LoadPages\LoggingOut.xaml.cs">
       <DependentUpon>LoggingOut.xaml</DependentUpon>
     </Compile>
@@ -223,23 +223,23 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Controls\ActionMessageView.xaml">
+    <Page Include="Views\Controls\View Controls\ActionMessageView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Controls\MessageTextControl.xaml">
+    <Page Include="Views\Controls\View Controls\MessageTextControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Controls\StandardMessageView.xaml">
+    <Page Include="Views\Controls\View Controls\StandardMessageView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Controls\UserList.xaml">
+    <Page Include="Views\Controls\Flyout Panels\UserList.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Controls\UserPanel.xaml">
+    <Page Include="Views\Controls\Flyout Panels\UserPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -247,7 +247,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Controls\AccountSettings.xaml">
+    <Page Include="Views\Controls\Flyout Panels\AccountSettings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
