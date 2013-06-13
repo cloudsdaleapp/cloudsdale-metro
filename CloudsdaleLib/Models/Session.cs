@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace CloudsdaleLib.Models {
     [JsonObject(MemberSerialization.OptIn)]
-    [ResourceEndpoint(Endpoints.SessionEndpoint, UpdateEndpoint = Endpoints.UserEndpoint, RestModelType = "user")]
+    [ResourceEndpoint(Endpoints.Session, UpdateEndpoint = Endpoints.User, RestModelType = "user")]
     public class Session : User {
         private string _authToken;
         private string _email;

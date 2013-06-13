@@ -92,8 +92,8 @@ namespace Cloudsdale_Metro.Controllers {
             {
                 var response = await client.GetStringAsync((
                     Cloud.UserIds.Length > 100
-                    ? Endpoints.CloudOnlineUsersEndpoint
-                    : Endpoints.CloudUsersEndpoint)
+                    ? Endpoints.CloudOnlineUsers
+                    : Endpoints.CloudUsers)
                     .Replace("[:id]", Cloud.Id));
                 var userData = await JsonConvert.DeserializeObjectAsync<WebResponse<User[]>>(response);
                 var users = new List<User>();
@@ -108,7 +108,7 @@ namespace Cloudsdale_Metro.Controllers {
 
             // Load messages
             {
-                var response = await client.GetStringAsync(Endpoints.CloudMessagesEndpoint.Replace("[:id]", Cloud.Id));
+                var response = await client.GetStringAsync(Endpoints.CloudMessages.Replace("[:id]", Cloud.Id));
                 var responseMessages = await JsonConvert.DeserializeObjectAsync<WebResponse<Message[]>>(response);
                 var newMessages = new List<Message>(messages
                     .Where(message => message.Timestamp > responseMessages.Result.Last().Timestamp));

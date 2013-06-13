@@ -1,13 +1,14 @@
-﻿using System.Net.Http;
-using System.Net.Http.Headers;
+﻿using System;
+using System.Net.Http;
 using CloudsdaleLib;
 using CloudsdaleLib.Helpers;
 using CloudsdaleLib.Models;
 using Cloudsdale_Metro.Common;
-using System.Linq;
 using Cloudsdale_Metro.Helpers;
 using Newtonsoft.Json;
 using Windows.Foundation.Collections;
+using Windows.System;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
 
 namespace Cloudsdale_Metro.Views.Controls {
@@ -45,7 +46,7 @@ namespace Cloudsdale_Metro.Views.Controls {
                 };
 
                 var response = await client.GetAsync(
-                    Endpoints.CloudUserBansEndpoint
+                    Endpoints.CloudUserBans
                     .Replace("[:id]", Cloud.Id)
                     .Replace("[:offender_id]", User.Id));
 
@@ -62,6 +63,16 @@ namespace Cloudsdale_Metro.Views.Controls {
                 && !User.IsModerator() || Session.IsOwner();
             DefaultViewModel["TrollBan"] =
                 User.Role == "founder" && User.Role == "developer";
+        }
+
+        private async void SkypeChatClick(object sender, RoutedEventArgs e) {
+            var skypeUri = "skype:" + User.SkypeName + "?chat";
+            if (!Uri.IsWellFormedUriString(skypeUri, UriKind.Absolute)) {
+                var dialog = new MessageDialog("Uh oh! " + User.Name + "'s skype account isn't valid!");
+                await dialog.ShowAsync();
+                return;
+            }
+            await Launcher.LaunchUriAsync(new Uri(skypeUri));
         }
     }
 }

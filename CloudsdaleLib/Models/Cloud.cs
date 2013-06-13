@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 
 namespace CloudsdaleLib.Models {
     [JsonObject(MemberSerialization.OptIn)]
-    [ResourceEndpoint(Endpoints.CloudEndpoint, RestModelType = "cloud")]
+    [ResourceEndpoint(Endpoints.Cloud, RestModelType = "cloud")]
     public class Cloud : CloudsdaleResource, IAvatarUploadTarget {
         private string _name;
         private string[] _userIds;
@@ -141,7 +141,7 @@ namespace CloudsdaleLib.Models {
                 DefaultRequestHeaders = { { "Accept", "application/json" } }
             };
 
-            var response = await request.PostAsync(Endpoints.UserEndpoint.Replace("[:id]", Id), postData);
+            var response = await request.PostAsync(Endpoints.User.Replace("[:id]", Id), postData);
             var result = await JsonConvert.DeserializeObjectAsync<WebResponse<Cloud>>(await response.Content.ReadAsStringAsync());
 
             if (response.StatusCode != HttpStatusCode.OK) {

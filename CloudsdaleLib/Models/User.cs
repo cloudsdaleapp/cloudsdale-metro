@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace CloudsdaleLib.Models {
     [JsonObject(MemberSerialization.OptIn)]
-    [ResourceEndpoint(Endpoints.UserEndpoint, RestModelType = "user")]
+    [ResourceEndpoint(Endpoints.User, RestModelType = "user")]
     public class User : CloudsdaleResource {
         private string _name;
         private bool? _hasAnAvatar;

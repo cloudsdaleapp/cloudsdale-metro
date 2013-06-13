@@ -110,7 +110,7 @@ namespace Cloudsdale_Metro.Views {
                     { "X-Auth-Token", App.Connection.Session.CurrentSession.AuthToken }
                 }
             };
-            var response = await client.PostAsync(Endpoints.CloudMessagesEndpoint.Replace("[:id]", cloudController.Cloud.Id),
+            var response = await client.PostAsync(Endpoints.CloudMessages.Replace("[:id]", cloudController.Cloud.Id),
                 new StringContent(messageData) {
                     Headers = {
                         ContentType = new MediaTypeHeaderValue("application/json")

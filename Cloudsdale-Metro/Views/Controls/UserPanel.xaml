@@ -41,9 +41,13 @@
     </UserControl.Resources>
     
     <StackPanel>
+        <!-- Username -->
         <TextBlock Foreground="Gray" FontSize="18" Margin="0,5,0,10">
             @<Run Text="{Binding Path=User.Username}" />
         </TextBlock>
+        
+        <!-- Skype -->
+        <Button Click="SkypeChatClick">Chat on Skype</Button>
         
         <!-- Also Known As list -->
         <StackPanel Visibility="{Binding Path=HasAka, Converter={StaticResource BoolVis}}" Margin="0,5,0,0">

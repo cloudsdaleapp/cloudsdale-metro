@@ -109,7 +109,7 @@ namespace Cloudsdale_Metro.Controllers {
             var request = new HttpClient {
                 DefaultRequestHeaders = { { "Accept", "application/json" } }
             };
-            var result = await request.PostAsync(Endpoints.SessionEndpoint, new ByteArrayContent(requestData) {
+            var result = await request.PostAsync(Endpoints.Session, new ByteArrayContent(requestData) {
                 Headers = { { "Content-Type", "application/json" }, { "Content-Length", requestData.Length.ToString() } }
             });
 
