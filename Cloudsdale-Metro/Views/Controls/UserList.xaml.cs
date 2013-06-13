@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using CloudsdaleLib.Models;
 using Cloudsdale_Metro.Controllers;
 using WinRTXamlToolkit.AwaitableUI;
 using Windows.Foundation;
@@ -21,13 +22,17 @@ namespace Cloudsdale_Metro.Views.Controls {
         private readonly CloudController _controller;
         public UserList(CloudController controller) {
             InitializeComponent();
-            DataContext = _controller = controller;
+            _controller = controller;
         }
 
 
         private async void UserList_OnLoaded(object sender, RoutedEventArgs e) {
             await this.WaitForNonZeroSizeAsync();
             DataContext = _controller;
+        }
+
+        private void UserClicked(object sender, ItemClickEventArgs e) {
+            CloudPage.ShowUserPanel((User)e.ClickedItem);
         }
     }
 }

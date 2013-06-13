@@ -146,7 +146,7 @@ namespace Cloudsdale_Metro.Views {
         private void UsersListClick(object sender, RoutedEventArgs e) {
             var userList = new SettingsFlyout {
                 HeaderBrush = new SolidColorBrush(Color.FromArgb(0xFF, 0x1A, 0x91, 0xDB)),
-                HeaderText = cloudController.Cloud.Name + " users",
+                HeaderText = "Users",
                 Background = new SolidColorBrush(Colors.Transparent),
                 ContentBackgroundBrush = new SolidColorBrush(Color.FromArgb(0xFF, 0xF0, 0xF0, 0xF0)),
                 Content = new UserList(cloudController),
@@ -181,6 +181,26 @@ namespace Cloudsdale_Metro.Views {
                 view.SelectedItem = cloudController.Cloud;
             }
 // ReSharper restore RedundantCheckBeforeAssignment
+        }
+
+        public static void ShowUserPanel(User user) {
+            var panel = new SettingsFlyout {
+                HeaderBrush = new SolidColorBrush(Color.FromArgb(0xFF, 0x1A, 0x91, 0xDB)),
+                HeaderText = user.Name,
+                Background = new SolidColorBrush(Colors.Transparent),
+                ContentBackgroundBrush = new SolidColorBrush(Color.FromArgb(0xFF, 0xF0, 0xF0, 0xF0)),
+                Content = new UserPanel(user)
+            };
+
+            panel.BackClicked += (o, args) => {
+                args.Cancel = true;
+                panel.IsOpen = false;
+            };
+
+            var userAvatar = user.Avatar.Preview;
+            panel.SmallLogoImageSource = new BitmapImage(userAvatar);
+
+            panel.IsOpen = true;
         }
     }
 

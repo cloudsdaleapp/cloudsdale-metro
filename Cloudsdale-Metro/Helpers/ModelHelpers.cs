@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using CloudsdaleLib.Models;
 using Cloudsdale_Metro.Controllers;
 
@@ -14,6 +11,18 @@ namespace Cloudsdale_Metro.Helpers {
 
         public static KeyValuePair<string, T> KeyOf<T>(this string key, T value) {
             return new KeyValuePair<string, T>(key, value);
-        } 
+        }
+
+        public static Session GetSession(this ConnectionController controller) {
+            return controller.Session.CurrentSession;
+        }
+
+        public static bool IsModerator(this User user) {
+            return App.Connection.MessageController.CurrentCloud.Cloud.ModeratorIds.Contains(user.Id);
+        }
+
+        public static bool IsOwner(this User user) {
+            return App.Connection.MessageController.CurrentCloud.Cloud.OwnerId == user.Id;
+        }
     }
 }

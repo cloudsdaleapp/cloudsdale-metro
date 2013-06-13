@@ -50,6 +50,7 @@
             <Setter Property="ItemContainerStyle" Value="{StaticResource UserContainerStyle}" />
             <Setter Property="SelectionMode" Value="None" />
             <Setter Property="IsSwipeEnabled" Value="False" />
+            <Setter Property="IsItemClickEnabled" Value="True" />
         </Style>
     </UserControl.Resources>
 
@@ -60,10 +61,12 @@
                 <TextBlock FontSize="22">Moderators</TextBlock>
             </StackPanel>
             <ListView ItemsSource="{Binding Source={StaticResource OnlineModeratorList}}"
+                      ItemClick="UserClicked"
                       Visibility="{Binding ElementName=ShowAllModsToggle, Path=IsChecked, 
                                            Converter={StaticResource BoolVis}, 
                                            ConverterParameter=Inverse}" />
             <ListView ItemsSource="{Binding Source={StaticResource ModeratorList}}"
+                      ItemClick="UserClicked"
                       Visibility="{Binding ElementName=ShowAllModsToggle, Path=IsChecked, 
                                            Converter={StaticResource BoolVis}}" />
             <StackPanel Orientation="Horizontal">
@@ -71,10 +74,12 @@
                 <TextBlock FontSize="22">Users</TextBlock>
             </StackPanel>
             <ListView ItemsSource="{Binding Source={StaticResource OnlineList}}"
+                      ItemClick="UserClicked"
                       Visibility="{Binding ElementName=ShowAllToggle, Path=IsChecked, 
                                            Converter={StaticResource BoolVis}, 
                                            ConverterParameter=Inverse}" />
             <ListView ItemsSource="{Binding Source={StaticResource AllUsersList}}"
+                      ItemClick="UserClicked"
                       Visibility="{Binding ElementName=ShowAllToggle, Path=IsChecked, 
                                            Converter={StaticResource BoolVis}}" />
         </StackPanel>

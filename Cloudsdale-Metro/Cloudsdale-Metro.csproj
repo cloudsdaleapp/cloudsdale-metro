@@ -153,9 +153,6 @@
       <DependentUpon>ActionMessageView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Controls\Hyperlink.cs" />
-    <Compile Include="Views\Controls\HyperRichTextBlock.xaml.cs">
-      <DependentUpon>HyperRichTextBlock.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\Controls\MessageTextControl.xaml.cs">
       <DependentUpon>MessageTextControl.xaml</DependentUpon>
     </Compile>
@@ -164,6 +161,9 @@
     </Compile>
     <Compile Include="Views\Controls\UserList.xaml.cs">
       <DependentUpon>UserList.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Controls\UserPanel.xaml.cs">
+      <DependentUpon>UserPanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Controls\ViewboxPanel.cs" />
     <Compile Include="Views\LoadPages\Connecting.xaml.cs">
@@ -224,10 +224,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Controls\HyperRichTextBlock.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Views\Controls\MessageTextControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -237,6 +233,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Controls\UserList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Controls\UserPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

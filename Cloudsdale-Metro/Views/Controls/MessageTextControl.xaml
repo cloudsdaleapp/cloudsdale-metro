@@ -10,6 +10,6 @@
     d:DesignWidth="400">
     
     <Grid>
-        <local:HyperRichTextBlock x:Name="RichText" />
+        <RichTextBlock x:Name="RichText" />
     </Grid>
 </UserControl>
