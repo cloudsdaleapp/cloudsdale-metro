@@ -12,6 +12,11 @@ namespace Cloudsdale_Metro.Views.Controls {
         private double scale;
 
         protected override Size MeasureOverride(Size availableSize) {
+            if (availableSize.Width < 5) {
+                scale = 1;
+                return availableSize;
+            }
+
             double width = 0;
             double height = 0;
             var unlimitedSize = new Size(double.PositiveInfinity, double.PositiveInfinity);
