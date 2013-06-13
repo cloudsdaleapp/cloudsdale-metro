@@ -157,6 +157,9 @@
     <Compile Include="Views\Controls\View Controls\MessageTextControl.xaml.cs">
       <DependentUpon>MessageTextControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Controls\View Controls\SkypeControl.xaml.cs">
+      <DependentUpon>SkypeControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Controls\View Controls\StandardMessageView.xaml.cs">
       <DependentUpon>StandardMessageView.xaml</DependentUpon>
     </Compile>
@@ -228,6 +231,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Controls\View Controls\MessageTextControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Controls\View Controls\SkypeControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

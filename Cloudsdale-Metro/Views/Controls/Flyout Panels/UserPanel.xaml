@@ -6,6 +6,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewControls="using:Cloudsdale_Metro.Views.Controls.View_Controls"
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="400">
@@ -47,7 +48,7 @@
         </TextBlock>
         
         <!-- Skype -->
-        <Button Click="SkypeChatClick">Chat on Skype</Button>
+        <viewControls:SkypeControl DataContext="{Binding Path=User.SkypeName}" SkypeName="{Binding}" />
         
         <!-- Also Known As list -->
         <StackPanel Visibility="{Binding Path=HasAka, Converter={StaticResource BoolVis}}" Margin="0,5,0,0">

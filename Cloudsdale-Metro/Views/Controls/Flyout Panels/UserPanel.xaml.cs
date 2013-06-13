@@ -64,15 +64,5 @@ namespace Cloudsdale_Metro.Views.Controls {
             DefaultViewModel["TrollBan"] =
                 User.Role == "founder" || User.Role == "developer";
         }
-
-        private async void SkypeChatClick(object sender, RoutedEventArgs e) {
-            var skypeUri = "skype:" + User.SkypeName + "?chat";
-            if (!Uri.IsWellFormedUriString(skypeUri, UriKind.Absolute)) {
-                var dialog = new MessageDialog("Uh oh! " + User.Name + "'s skype account isn't valid!");
-                await dialog.ShowAsync();
-                return;
-            }
-            await Launcher.LaunchUriAsync(new Uri(skypeUri));
-        }
     }
 }
