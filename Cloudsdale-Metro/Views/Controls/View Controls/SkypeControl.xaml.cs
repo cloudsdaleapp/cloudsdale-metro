@@ -42,9 +42,9 @@ namespace Cloudsdale_Metro.Views.Controls.View_Controls {
             set { SetValue(SkypeNameProperty, value); }
         }
 
-        private void SkypeButton_OnClick(object sender, RoutedEventArgs e) {
+        private async void SkypeButton_OnClick(object sender, RoutedEventArgs e) {
             try {
-                Launcher.LaunchUriAsync(new Uri("skype:" + SkypeName + "?chat"));
+                await Launcher.LaunchUriAsync(new Uri("skype:" + SkypeName + "?chat"));
             } catch (FormatException) {
             }
         }

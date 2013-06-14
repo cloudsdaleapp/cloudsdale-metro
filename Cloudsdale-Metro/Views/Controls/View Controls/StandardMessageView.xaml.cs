@@ -3,6 +3,7 @@ using CloudsdaleLib.Models;
 using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Input;
 
 namespace Cloudsdale_Metro.Views.Controls {
     public sealed partial class StandardMessageView {
@@ -32,6 +33,10 @@ namespace Cloudsdale_Metro.Views.Controls {
         private async void DropClicked(object sender, ItemClickEventArgs e) {
             var drop = (Drop)e.ClickedItem;
             await Launcher.LaunchUriAsync(drop.Url);
+        }
+
+        private void AvatarTapped(object sender, TappedRoutedEventArgs e) {
+            new UserPanel(((Message)DataContext).User).FlyOut();
         }
     }
 }

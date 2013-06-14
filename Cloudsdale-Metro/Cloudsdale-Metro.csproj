@@ -150,6 +150,7 @@
     <Compile Include="Views\CloudPage.xaml.cs">
       <DependentUpon>CloudPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Controls\Flyout Panels\CloudsdaleFlyout.cs" />
     <Compile Include="Views\Controls\View Controls\ActionMessageView.xaml.cs">
       <DependentUpon>ActionMessageView.xaml</DependentUpon>
     </Compile>
@@ -211,6 +212,7 @@
     <Content Include="Assets\SplashScreen.png" />
     <Content Include="Assets\StoreLogo.png" />
     <Content Include="Assets\Fallback\user.png" />
+    <Content Include="Assets\Trollface.png" />
     <Content Include="Common\ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>

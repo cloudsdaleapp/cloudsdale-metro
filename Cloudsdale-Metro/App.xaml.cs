@@ -53,19 +53,9 @@ namespace Cloudsdale_Metro {
         }
 
         private static void OnCommandsRequested(SettingsPane sender, SettingsPaneCommandsRequestedEventArgs args) {
-            var accountSettings = new SettingsCommand("AccountSettings", "Account settings", command => {
-                var settings = new SettingsFlyout {
-                    Background = new SolidColorBrush(Colors.White),
-                    HeaderBrush = new SolidColorBrush(Color.FromArgb(0xAF, 0x1A, 0x91, 0xDB)),
-                    HeaderText = "Account settings",
-                    Content = new AccountSettings()
-                };
-
-                var avatar = new BitmapImage(Connection.Session.CurrentSession.Avatar.Preview);
-                settings.SmallLogoImageSource = avatar;
-
-                settings.IsOpen = true;
-            });
+            var accountSettings = new SettingsCommand(
+                "AccountSettings", "Account settings",
+                command => new AccountSettings().FlyOut());
 
             if (Connection.Session.CurrentSession != null && !(Connection.MainFrame.Content is LoggingIn)) {
                 args.Request.ApplicationCommands.Add(accountSettings);

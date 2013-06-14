@@ -1,4 +1,4 @@
-﻿<UserControl
+﻿<flyoutPanels:CloudsdaleFlyout
     x:Class="Cloudsdale_Metro.Views.Controls.UserPanel"
     DataContext="{Binding Path=DefaultViewModel, RelativeSource={RelativeSource Self}}"
     Loaded="UserPanel_OnLoaded"
@@ -7,10 +7,11 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewControls="using:Cloudsdale_Metro.Views.Controls.View_Controls"
+    xmlns:flyoutPanels="using:Cloudsdale_Metro.Views.Controls.Flyout_Panels"
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="400">
-    
+
     <UserControl.Resources>
         <DataTemplate x:Key="BanTemplate">
             <Border Background="White" CornerRadius="5" BorderThickness="1" BorderBrush="LightGray" Margin="0,0,0,5">
@@ -40,16 +41,19 @@
             </Border>
         </DataTemplate>
     </UserControl.Resources>
-    
-    <StackPanel>
+
+    <StackPanel Margin="0,0,0,50">
+        <!-- Avatar -->
+        <Image Margin="0,16" Source="{Binding Path=User.Avatar[256]}" />
+
         <!-- Username -->
         <TextBlock Foreground="Gray" FontSize="18" Margin="0,5,0,10">
             @<Run Text="{Binding Path=User.Username}" />
         </TextBlock>
-        
+
         <!-- Skype -->
         <viewControls:SkypeControl DataContext="{Binding Path=User.SkypeName}" SkypeName="{Binding}" />
-        
+
         <!-- Also Known As list -->
         <StackPanel Visibility="{Binding Path=HasAka, Converter={StaticResource BoolVis}}" Margin="0,5,0,0">
             <TextBlock FontSize="24">Also Known As</TextBlock>
@@ -61,18 +65,28 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </StackPanel>
-        
-        <!-- Avatar -->
-        <Border Margin="30" BorderBrush="Gray" BorderThickness="1">
-            <Image Source="{Binding Path=User.Avatar[256]}" />
-        </Border>
-        
+
+        <!-- Moderation Tools -->
         <StackPanel Visibility="{Binding Path=IsModerator, Converter={StaticResource BoolVis}}">
             <TextBlock FontSize="24">Permanent Record</TextBlock>
             <Grid>
                 <ItemsControl ItemsSource="{Binding Path=Bans}" ItemTemplate="{StaticResource BanTemplate}" />
                 <ProgressRing Foreground="RoyalBlue" IsActive="{Binding Path=BansLoading}" Width="50" Height="50" />
             </Grid>
+            
+            <Grid Visibility="{Binding Path=CanBan}">
+                <Grid Visibility="{Binding Path=TrollBan, Converter={StaticResource BoolVis}, ConverterParameter=Inverse}">
+
+                </Grid>
+                <Grid Visibility="{Binding Path=TrollBan, Converter={StaticResource BoolVis}}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <TextBlock FontSize="20" TextWrapping="Wrap">Oh, you thought you could ban me?</TextBlock>
+                    <Image Grid.Row="1" Source="/Assets/Trollface.png" Width="200" />
+                </Grid>
+            </Grid>
         </StackPanel>
     </StackPanel>
-</UserControl>
+</flyoutPanels:CloudsdaleFlyout>

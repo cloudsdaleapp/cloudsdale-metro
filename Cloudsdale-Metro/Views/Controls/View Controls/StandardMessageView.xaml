@@ -44,7 +44,7 @@
         </Style>
     </UserControl.Resources>
 
-    <Grid Margin="5,0,5,5">
+    <Grid Margin="5,0,5,7">
         <Border HorizontalAlignment="Stretch" Height="1" x:Name="Separator"
                 VerticalAlignment="Top">
             <Border.Background>
@@ -55,7 +55,7 @@
                 </LinearGradientBrush>
             </Border.Background>
         </Border>
-        <Grid Margin="0,5,0,0">
+        <Grid Margin="0,7,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
@@ -68,7 +68,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <Border BorderBrush="#3a3a3a" BorderThickness="1" VerticalAlignment="Top">
+                <Border BorderBrush="#3a3a3a" BorderThickness="1" VerticalAlignment="Top" Tapped="AvatarTapped">
                     <Image Source="{Binding Path=User.Avatar.Normal}" Width="60" Height="60" Name="AvatarImage" />
                 </Border>
                 <Border DataContext="{Binding Path=User.Role}" BorderBrush="Gray" Grid.Row="1"
@@ -87,7 +87,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition />
                 </Grid.RowDefinitions>
-                <local:ViewboxPanel Height="32">
+                <local:ViewboxPanel MaxHeight="32">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />

@@ -1,4 +1,5 @@
-﻿using CloudsdaleLib.Models;
+﻿using System;
+using CloudsdaleLib.Models;
 using Cloudsdale_Metro.Controllers;
 using WinRTXamlToolkit.AwaitableUI;
 using Windows.UI.Xaml;
@@ -12,8 +13,8 @@ namespace Cloudsdale_Metro.Views.Controls {
         public UserList(CloudController controller) {
             InitializeComponent();
             _controller = controller;
+            InitializeFlyout();
         }
-
 
         private async void UserList_OnLoaded(object sender, RoutedEventArgs e) {
             await this.WaitForNonZeroSizeAsync();
@@ -21,7 +22,15 @@ namespace Cloudsdale_Metro.Views.Controls {
         }
 
         private void UserClicked(object sender, ItemClickEventArgs e) {
-            CloudPage.ShowUserPanel((User)e.ClickedItem);
+            new UserPanel((User)e.ClickedItem).FlyOut();
+        }
+
+        public override string Header {
+            get { return "Users"; }
+        }
+
+        public override Uri Image {
+            get { return _controller.Cloud.Avatar.Preview; }
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Callisto.Controls;
 using CloudsdaleLib.Models;
@@ -21,6 +22,8 @@ namespace Cloudsdale_Metro.Views.Controls {
         public AccountSettings() {
             InitializeComponent();
             DataContext = session = App.Connection.Session.CurrentSession;
+
+            InitializeFlyout();
         }
 
         private async void LogoutClick(object sender, RoutedEventArgs e) {
@@ -81,6 +84,14 @@ namespace Cloudsdale_Metro.Views.Controls {
             box.IsEnabled = false;
             await box.WaitForLayoutUpdateAsync();
             box.IsEnabled = true;
+        }
+
+        public override string Header {
+            get { return "Account Settings"; }
+        }
+
+        public override Uri Image {
+            get { return session.Avatar.Preview; }
         }
     }
 }

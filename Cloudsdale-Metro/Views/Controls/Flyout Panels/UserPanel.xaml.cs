@@ -7,8 +7,6 @@ using Cloudsdale_Metro.Common;
 using Cloudsdale_Metro.Helpers;
 using Newtonsoft.Json;
 using Windows.Foundation.Collections;
-using Windows.System;
-using Windows.UI.Popups;
 using Windows.UI.Xaml;
 
 namespace Cloudsdale_Metro.Views.Controls {
@@ -16,6 +14,14 @@ namespace Cloudsdale_Metro.Views.Controls {
         private readonly LayoutAwarePage.ObservableDictionary<string, object> _defaultViewModel
             = new LayoutAwarePage.ObservableDictionary<string, object>();
         public IObservableMap<string, object> DefaultViewModel { get { return _defaultViewModel; } }
+
+        public override string Header {
+            get { return User.Name; }
+        }
+
+        public override Uri Image {
+            get { return null; }
+        }
 
         public User User { get; set; }
         public Session Session { get; set; }
@@ -27,6 +33,8 @@ namespace Cloudsdale_Metro.Views.Controls {
             Cloud = App.Connection.MessageController.CurrentCloud.Cloud;
 
             InitializeComponent();
+
+            InitializeFlyout();
         }
 
         private async void UserPanel_OnLoaded(object sender, RoutedEventArgs e) {

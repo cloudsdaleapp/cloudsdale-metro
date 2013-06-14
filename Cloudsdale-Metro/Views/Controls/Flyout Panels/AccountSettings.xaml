@@ -1,9 +1,10 @@
-﻿<UserControl
+﻿<flyoutPanels:CloudsdaleFlyout
     x:Class="Cloudsdale_Metro.Views.Controls.AccountSettings"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:common="using:Cloudsdale_Metro.Common"
+    xmlns:flyoutPanels="using:Cloudsdale_Metro.Views.Controls.Flyout_Panels"
     mc:Ignorable="d">
     
     <UserControl.Resources>
@@ -51,4 +52,4 @@
             <TextBlock Foreground="Red" FontSize="14" Name="SkypeModelError" />
         </StackPanel>
     </StackPanel>
-</UserControl>
+</flyoutPanels:CloudsdaleFlyout>

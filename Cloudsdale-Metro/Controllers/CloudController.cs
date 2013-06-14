@@ -24,8 +24,7 @@ namespace Cloudsdale_Metro.Controllers {
 
         public CloudController(Cloud cloud) {
             Cloud = cloud;
-            userStatuses[App.Connection.Session.CurrentSession.Id] =
-                App.Connection.Session.CurrentSession.PreferredStatus;
+            FixSessionStatus();
         }
 
         public Cloud Cloud { get; private set; }
@@ -175,6 +174,7 @@ namespace Cloudsdale_Metro.Controllers {
         }
 
         private Status SetStatus(string userId, Status status) {
+            FixSessionStatus();
             userStatuses[userId] = status;
             OnPropertyChanged("OnlineModerators");
             OnPropertyChanged("AllModerators");
@@ -184,7 +184,13 @@ namespace Cloudsdale_Metro.Controllers {
         }
 
         public Status StatusForUser(string userId) {
+            FixSessionStatus();
             return userStatuses.ContainsKey(userId) ? userStatuses[userId] : SetStatus(userId, Status.offline);
+        }
+
+        private void FixSessionStatus() {
+            userStatuses[App.Connection.Session.CurrentSession.Id] =
+                App.Connection.Session.CurrentSession.PreferredStatus;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
