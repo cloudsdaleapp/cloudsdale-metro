@@ -80,7 +80,6 @@ namespace Cloudsdale_Metro.Views {
                 scrollHeight = ChatScroll.VerticalOffset + amountToScroll*1.1;
                 scrollHeight = Math.Min(scrollHeight, ChatScroll.ScrollableHeight);
             } else {
-                amountToScroll = ChatScroll.ScrollableHeight - ChatScroll.VerticalOffset;
                 scrollHeight = ChatScroll.ScrollableHeight;
             }
 
