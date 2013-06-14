@@ -36,7 +36,12 @@ namespace CloudsdaleLib.Models {
 
         [JsonProperty("avatar")]
         public Avatar Avatar {
-            get { return _avatar; }
+            get {
+                if (_avatar != null) {
+                    _avatar.Owner = this;
+                }
+                return _avatar;
+            }
             set {
                 if (Equals(value, _avatar)) return;
                 _avatar = value;

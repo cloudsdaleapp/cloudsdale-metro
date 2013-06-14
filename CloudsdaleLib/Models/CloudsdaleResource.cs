@@ -117,6 +117,10 @@ namespace CloudsdaleLib.Models {
             return await client.GetAsync(uri);
         }
 
+        public string RestModelType {
+            get { return GetType().GetTypeInfo().GetCustomAttribute<ResourceEndpointAttribute>().RestModelType; }
+        }
+
         [JsonIgnore]
         protected DateTime LastUpdated { get; set; }
 

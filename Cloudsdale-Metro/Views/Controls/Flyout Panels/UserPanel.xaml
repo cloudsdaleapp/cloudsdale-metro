@@ -63,8 +63,8 @@
         </StackPanel>
         
         <!-- Avatar -->
-        <Border Width="200" Height="200" Margin="30" BorderBrush="Gray" BorderThickness="1">
-            <Image Source="{Binding Path=User.Avatar.Normal}" />
+        <Border Margin="30" BorderBrush="Gray" BorderThickness="1">
+            <Image Source="{Binding Path=User.Avatar[256]}" />
         </Border>
         
         <StackPanel Visibility="{Binding Path=IsModerator, Converter={StaticResource BoolVis}}">

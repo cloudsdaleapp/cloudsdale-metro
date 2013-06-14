@@ -14,6 +14,8 @@ namespace CloudsdaleLib.Models {
         private Uri _chat;
         private Uri _preview;
 
+        internal CloudsdaleResource Owner { get; set; }
+
         [JsonProperty("normal")]
         public Uri Normal {
             get { return _normal; }
@@ -61,6 +63,19 @@ namespace CloudsdaleLib.Models {
                 if (Equals(value, _preview)) return;
                 _preview = value;
                 OnPropertyChanged();
+            }
+        }
+
+        public Uri this[int size] {
+            get {
+                if (Owner == null) {
+                    return Normal;
+                }
+
+                return new Uri(Endpoints.Avatar
+                    .Replace("[:type]", Owner.RestModelType)
+                    .Replace("[:id]", Owner.Id)
+                    .Replace("[:size]", size.ToString()));
             }
         }
     }

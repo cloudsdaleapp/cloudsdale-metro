@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Net.Http;
@@ -11,7 +10,6 @@ using CloudsdaleLib.Helpers;
 using CloudsdaleLib.Models;
 using Cloudsdale_Metro.Common;
 using Cloudsdale_Metro.Controllers;
-using Cloudsdale_Metro.Views.ChatConverters;
 using Cloudsdale_Metro.Views.Controls;
 using Newtonsoft.Json;
 using WinRTXamlToolkit.AwaitableUI;
@@ -23,17 +21,19 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
 
-// The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234237
-
 namespace Cloudsdale_Metro.Views {
-    /// <summary>
-    /// A basic page that provides characteristics common to most applications.
-    /// </summary>
     public sealed partial class CloudPage {
+        #region Fields
+
         private CloudController cloudController;
+
+        #endregion
+
+        #region Load/Unload
 
         public CloudPage() {
             InitializeComponent();
@@ -49,27 +49,64 @@ namespace Cloudsdale_Metro.Views {
             DefaultViewModel["Items"] = cloudController.Messages;
             cloudController.Messages.CollectionChanged += MessagesOnCollectionChanged;
             ScrollChat();
-        }
 
-        private void MessagesOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs) {
-            ScrollChat();
+            OverlayGrid.Visibility = Visibility.Collapsed;
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e) {
             cloudController.Messages.CollectionChanged -= MessagesOnCollectionChanged;
         }
 
-        protected override async void GoBack(object sender, RoutedEventArgs e) {
-            if (CloudGrid.Visibility == Visibility.Collapsed) {
-                CloudListExpand.Begin();
-                await CloudListView.WaitForLayoutUpdateAsync();
-                CloudListView.ScrollIntoView(cloudController.Cloud);
+        #endregion
+
+        #region Chat View
+
+        private async void ScrollChat(bool byItem = false, double height = -1) {
+            await Task.Delay(100);
+            await ChatList.WaitForNonZeroSizeAsync();
+
+            double scrollHeight;
+            double amountToScroll;
+
+            if (height > 0) {
+                amountToScroll = height;
+                scrollHeight = ChatScroll.VerticalOffset + amountToScroll;
+            } else if (byItem) {
+                var lastContainer = ChatList.ItemContainerGenerator.
+                    ContainerFromItem(cloudController.Messages.Last()) as ContentPresenter;
+                if (lastContainer == null) return;
+
+                amountToScroll = lastContainer.ActualHeight;
+                scrollHeight = ChatScroll.VerticalOffset + amountToScroll*1.1;
+                scrollHeight = Math.Min(scrollHeight, ChatScroll.ScrollableHeight);
             } else {
-                CloudListCollapse.Begin();
+                amountToScroll = ChatScroll.ScrollableHeight - ChatScroll.VerticalOffset;
+                scrollHeight = ChatScroll.ScrollableHeight;
             }
+
+            await ChatScroll.ScrollToVerticalOffsetWithAnimation(scrollHeight, 0.5, new ExponentialEase());
         }
 
+        private void ChatScroll_OnSizeChanged(object sender, SizeChangedEventArgs e) {
+            ScrollChat();
+        }
+
+        private void MessagesOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs args) {
+            //ScrollChat(true);
+        }
+
+        private void ChatList_OnSizeChanged(object sender, SizeChangedEventArgs e) {
+            var change = e.NewSize.Height - e.PreviousSize.Height;
+            ScrollChat(height: change);
+        }
+
+        #endregion
+
+        #region Messaging
+
         private void SendBoxKeyDown(object sender, KeyRoutedEventArgs e) {
+            ScrollChat();
+
             var sendBox = (TextBox)sender;
             if (e.Key != VirtualKey.Enter) return;
             var state = CoreWindow.GetForCurrentThread().GetKeyState(VirtualKey.Shift);
@@ -133,35 +170,9 @@ namespace Cloudsdale_Metro.Views {
             } catch (JsonException) { }
         }
 
-        private async void ScrollChat() {
-            await Task.Delay(100);
-            await ChatList.WaitForNonZeroSizeAsync();
-            await ChatScroll.ScrollToVerticalOffsetWithAnimation(ChatScroll.ScrollableHeight, 0.5);
-        }
+        #endregion
 
-        private void ChatScroll_OnSizeChanged(object sender, SizeChangedEventArgs e) {
-            ScrollChat();
-        }
-
-        private void UsersListClick(object sender, RoutedEventArgs e) {
-            var userList = new SettingsFlyout {
-                HeaderBrush = new SolidColorBrush(Color.FromArgb(0xFF, 0x1A, 0x91, 0xDB)),
-                HeaderText = "Users",
-                Background = new SolidColorBrush(Colors.Transparent),
-                ContentBackgroundBrush = new SolidColorBrush(Color.FromArgb(0xFF, 0xF0, 0xF0, 0xF0)),
-                Content = new UserList(cloudController),
-            };
-
-            userList.BackClicked += (o, args) => {
-                args.Cancel = true;
-                userList.IsOpen = false;
-            };
-
-            var cloudAvatar = cloudController.Cloud.Avatar.Preview;
-            userList.SmallLogoImageSource = new BitmapImage(cloudAvatar);
-
-            userList.IsOpen = true;
-        }
+        #region Cloud list
 
         private void CloudItemClicked(object sender, ItemClickEventArgs e) {
             if (e.ClickedItem == cloudController.Cloud) {
@@ -183,12 +194,54 @@ namespace Cloudsdale_Metro.Views {
 // ReSharper restore RedundantCheckBeforeAssignment
         }
 
+        private async void CloudListExpand_OnCompleted(object sender, object e) {
+            await CloudListView.WaitForLayoutUpdateAsync();
+            CloudListView.ScrollIntoView(cloudController.Cloud);
+        }
+
+        protected override void GoBack(object sender, RoutedEventArgs e) {
+            if (CloudGrid.Visibility == Visibility.Collapsed) {
+                CloudListExpand.Begin();
+            } else {
+                CloudListCollapse.Begin();
+            }
+        }
+
+        #endregion
+
+        #region User List
+
+        private void UsersListClick(object sender, RoutedEventArgs e) {
+            var userList = new SettingsFlyout {
+                HeaderBrush = new SolidColorBrush(Color.FromArgb(0xFF, 0x1A, 0x91, 0xDB)),
+                HeaderText = "Users",
+                Background = new SolidColorBrush(Colors.Transparent),
+                ContentBackgroundBrush = new SolidColorBrush(Color.FromArgb(0xFF, 0xF0, 0xF0, 0xF0)),
+                Content = new UserList(cloudController),
+            };
+
+            userList.BackClicked += (o, args) => {
+                args.Cancel = true;
+                userList.IsOpen = false;
+            };
+
+            var cloudAvatar = cloudController.Cloud.Avatar.Preview;
+            userList.SmallLogoImageSource = new BitmapImage(cloudAvatar);
+
+            userList.IsOpen = true;
+        }
+
+        #endregion
+
+        #region User Panel
+
         public static void ShowUserPanel(User user) {
             var panel = new SettingsFlyout {
                 HeaderBrush = new SolidColorBrush(Color.FromArgb(0xFF, 0x1A, 0x91, 0xDB)),
                 HeaderText = user.Name,
                 Background = new SolidColorBrush(Colors.Transparent),
                 ContentBackgroundBrush = new SolidColorBrush(Color.FromArgb(0xFF, 0xF0, 0xF0, 0xF0)),
+                FlyoutWidth = SettingsFlyout.SettingsFlyoutWidth.Narrow,
                 Content = new UserPanel(user)
             };
 
@@ -202,7 +255,11 @@ namespace Cloudsdale_Metro.Views {
 
             panel.IsOpen = true;
         }
+
+        #endregion
     }
+
+    #region Helper Classes
 
     public class MessageTemplateSelector : DataTemplateSelector {
         protected override DataTemplate SelectTemplateCore(object item, DependencyObject container) {
@@ -214,4 +271,6 @@ namespace Cloudsdale_Metro.Views {
             return (DataTemplate)element.GetFirstAncestorOfType<LayoutAwarePage>().Resources["StandardChatTemplate"];
         }
     }
+
+    #endregion
 }

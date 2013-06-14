@@ -59,7 +59,6 @@ namespace Cloudsdale_Metro.Controllers {
             get {
                 var list =
                     userStatuses.Where(kvp => kvp.Value != Status.offline)
-                                .Where(kvp => Cloud.UserIds.Contains(kvp.Key))
                                 .Where(kvp => !Cloud.ModeratorIds.Contains(kvp.Key))
                                 .Select(kvp => App.Connection.ModelController.GetUser(kvp.Key))
                                 .ToList();
@@ -70,8 +69,7 @@ namespace Cloudsdale_Metro.Controllers {
         public List<User> AllUsers {
             get {
                 var list =
-                    userStatuses.Where(kvp => Cloud.UserIds.Contains(kvp.Key))
-                                .Where(kvp => !Cloud.ModeratorIds.Contains(kvp.Key))
+                    userStatuses.Where(kvp => !Cloud.ModeratorIds.Contains(kvp.Key))
                                 .Select(kvp => App.Connection.ModelController.GetUser(kvp.Key))
                                 .ToList();
                 list.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.Ordinal));
