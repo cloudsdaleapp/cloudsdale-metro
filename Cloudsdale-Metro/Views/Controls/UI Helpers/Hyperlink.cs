@@ -24,7 +24,7 @@ namespace Cloudsdale_Metro.Views.Controls {
 
             var link = new HyperlinkButton {
                 Foreground = new SolidColorBrush(Color.FromArgb(0xFF, 0x63, 0xA0, 0xD0)),
-                Margin = new Thickness(-3, 0, -3, -8),
+                Margin = new Thickness(-3, 0, -3, -5),
                 Padding = new Thickness(0),
                 Content = args.NewValue,
                 FontSize = hyperlink.FontSize
@@ -53,15 +53,15 @@ namespace Cloudsdale_Metro.Views.Controls {
                     Items = {
                         new MenuItem {
                             Text = "Open Link",
-                            Command = new OpenLinkCommand(),
+                            Command = new MenuCommand<OpenLinkCommand>(),
                             CommandParameter = uri
                         },
                         new MenuItem {
                             Text = "Copy Link",
-                            Command = new CopyLinkCommand(),
-                            CommandParameter = uri
+                            Command = new MenuCommand<CopyLinkCommand>(),
+                            CommandParameter = uri,
                         }
-                    }
+                    },
                 },
                 IsOpen = true
             };

@@ -123,6 +123,7 @@
                         <ColumnDefinition />
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="10" />
                     </Grid.ColumnDefinitions>
                     <Button Style="{StaticResource PortraitBackButtonStyle}" Click="GoBack" Margin="16" Padding="5">
                         <Button.Projection>
@@ -131,8 +132,20 @@
                         </Button.Projection>
                     </Button>
 
-                    <Button Grid.Column="2" FontSize="24" Margin="5" Width="100" Click="UsersListClick">Users</Button>
-                    <Button Grid.Column="3" FontSize="24" Margin="5" Width="100">Drops</Button>
+                    <Button Grid.Column="2" Margin="5" Width="70" Height="70" Padding="2" Click="UsersListClick">
+                        <StackPanel>
+                            <Image Source="/Assets/user.png" Height="30" HorizontalAlignment="Center" />
+                            <TextBlock FontSize="16" Foreground="White"
+                                       HorizontalAlignment="Center">Users</TextBlock>
+                        </StackPanel>
+                    </Button>
+                    <Button Grid.Column="3" Margin="5" Width="70" Height="70" Padding="2">
+                        <StackPanel>
+                            <Image Source="/Assets/drop.png" Height="30" HorizontalAlignment="Center" />
+                            <TextBlock FontSize="16" Foreground="White"
+                                       HorizontalAlignment="Center">Drops</TextBlock>
+                        </StackPanel>
+                    </Button>
                 </Grid>
                 <ScrollViewer Name="ChatScroll" SizeChanged="ChatScroll_OnSizeChanged" 
                           ZoomMode="Disabled" HorizontalScrollMode="Disabled" Grid.Row="1">
@@ -154,8 +167,8 @@
                 </VisualStateGroup>
             </VisualStateManager.VisualStateGroups>
         </Grid>
-        <Grid Background="#5F000000" x:Name="OverlayGrid">
-            <ProgressRing Height="100" Width="100" Foreground="White" IsActive="True" />
+        <Grid Background="#2F000000" x:Name="OverlayGrid">
+            <ProgressRing Height="100" Width="100" Foreground="#1a91db" IsActive="True" />
         </Grid>
     </controls:RootGrid>
 </common:LayoutAwarePage>

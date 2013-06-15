@@ -5,9 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.UI.Input;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media;
 
 namespace Cloudsdale_Metro.Helpers {
     public static class UIHelpers {
@@ -29,5 +31,18 @@ namespace Cloudsdale_Metro.Helpers {
             }
             return element as T;
         }
+
+        public static IEnumerable<T> Children<T>(this DependencyObject parent) where T : DependencyObject {
+            var childCount = VisualTreeHelper.GetChildrenCount(parent);
+            for (var i = 0; i < childCount; ++i) {
+                var child = VisualTreeHelper.GetChild(parent, i);
+                if (child is T) {
+                    yield return child as T;
+                }
+                foreach (var subChild in child.Children<T>()) {
+                    yield return subChild;
+                }
+            }
+        } 
     }
 }
