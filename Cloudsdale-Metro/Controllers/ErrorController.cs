@@ -13,12 +13,25 @@ namespace Cloudsdale_Metro.Controllers {
 
         public async Task OnError<T>(WebResponse<T> response) {
             LastError = response;
-            var message = response.Errors.Aggregate(
-                response.Flash.Message + "\n", 
-                (current, error) => current + "\n  - " + error.Node + " '" 
-                    + error.NodeValue + "' " + error.Message);
-            var dialog = new MessageDialog(message, response.Flash.Title);
+            string title;
+            var message = BuildMessage(response, out title);
+            var dialog = new MessageDialog(message, title);
             await dialog.ShowAsync();
+        }
+
+        private static string BuildMessage<T>(WebResponse<T> response, out string title) {
+            title = response.Flash != null ? response.Flash.Title : "An error occured";
+            var message = response.Flash != null ? response.Flash.Message : "";
+            return response.Errors.Aggregate(message, (current, error) => error.Node != null 
+                ? AppendLine(current, error.Node + " '" + error.Node + "' " + error.Message) 
+                : AppendLine(current, error.Message));
+        }
+
+        private static string AppendLine(string start, string line) {
+            if (start.Length > 0) {
+                return start + "\n" + line;
+            }
+            return start + line;
         }
     }
 }

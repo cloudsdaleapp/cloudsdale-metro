@@ -42,7 +42,7 @@ namespace Cloudsdale_Metro.Views {
         protected override async void OnNavigatedTo(NavigationEventArgs e) {
             cloudController = App.Connection.MessageController.CurrentCloud;
             cloudController.UnreadMessages = 0;
-            DefaultViewModel["Clouds"] = App.Connection.Session.CurrentSession.Clouds;
+            DefaultViewModel["Clouds"] = App.Connection.SessionController.CurrentSession.Clouds;
             await CloudListView.WaitForLayoutUpdateAsync();
             CloudListView.SelectedItem = cloudController.Cloud;
             await cloudController.EnsureLoaded();
@@ -136,14 +136,14 @@ namespace Cloudsdale_Metro.Views {
             var messageData = await JsonConvert.SerializeObjectAsync(messageModel);
 
             messageModel.Id = Guid.NewGuid().ToString();
-            messageModel.Author = App.Connection.Session.CurrentSession;
+            messageModel.Author = App.Connection.SessionController.CurrentSession;
 
             cloudController.Messages.AddToEnd(messageModel);
 
             var client = new HttpClient {
                 DefaultRequestHeaders = {
                     { "Accept", "application/json" }, 
-                    { "X-Auth-Token", App.Connection.Session.CurrentSession.AuthToken }
+                    { "X-Auth-Token", App.Connection.SessionController.CurrentSession.AuthToken }
                 }
             };
             var response = await client.PostAsync(Endpoints.CloudMessages.Replace("[:id]", cloudController.Cloud.Id),

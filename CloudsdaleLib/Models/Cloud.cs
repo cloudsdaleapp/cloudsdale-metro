@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using CloudsdaleLib.Helpers;
 using Newtonsoft.Json;
@@ -128,25 +129,24 @@ namespace CloudsdaleLib.Models {
                 postData = new MultipartFormDataContent("--" + Guid.NewGuid() + "--") {
                     new ByteArrayContent(dataStream.ToArray()) {
                         Headers = {
-                            {
-                                "Centent-Disposition",
-                                new[] {
-                                    "form-data", 
-                                    "name=\"cloud[avatar]\"",
-                                    "filename=\"GenericImage.png\""
-                                }
+                            ContentDisposition = new ContentDispositionHeaderValue("form-data") {
+                                Name = "cloud[avatar]",
+                                FileName = "GenericImage.png"
                             },
-                            { "Content-Type", dataStream.Length.ToString() }
+                            ContentLength = dataStream.Length,
                         }
                     }
                 };
             }
 
             var request = new HttpClient {
-                DefaultRequestHeaders = { { "Accept", "application/json" } }
+                DefaultRequestHeaders = { 
+                    { "Accept", "application/json" },
+                    { "X-Auth-Token", Cloudsdale.SessionProvider.CurrentSession.AuthToken } 
+                }
             };
 
-            var response = await request.PostAsync(Endpoints.User.Replace("[:id]", Id), postData);
+            var response = await request.PostAsync(Endpoints.Cloud.Replace("[:id]", Id), postData);
             var result = await JsonConvert.DeserializeObjectAsync<WebResponse<Cloud>>(await response.Content.ReadAsStringAsync());
 
             if (response.StatusCode != HttpStatusCode.OK) {

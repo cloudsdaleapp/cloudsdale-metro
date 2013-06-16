@@ -20,13 +20,13 @@ namespace Cloudsdale_Metro.Controllers {
 
         public Frame MainFrame { get; private set; }
 
-        public readonly SessionController Session = new SessionController();
+        public readonly SessionController SessionController = new SessionController();
         public readonly ErrorController ErrorController = new ErrorController();
         public readonly MessageController MessageController = new MessageController();
         public readonly ModelController ModelController = new ModelController();
 
         public ConnectionController() {
-            Cloudsdale.SessionProvider = Session;
+            Cloudsdale.SessionProvider = SessionController;
             Cloudsdale.ModelErrorProvider = ErrorController;
             Cloudsdale.CloudServicesProvider = MessageController;
             Cloudsdale.UserProvider = ModelController;
@@ -52,7 +52,7 @@ namespace Cloudsdale_Metro.Controllers {
                 };
             }
 
-            await Session.LoadSession();
+            await SessionController.LoadSession();
 
             if (MainFrame == null) {
                 MainFrame = new Frame {
@@ -100,8 +100,8 @@ namespace Cloudsdale_Metro.Controllers {
             Faye = null;
             await MainFrame.Dispatcher.RunAsync(CoreDispatcherPriority.Low, async delegate {
                 await EnsureFayeConnection();
-                if (Session.CurrentSession == null) return;
-                ConnectSession(Session.CurrentSession);
+                if (SessionController.CurrentSession == null) return;
+                ConnectSession(SessionController.CurrentSession);
                 if (MessageController.CurrentCloud == null) return;
                 await MessageController.CurrentCloud.EnsureLoaded();
             });

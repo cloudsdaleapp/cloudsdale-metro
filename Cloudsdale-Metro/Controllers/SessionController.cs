@@ -103,15 +103,12 @@ namespace Cloudsdale_Metro.Controllers {
                 return;
             }
 
-            var requestModel = new { email = form.Email ?? "", password = form.Password ?? "" };
-            var requestData = Encoding.UTF8.GetBytes(await JsonConvert.SerializeObjectAsync(requestModel, Formatting.None));
-
-            var request = new HttpClient {
-                DefaultRequestHeaders = { { "Accept", "application/json" } }
+            var requestModel = new {
+                email = form.Email,
+                password = form.Password
             };
-            var result = await request.PostAsync(Endpoints.Session, new ByteArrayContent(requestData) {
-                Headers = { { "Content-Type", "application/json" }, { "Content-Length", requestData.Length.ToString() } }
-            });
+            var request = new HttpClient().AcceptsJson();
+            var result = await request.PostAsync(Endpoints.Session, new JsonContent(requestModel));
 
             var resultString = await result.Content.ReadAsStringAsync();
             var response = await JsonConvert.DeserializeObjectAsync<WebResponse<SessionWrapper>>(resultString);

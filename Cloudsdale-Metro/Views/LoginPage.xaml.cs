@@ -16,19 +16,19 @@ namespace Cloudsdale_Metro.Views {
             InitializeComponent();
             DataContext = LoginForm;
 
-            SessionGrid.ItemsSource = App.Connection.Session.PastSessions;
+            SessionGrid.ItemsSource = App.Connection.SessionController.PastSessions;
         }
 
         protected override async void OnNavigatedTo(NavigationEventArgs e) {
             CloudCanvas.StartLoop();
             await DoLastLogin();
-            LoginForm.Session = App.Connection.Session.CurrentSession;
+            LoginForm.Session = App.Connection.SessionController.CurrentSession;
         }
 
         private async Task DoLastLogin() {
-            if (App.Connection.Session.LastSession == null) return;
-            var session = App.Connection.Session.PastSessions.FirstOrDefault(
-                user => user.Id == App.Connection.Session.LastSession);
+            if (App.Connection.SessionController.LastSession == null) return;
+            var session = App.Connection.SessionController.PastSessions.FirstOrDefault(
+                user => user.Id == App.Connection.SessionController.LastSession);
             if (session == null) return;
             LoginForm.Session = session;
             await this.WaitForLoadedAsync();
@@ -62,7 +62,7 @@ namespace Cloudsdale_Metro.Views {
 
         async Task DoLogin() {
             Frame.Navigate(typeof(LoggingIn));
-            await App.Connection.Session.LogIn(LoginForm);
+            await App.Connection.SessionController.LogIn(LoginForm);
         }
     }
 }

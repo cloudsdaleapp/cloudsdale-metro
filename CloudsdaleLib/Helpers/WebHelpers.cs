@@ -18,6 +18,17 @@ namespace CloudsdaleLib.Helpers {
         public JsonContent(JToken json)
             : this(json.ToString(Formatting.None)) {
         }
+
+        public JsonContent(object json)
+            : this(JObject.FromObject(json).ToString(Formatting.None)) {
+        }
+    }
+
+    public static class WebHelpers {
+        public static HttpClient AcceptsJson(this HttpClient client) {
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            return client;
+        }
     }
 
     [JsonObject(MemberSerialization.OptIn)]

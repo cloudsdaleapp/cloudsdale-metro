@@ -24,13 +24,15 @@ namespace CloudsdaleLib.Models {
 
         public virtual void CopyTo(CloudsdaleModel other) {
             var properties = GetType().GetRuntimeProperties();
+            var targetType = other.GetType();
             foreach (var property in properties) {
                 var attribute = property.GetCustomAttribute<JsonPropertyAttribute>();
                 if (attribute == null) continue;
 
                 var value = property.GetValue(this);
                 if (value != null) {
-                    property.SetValue(other, value);
+                    var targetProperty = targetType.GetRuntimeProperty(property.Name);
+                    targetProperty.SetValue(other, value);
                 }
             }
         }

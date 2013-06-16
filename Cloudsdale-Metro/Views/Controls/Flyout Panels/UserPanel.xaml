@@ -44,7 +44,7 @@
 
     <StackPanel Margin="0,0,0,50">
         <!-- Avatar -->
-        <Image Margin="0,16" Source="{Binding Path=User.Avatar[256]}" />
+        <Image Margin="0,16" Source="{Binding Path=User.Avatar[256]}" Height="256" />
 
         <!-- Username -->
         <TextBlock Foreground="Gray" FontSize="18" Margin="0,5,0,10">
@@ -74,7 +74,7 @@
                 <ProgressRing Foreground="RoyalBlue" IsActive="{Binding Path=BansLoading}" Width="50" Height="50" />
             </Grid>
             
-            <Grid Visibility="{Binding Path=CanBan}">
+            <Grid Visibility="{Binding Path=CanBan, Converter={StaticResource BoolVis}}">
                 <Grid Visibility="{Binding Path=TrollBan, Converter={StaticResource BoolVis}, ConverterParameter=Inverse}">
 
                 </Grid>

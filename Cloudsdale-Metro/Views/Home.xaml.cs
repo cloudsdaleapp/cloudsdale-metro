@@ -36,7 +36,7 @@ namespace Cloudsdale_Metro.Views {
         /// <param name="pageState">A dictionary of state preserved by this page during an earlier
         /// session.  This will be null the first time a page is visited.</param>
         protected override void LoadState(Object navigationParameter, Dictionary<String, Object> pageState) {
-            DefaultViewModel["Items"] = App.Connection.Session.CurrentSession.Clouds;
+            DefaultViewModel["Items"] = App.Connection.SessionController.CurrentSession.Clouds;
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e) {

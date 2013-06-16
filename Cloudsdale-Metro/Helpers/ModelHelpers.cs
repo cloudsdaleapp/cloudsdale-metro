@@ -14,7 +14,7 @@ namespace Cloudsdale_Metro.Helpers {
         }
 
         public static Session GetSession(this ConnectionController controller) {
-            return controller.Session.CurrentSession;
+            return controller.SessionController.CurrentSession;
         }
 
         public static bool IsModerator(this User user) {

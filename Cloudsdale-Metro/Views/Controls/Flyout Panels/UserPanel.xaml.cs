@@ -41,6 +41,8 @@ namespace Cloudsdale_Metro.Views.Controls {
             DefaultViewModel["User"] = User;
             DefaultViewModel["HasAka"] = User.AlsoKnownAs.Length > 0;
             DefaultViewModel["IsModerator"] = Session.IsModerator();
+            DefaultViewModel["CanBan"] = false;
+            DefaultViewModel["TrollBan"] = false;
 
             if (App.Connection.GetSession().IsModerator()) {
                 DefaultViewModel["Bans"] = new Ban[0];

@@ -1,46 +1,57 @@
 ﻿using System;
-using System.Collections.Generic;
 using Callisto.Controls;
 using Cloudsdale_Metro.Helpers;
+using Windows.System;
 using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Documents;
-using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 
 namespace Cloudsdale_Metro.Views.Controls {
     public class Hyperlink : Span {
         private InlineUIContainer marker;
+        private static DateTime lastTriggered = DateTime.Now;
 
         public static readonly DependencyProperty TextProperty =
-            DependencyProperty.Register("Text", typeof (string), typeof (Hyperlink),
+            DependencyProperty.Register("Text", typeof(string), typeof(Hyperlink),
                                         new PropertyMetadata(default(string), TextChanged));
 
         private static void TextChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs args) {
-            var hyperlink = (Hyperlink) dependencyObject;
+            var hyperlink = (Hyperlink)dependencyObject;
             hyperlink.Inlines.Clear();
 
             var link = new HyperlinkButton {
                 Foreground = new SolidColorBrush(Color.FromArgb(0xFF, 0x63, 0xA0, 0xD0)),
-                Margin = new Thickness(-3, 0, -3, -5),
+                Margin = new Thickness(-3, 0, -3, -7),
                 Padding = new Thickness(0),
                 Content = args.NewValue,
                 FontSize = hyperlink.FontSize
             };
-            link.Tapped += delegate { hyperlink.TriggerLink(); };
+            link.Tapped += delegate { hyperlink.TriggerLink(true); };
+            link.RightTapped += delegate { hyperlink.TriggerLink(false); };
             hyperlink.marker = new InlineUIContainer { Child = link };
             hyperlink.Inlines.Add(hyperlink.marker);
         }
 
-        public void TriggerLink() {
+        public void TriggerLink(bool directOpen) {
+            if (lastTriggered > DateTime.Now.AddMilliseconds(-500)) {
+                return;
+            }
+            lastTriggered = DateTime.Now;
+
             Uri uri;
             if (Uri.IsWellFormedUriString(Target, UriKind.Absolute)) {
                 uri = new Uri(Target);
             } else if (Uri.IsWellFormedUriString("http://" + Target, UriKind.Absolute)) {
                 uri = new Uri("http://" + Target);
             } else {
+                return;
+            }
+
+            if (directOpen) {
+                Launcher.LaunchUriAsync(uri);
                 return;
             }
 
@@ -69,16 +80,16 @@ namespace Cloudsdale_Metro.Views.Controls {
         }
 
         public string Text {
-            get { return (string) GetValue(TextProperty); }
+            get { return (string)GetValue(TextProperty); }
             set { SetValue(TextProperty, value); }
         }
 
         public static readonly DependencyProperty TargetProperty =
-            DependencyProperty.Register("Target", typeof (string), typeof (Hyperlink),
+            DependencyProperty.Register("Target", typeof(string), typeof(Hyperlink),
                                         new PropertyMetadata(default(string), TextChanged));
 
         public string Target {
-            get { return (string) GetValue(TargetProperty); }
+            get { return (string)GetValue(TargetProperty); }
             set { SetValue(TargetProperty, value); }
         }
     }

@@ -162,6 +162,7 @@ namespace Cloudsdale_Metro.Controllers {
             if (App.Connection.MessageController.CurrentCloud == this) {
                 UnreadMessages = 0;
             }
+            App.Connection.MessageController.UpdateUnread();
         }
 
         public int UnreadMessages {
@@ -189,8 +190,8 @@ namespace Cloudsdale_Metro.Controllers {
         }
 
         private void FixSessionStatus() {
-            userStatuses[App.Connection.Session.CurrentSession.Id] =
-                App.Connection.Session.CurrentSession.PreferredStatus;
+            userStatuses[App.Connection.SessionController.CurrentSession.Id] =
+                App.Connection.SessionController.CurrentSession.PreferredStatus;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

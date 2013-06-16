@@ -7,7 +7,7 @@ namespace Cloudsdale_Metro.Controllers {
     public class ModelController : IUserProvider, ICloudProvider {
         private readonly Dictionary<string, User> users = new Dictionary<string, User>();
         private readonly Dictionary<string, Cloud> clouds = new Dictionary<string, Cloud>();
-        private SessionController sessionController { get { return App.Connection.Session; } }
+        private SessionController sessionController { get { return App.Connection.SessionController; } }
 
         public async Task<User> GetUserAsync(string id) {
             if (id == sessionController.CurrentSession.Id) {

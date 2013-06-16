@@ -57,7 +57,7 @@ namespace Cloudsdale_Metro {
                 "AccountSettings", "Account settings",
                 command => new AccountSettings().FlyOut());
 
-            if (Connection.Session.CurrentSession != null && !(Connection.MainFrame.Content is LoggingIn)) {
+            if (Connection.SessionController.CurrentSession != null && !(Connection.MainFrame.Content is LoggingIn)) {
                 args.Request.ApplicationCommands.Add(accountSettings);
             }
         }

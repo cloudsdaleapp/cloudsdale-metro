@@ -1,10 +1,12 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Callisto.Controls;
 using CloudsdaleLib.Models;
 using Cloudsdale_Metro.Helpers;
 using Newtonsoft.Json.Linq;
+using Windows.Storage.Pickers;
 using Windows.System;
 using Windows.UI;
 using Windows.UI.Xaml;
@@ -13,46 +15,112 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using WinRTXamlToolkit.AwaitableUI;
 
-// The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
-
 namespace Cloudsdale_Metro.Views.Controls {
     public sealed partial class AccountSettings {
-        private readonly Session session;
 
-        public AccountSettings() {
-            InitializeComponent();
-            DataContext = session = App.Connection.Session.CurrentSession;
-
-            InitializeFlyout();
-        }
+        #region Logout
 
         private async void LogoutClick(object sender, RoutedEventArgs e) {
             ((SettingsFlyout)Parent).IsOpen = false;
-            await App.Connection.Session.LogOut();
+            await App.Connection.SessionController.LogOut();
         }
 
+        #endregion
+
+        #region Name
+
         private async void NameBox_OnLostFocus(object sender, RoutedEventArgs e) {
-            var nameBox = (TextBox)sender;
+            var nameBox = sender as TextBox;
             if (string.IsNullOrWhiteSpace(nameBox.Text)) {
-                session.Name = session.Name;
+                DataContext = session;
                 return;
             }
             await DoUpdate("name", nameBox.Text, nameBox, NameModelError, NameProgress);
         }
 
+        #endregion
+
+        #region Skype
+
         private async void SkypeBox_OnLostFocus(object sender, RoutedEventArgs e) {
-            var skypeBox = (TextBox)sender;
+            var skypeBox = sender as TextBox;
             await DoUpdate("skype_name", skypeBox.Text, skypeBox, SkypeModelError, SkypeProgress);
         }
 
+        #endregion
+
+        #region Avatar
+
+        private async void AvatarBox_OnLostFocus(object sender, RoutedEventArgs e) {
+            var avatarBox = sender as TextBox;
+            if (string.IsNullOrWhiteSpace(avatarBox.Text)) {
+                DataContext = session;
+                return;
+            }
+            await DoUpdate("remote_avatar_url", avatarBox.Text, avatarBox, AvatarModelError, AvatarProgress);
+            avatarBox.Text = "";
+        }
+
+        private async void AvatarTapped(object sender, TappedRoutedEventArgs e) {
+            var picker = new FileOpenPicker {
+                FileTypeFilter = {
+                    ".png", ".jpg", ".jpeg", ".gif", ".bmp"
+                },
+                CommitButtonText = "Upload Avatar",
+                SuggestedStartLocation = PickerLocationId.PicturesLibrary,
+                ViewMode = PickerViewMode.Thumbnail
+            };
+
+            var pic = await picker.PickSingleFileAsync();
+            if (pic == null) {
+                return;
+            }
+            new AccountSettings().FlyOut();
+            await session.UploadAvatar(await pic.OpenStreamForReadAsync(), "image/png");
+        }
+
+        #endregion
+
+        #region Email
+
+        private async void EmailBox_OnLostFocus(object sender, RoutedEventArgs e) {
+            var emailBox = sender as TextBox;
+            if (string.IsNullOrWhiteSpace(emailBox.Text)) {
+                DataContext = session;
+                return;
+            }
+            await DoUpdate("email", emailBox.Text, emailBox, EmailModelError, EmailProgress);
+        }
+
+        #endregion
+
+        #region Status
+
         private async void Selector_OnSelectionChanged(object sender, SelectionChangedEventArgs e) {
-            var statusBox = (ComboBox)sender;
+            var statusBox = sender as ComboBox;
             if (statusBox.SelectedIndex < 0 || statusBox.SelectedIndex > 3) return;
             var newStatus = (Status)statusBox.SelectedIndex;
             if (newStatus == session.PreferredStatus) return;
 
             await DoUpdate("preferred_status", newStatus.ToString(), statusBox, StatusModelError, StatusProgress);
         }
+
+        #endregion
+
+        #region Password
+
+        private async void PasswordBox_OnLostFocus(object sender, RoutedEventArgs e) {
+            var passBox = sender as PasswordBox;
+            if (string.IsNullOrWhiteSpace(passBox.Password)) {
+                return;
+            }
+            await DoUpdate("password", passBox.Password, passBox, PasswordModelError, PasswordProgress);
+            passBox.Password = "";
+        }
+
+        #endregion
+
+        #region Updating
 
         private async Task DoUpdate(string property, JToken input, Control inputBox, TextBlock errorBlock, UIElement progress) {
             errorBlock.Text = "";
@@ -86,6 +154,18 @@ namespace Cloudsdale_Metro.Views.Controls {
             box.IsEnabled = true;
         }
 
+        #endregion
+
+        #region Flyout carp
+        private readonly Session session;
+
+        public AccountSettings() {
+            InitializeComponent();
+            DataContext = session = App.Connection.SessionController.CurrentSession;
+
+            InitializeFlyout();
+        }
+
         public override string Header {
             get { return "Account Settings"; }
         }
@@ -93,5 +173,7 @@ namespace Cloudsdale_Metro.Views.Controls {
         public override Uri Image {
             get { return session.Avatar.Preview; }
         }
+
+        #endregion
     }
 }

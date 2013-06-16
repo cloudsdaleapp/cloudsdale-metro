@@ -1,10 +1,16 @@
 ﻿using System;
+using System.IO;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
+using CloudsdaleLib.Helpers;
 using Newtonsoft.Json;
 
 namespace CloudsdaleLib.Models {
     [JsonObject(MemberSerialization.OptIn)]
     [ResourceEndpoint(Endpoints.User, RestModelType = "user")]
-    public class User : CloudsdaleResource {
+    public class User : CloudsdaleResource, IAvatarUploadTarget {
         private string _name;
         private bool? _hasAnAvatar;
         private bool? _isMemberOfACloud;
@@ -174,6 +180,47 @@ namespace CloudsdaleLib.Models {
 
         [JsonProperty("status")]
         public Status? Status;
+
+        #endregion
+
+        #region Avatar Upload
+
+        public async Task UploadAvatar(Stream pictureStream, string mimeType) {
+            HttpContent postData;
+            using (var dataStream = new MemoryStream()) {
+                using (pictureStream) {
+                    await pictureStream.CopyToAsync(dataStream);
+                }
+
+                postData = new MultipartFormDataContent("--" + Guid.NewGuid() + "--") {
+                    new ByteArrayContent(dataStream.ToArray()) {
+                        Headers = {
+                            ContentDisposition = new ContentDispositionHeaderValue("form-data") {
+                                Name = "user[avatar]",
+                                FileName = "GenericImage.png"
+                            },
+                            ContentLength = dataStream.Length,
+                        }
+                    }
+                };
+            }
+
+            var request = new HttpClient {
+                DefaultRequestHeaders = {
+                    { "Accept", "application/json" },
+                    { "X-Auth-Token", Cloudsdale.SessionProvider.CurrentSession.AuthToken }
+                }
+            };
+
+            var response = await request.PostAsync(Endpoints.User.Replace("[:id]", Id), postData);
+            var result = await JsonConvert.DeserializeObjectAsync<WebResponse<User>>(await response.Content.ReadAsStringAsync());
+
+            if (response.StatusCode != HttpStatusCode.OK) {
+                await Cloudsdale.ModelErrorProvider.OnError(result);
+            } else {
+                result.Result.CopyTo(this);
+            }
+        }
 
         #endregion
     }
