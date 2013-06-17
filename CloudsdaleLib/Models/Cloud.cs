@@ -8,9 +8,14 @@ using CloudsdaleLib.Helpers;
 using Newtonsoft.Json;
 
 namespace CloudsdaleLib.Models {
+    /// <summary>
+    /// A cloud is a construct which players join, leave, and send messages to.
+    /// This class will be sent down in your session, and can be retrieved
+    /// from a variety of endpoints
+    /// </summary>
     [JsonObject(MemberSerialization.OptIn)]
     [ResourceEndpoint(Endpoints.Cloud, RestModelType = "cloud")]
-    public class Cloud : CloudsdaleResource, IAvatarUploadTarget {
+    public sealed class Cloud : CloudsdaleResource, IAvatarUploadTarget {
         private string _name;
         private string[] _userIds;
         private string[] _moderatorIds;
@@ -21,9 +26,16 @@ namespace CloudsdaleLib.Models {
         private DateTime? _created;
         private string _description;
 
+        /// <summary>
+        /// Creates a cloud object based on the given ID
+        /// </summary>
+        /// <param name="id">The permanent ID to be associated with this object</param>
         [JsonConstructor]
         public Cloud(string id) : base(id) { }
 
+        /// <summary>
+        /// The name of the cloud
+        /// </summary>
         [JsonProperty("name")]
         public string Name {
             get { return _name; }
@@ -34,6 +46,9 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// Description of the cloud
+        /// </summary>
         [JsonProperty("description")]
         public string Description {
             get { return _description; }
@@ -44,6 +59,9 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// When the cloud was created
+        /// </summary>
         [JsonProperty("created_at")]
         public DateTime? Created {
             get { return _created; }
@@ -54,6 +72,9 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// Rules for the cloud
+        /// </summary>
         [JsonProperty("rules")]
         public string Rules {
             get { return _rules; }
@@ -64,6 +85,9 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// Whether the cloud is private
+        /// </summary>
         [JsonProperty("hidden")]
         public bool? Hidden {
             get { return _hidden; }
@@ -74,6 +98,9 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// Avatar for the cloud
+        /// </summary>
         [JsonProperty("avatar")]
         public Avatar Avatar {
             get {
@@ -89,6 +116,9 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// ID for the owner of the cloud
+        /// </summary>
         [JsonProperty("owner_id")]
         public string OwnerId {
             get { return _ownerId; }
@@ -99,6 +129,9 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// IDs for the moderators of the cloud
+        /// </summary>
         [JsonProperty("moderator_ids")]
         public string[] ModeratorIds {
             get { return _moderatorIds; }
@@ -109,6 +142,9 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// IDs for all the members of the cloud
+        /// </summary>
         [JsonProperty("user_ids")]
         public string[] UserIds {
             get { return _userIds; }
@@ -119,6 +155,12 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// Uploads a new avatar for the cloud
+        /// </summary>
+        /// <param name="pictureStream">Stream for the new cloud avatar</param>
+        /// <param name="mimeType">Mime type of the picture being uploaded</param>
+        /// <returns></returns>
         public async Task UploadAvatar(Stream pictureStream, string mimeType) {
             HttpContent postData;
             using (var dataStream = new MemoryStream()) {
@@ -140,7 +182,7 @@ namespace CloudsdaleLib.Models {
             }
 
             var request = new HttpClient {
-                DefaultRequestHeaders = { 
+                DefaultRequestHeaders = {
                     { "Accept", "application/json" },
                     { "X-Auth-Token", Cloudsdale.SessionProvider.CurrentSession.AuthToken } 
                 }

@@ -8,6 +8,9 @@ using CloudsdaleLib.Helpers;
 using Newtonsoft.Json;
 
 namespace CloudsdaleLib.Models {
+    /// <summary>
+    /// A user object for clousdsdale
+    /// </summary>
     [JsonObject(MemberSerialization.OptIn)]
     [ResourceEndpoint(Endpoints.User, RestModelType = "user")]
     public class User : CloudsdaleResource, IAvatarUploadTarget {
@@ -30,6 +33,23 @@ namespace CloudsdaleLib.Models {
         public User(string id) : base(id) {}
 
         #region Visual information
+
+        /// <summary>
+        /// This user's unique username
+        /// </summary>
+        [JsonProperty("username")]
+        public string Username {
+            get { return _username; }
+            set {
+                if (value == _username) return;
+                _username = value;
+                OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// The user's display name
+        /// </summary>
         [JsonProperty("name")]
         public string Name {
             get { return _name; }
@@ -40,6 +60,9 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// The user's avatar
+        /// </summary>
         [JsonProperty("avatar")]
         public Avatar Avatar {
             get {
@@ -55,6 +78,9 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// The user's server role (e.g. admin or donor)
+        /// </summary>
         [JsonProperty("role")]
         public string Role {
             get { return _role; }
@@ -65,6 +91,9 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// The user's provided skype name
+        /// </summary>
         [JsonProperty("skype_name")]
         public string SkypeName {
             get { return _skypeName; }
@@ -75,6 +104,9 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// A list of names the user has been known to go by
+        /// </summary>
         [JsonProperty("also_known_as")]
         public string[] AlsoKnownAs {
             get { return _alsoKnownAs; }
@@ -88,6 +120,9 @@ namespace CloudsdaleLib.Models {
         #endregion
 
         #region Information relavent to internal treatment
+        /// <summary>
+        /// When the user joined cloudsdale
+        /// </summary>
         [JsonProperty("member_since")]
         public DateTime? MemberSince {
             get { return _memberSince; }
@@ -98,6 +133,9 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// If the user is suspended, until which date they cannot join cloudsdale
+        /// </summary>
         [JsonProperty("suspended_until")]
         public DateTime? SuspendedUntil {
             get { return _suspendedUntil; }
@@ -108,6 +146,9 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// The reason for the user's site-wide suspension
+        /// </summary>
         [JsonProperty("reason_for_suspension")]
         public string SuspensionReason {
             get { return _suspensionReason; }
@@ -118,6 +159,9 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// Whether the account is currently banned from cloudsdale
+        /// </summary>
         [JsonProperty("is_banned")]
         public bool? IsBanned {
             get { return _isBanned; }
@@ -128,6 +172,9 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// Whether this is a registered user object
+        /// </summary>
         [JsonProperty("is_registered")]
         public bool? IsRegistered {
             get { return _isRegistered; }
@@ -138,6 +185,9 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// Whether the user has agreed to the Terms and Conditions
+        /// </summary>
         [JsonProperty("has_read_tnc")]
         public bool? HasReadTnc {
             get { return _hasReadTnc; }
@@ -148,6 +198,9 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// Whether this user is a member of a cloud
+        /// </summary>
         [JsonProperty("is_member_of_a_cloud")]
         public bool? IsMemberOfACloud {
             get { return _isMemberOfACloud; }
@@ -158,22 +211,15 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// Whether this user has set an avatar
+        /// </summary>
         [JsonProperty("has_an_avatar")]
         public bool? HasAnAvatar {
             get { return _hasAnAvatar; }
             set {
                 if (value.Equals(_hasAnAvatar)) return;
                 _hasAnAvatar = value;
-                OnPropertyChanged();
-            }
-        }
-
-        [JsonProperty("username")]
-        public string Username {
-            get { return _username; }
-            set {
-                if (value == _username) return;
-                _username = value;
                 OnPropertyChanged();
             }
         }

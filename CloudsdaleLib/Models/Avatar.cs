@@ -2,8 +2,11 @@
 using Newtonsoft.Json;
 
 namespace CloudsdaleLib.Models {
+    /// <summary>
+    /// Avatar for a cloudsdale entity
+    /// </summary>
     [JsonObject(MemberSerialization.OptIn)]
-    public class Avatar : CloudsdaleModel {
+    public sealed class Avatar : CloudsdaleModel {
         private Uri _normal;
         private Uri _mini;
         private Uri _thumb;
@@ -12,6 +15,9 @@ namespace CloudsdaleLib.Models {
 
         internal CloudsdaleResource Owner { get; set; }
 
+        /// <summary>
+        /// 200x200 image avatar endpoint
+        /// </summary>
         [JsonProperty("normal")]
         public Uri Normal {
             get { return _normal; }
@@ -22,6 +28,9 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// 24x24 image avatar endpoint
+        /// </summary>
         [JsonProperty("mini")]
         public Uri Mini {
             get { return _mini; }
@@ -32,6 +41,9 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// 50x50 avatar endpoint
+        /// </summary>
         [JsonProperty("thumb")]
         public Uri Thumb {
             get { return _thumb; }
@@ -42,6 +54,9 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// 40x40 image avatar endpoint
+        /// </summary>
         [JsonProperty("chat")]
         public Uri Chat {
             get { return _chat; }
@@ -52,6 +67,9 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// 70x70 image avatar endpoint
+        /// </summary>
         [JsonProperty("preview")]
         public Uri Preview {
             get { return _preview; }
@@ -62,6 +80,11 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// Avatar of specific image size
+        /// </summary>
+        /// <param name="size">Square dimmension for avatar retrieval</param>
+        /// <returns>Endpoint for avatar of given size</returns>
         public Uri this[int size] {
             get {
                 if (Owner == null) {

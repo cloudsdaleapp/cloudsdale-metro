@@ -1,6 +1,9 @@
 ﻿using CloudsdaleLib.Providers;
 
 namespace CloudsdaleLib {
+    /// <summary>
+    /// Provides static access to all the providers of cloudsdale
+    /// </summary>
     public class Cloudsdale {
         private static readonly ISessionProvider DefaultSessionProvider = new DefaultSessionProvider();
         private static readonly ICloudServicesProvider DefaultCloudServicesProvider = new DefaultCloudServicesProvider();

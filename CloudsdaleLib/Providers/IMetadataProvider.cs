@@ -5,15 +5,24 @@ using CloudsdaleLib.Annotations;
 using CloudsdaleLib.Models;
 
 namespace CloudsdaleLib.Providers {
+    /// <summary>
+    /// Provides metadata objects to models
+    /// </summary>
     public interface IMetadataProvider {
         IMetadataObject CreateNew(CloudsdaleModel model);
     }
 
+    /// <summary>
+    /// Stores a metadata value
+    /// </summary>
     public interface IMetadataObject {
         object Value { get; set; }
         CloudsdaleModel Model { get; }
     }
 
+    /// <summary>
+    /// Provides access to the metadata providers
+    /// </summary>
     public interface IMetadataProviderStore {
         IMetadataProvider this[string key] { get; set; }
     }

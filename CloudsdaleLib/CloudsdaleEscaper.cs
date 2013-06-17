@@ -3,6 +3,10 @@ using System.Linq;
 using System.Text;
 
 namespace CloudsdaleLib {
+    /// <summary>
+    /// Allows escaping and parsing of message content 
+    /// (FUCKING >WEB BULLSHIT IF YOU ASK ME :V)
+    /// </summary>
     public static class CloudsdaleEscaper {
         private static readonly Dictionary<char, string> EscapeMappings = new Dictionary<char, string> {
             {'\\', "\\\\"}, {'\n', "\\n"}, {'\r', ""}, {'\t', "\\t"}
@@ -11,11 +15,21 @@ namespace CloudsdaleLib {
             {'\\', '\\'}, {'n', '\n'}, {'r', '\r'}, {'t', '\t'}
         };
 
+        /// <summary>
+        /// Escape a message before it is sent to the server
+        /// </summary>
+        /// <param name="message">Message to escape</param>
+        /// <returns>Escaped version of message</returns>
         public static string EscapeMessage(this string message) {
             return EscapeMappings.Aggregate(message, (current, mapping) =>
                 current.Replace(mapping.Key.ToString(), mapping.Value));
         }
 
+        /// <summary>
+        /// Parses a message sent down from the server
+        /// </summary>
+        /// <param name="message">Message to parse</param>
+        /// <returns>Parsed message</returns>
         public static string ParseMessage(this string message) {
             var builder = new StringBuilder();
 

@@ -2,6 +2,12 @@
 using Newtonsoft.Json;
 
 namespace CloudsdaleLib.Models {
+    /// <summary>
+    /// A "drop" is a little piece of information about
+    /// a link which was posted in the chat. Drops
+    /// are useful to provide a preview to a user before
+    /// they click on a link
+    /// </summary>
     [JsonObject(MemberSerialization.OptIn)]
     public class Drop : CloudsdaleModel  {
         public readonly string Id;
@@ -13,6 +19,9 @@ namespace CloudsdaleLib.Models {
             Id = id;
         }
 
+        /// <summary>
+        /// The title of the resource at the other end of the drop
+        /// </summary>
         [JsonProperty("title")]
         public string Title {
             get { return _title; }
@@ -23,6 +32,9 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// URL to the link posted
+        /// </summary>
         [JsonProperty("url")]
         public Uri Url {
             get { return _url; }
@@ -33,6 +45,9 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// Preview of the posted webpage
+        /// </summary>
         [JsonProperty("preview")]
         public Uri Preview {
             get { return _preview; }

@@ -5,8 +5,14 @@ using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 
 namespace CloudsdaleLib.Models {
+    /// <summary>
+    /// A message send on cloudsdale
+    /// </summary>
     [JsonObject(MemberSerialization.OptIn)]
     public class Message : CloudsdaleModel, IMergable, IPreProcessable {
+        /// <summary>
+        /// Regular expression to determine if a message is of the action format
+        /// </summary>
         public static readonly Regex SlashMeFormat = new Regex(@"^/me");
 
         public Message() {
@@ -25,6 +31,9 @@ namespace CloudsdaleLib.Models {
 
         private readonly List<Message> _messages = new List<Message>();
 
+        /// <summary>
+        /// ID of the message to distinguish it from others
+        /// </summary>
         [JsonProperty("id")]
         public string Id {
             get { return _id; }
@@ -35,6 +44,9 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// The time at which the message was sent
+        /// </summary>
         [JsonProperty("timestamp")]
         public DateTime Timestamp {
             get { return _timestamp; }
@@ -46,6 +58,9 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// Content of the message
+        /// </summary>
         [JsonProperty("content")]
         public string Content {
             get { return _content; }
@@ -57,6 +72,9 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// The ID of the client which sent the message
+        /// </summary>
         [JsonProperty("client_id")]
         public string ClientId {
             get { return _clientId; }
@@ -67,6 +85,10 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// The type of device from which the message was sent.
+        /// Valid values include "desktop", "mobile", and "robot"
+        /// </summary>
         [JsonProperty("device")]
         public string Device {
             get { return _device; }
@@ -77,6 +99,9 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// The ID of the user which sent the message
+        /// </summary>
         [JsonProperty("author_id")]
         public string AuthorId {
             get { return _authorId; }
@@ -87,6 +112,9 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// Drops detected within the message
+        /// </summary>
         [JsonProperty("drops")]
         public Drop[] Drops {
             get { return _drops; }
@@ -98,6 +126,10 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// A limited amount of information about
+        /// the user who sent the message
+        /// </summary>
         [JsonProperty("author")]
         public User Author {
             get { return _author; }
@@ -109,6 +141,10 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// Collation of the contents of all the messages which
+        /// have been merged with this one
+        /// </summary>
         public string[] Messages {
             get {
                 var messages = new string[_messages.Count + 1];
@@ -120,6 +156,10 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// A collection of the drops from all of the
+        /// messages which have been merged with this one
+        /// </summary>
         public IEnumerable<Drop> AllDrops {
             get {
                 return _messages.Aggregate(new List<Drop>(Drops), (list, message) => {
@@ -129,10 +169,17 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// The cache-backed user object for the 
+        /// user which sent this message
+        /// </summary>
         public User User {
             get { return Cloudsdale.CloudServicesProvider.GetBackedUser(Author.Id); }
         }
 
+        /// <summary>
+        /// The timestamp of the last message which was merged with this one
+        /// </summary>
         public DateTime FinalTimestamp {
             get {
                 if (_messages.Count < 1) {

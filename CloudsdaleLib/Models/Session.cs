@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 namespace CloudsdaleLib.Models {
     [JsonObject(MemberSerialization.OptIn)]
     [ResourceEndpoint(Endpoints.Session, UpdateEndpoint = Endpoints.User, RestModelType = "user")]
-    public class Session : User {
+    public sealed class Session : User {
         private string _authToken;
         private string _email;
         private Status _preferredStatus;
@@ -21,6 +21,10 @@ namespace CloudsdaleLib.Models {
         [JsonConstructor]
         public Session(string id) : base(id) { }
 
+        /// <summary>
+        /// The Authentication Token used to
+        /// authenticate this user at API endpoints
+        /// </summary>
         [JsonProperty("auth_token")]
         public string AuthToken {
             get { return _authToken; }
@@ -31,6 +35,9 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// Email address of the user
+        /// </summary>
         [JsonProperty("email")]
         public string Email {
             get { return _email; }
@@ -41,6 +48,9 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// The online status of the user
+        /// </summary>
         [JsonProperty("preferred_status")]
         public Status PreferredStatus {
             get { return _preferredStatus; }
@@ -51,6 +61,9 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// Whether the user has yet to confirm their registration
+        /// </summary>
         [JsonProperty("needs_to_confirm_registration")]
         public bool? NeedsToConfirmRegistration {
             get { return _needsToConfirmRegistration; }
@@ -61,6 +74,9 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// Whether the user must change their password
+        /// </summary>
         [JsonProperty("needs_password_change")]
         public bool? NeedsPasswordChange {
             get { return _needsPasswordChange; }
@@ -71,6 +87,9 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// Whether the user must change their name
+        /// </summary>
         [JsonProperty("needs_name_change")]
         public bool? NeedsNameChange {
             get { return _needsNameChange; }
@@ -81,6 +100,9 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// Whether the user must change their email address
+        /// </summary>
         [JsonProperty("NeedsEmailChange")]
         public bool? NeedsEmailChange {
             get { return _needsEmailChange; }
@@ -91,6 +113,9 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// A list of all the clouds this user is a member of
+        /// </summary>
         [JsonProperty("clouds")]
         public List<Cloud> Clouds {
             get { return _clouds; }
@@ -105,6 +130,9 @@ namespace CloudsdaleLib.Models {
             }
         }
 
+        /// <summary>
+        /// A list of active bans on this user
+        /// </summary>
         [JsonProperty("bans")]
         public List<Ban> Bans {
             get { return _bans; }

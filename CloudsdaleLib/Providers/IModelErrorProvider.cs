@@ -3,6 +3,9 @@ using System.Threading.Tasks;
 using CloudsdaleLib.Helpers;
 
 namespace CloudsdaleLib.Providers {
+    /// <summary>
+    /// Processes model errors during resource updates and validations
+    /// </summary>
     public interface IModelErrorProvider {
         Task OnError<T>(WebResponse<T> response);
     }
