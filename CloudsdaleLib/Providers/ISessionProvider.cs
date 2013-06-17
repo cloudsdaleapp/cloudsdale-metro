@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CloudsdaleLib.Models;
+﻿using CloudsdaleLib.Models;
 
 namespace CloudsdaleLib.Providers {
     public interface ISessionProvider {

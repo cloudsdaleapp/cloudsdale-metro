@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
 using System.Threading.Tasks;
-using Windows.ApplicationModel;
 using Windows.Storage;
 using Windows.Storage.Streams;
 using Windows.UI.Xaml;
@@ -21,7 +18,7 @@ namespace Cloudsdale_Metro.Common {
     /// </summary>
     internal sealed class SuspensionManager {
         private static Dictionary<string, object> _sessionState = new Dictionary<string, object>();
-        private static List<Type> _knownTypes = new List<Type>();
+        private static readonly List<Type> knownTypes = new List<Type>();
         private const string sessionStateFilename = "_sessionState.xml";
 
         /// <summary>
@@ -41,7 +38,7 @@ namespace Cloudsdale_Metro.Common {
         /// added to customize the serialization process.
         /// </summary>
         public static List<Type> KnownTypes {
-            get { return _knownTypes; }
+            get { return knownTypes; }
         }
 
         /// <summary>
@@ -54,7 +51,7 @@ namespace Cloudsdale_Metro.Common {
         public static async Task SaveAsync() {
             try {
                 // Save the navigation state for all registered frames
-                foreach (var weakFrameReference in _registeredFrames) {
+                foreach (var weakFrameReference in RegisteredFrames) {
                     Frame frame;
                     if (weakFrameReference.TryGetTarget(out frame)) {
                         SaveFrameNavigationState(frame);
@@ -63,8 +60,8 @@ namespace Cloudsdale_Metro.Common {
 
                 // Serialize the session state synchronously to avoid asynchronous access to shared
                 // state
-                MemoryStream sessionData = new MemoryStream();
-                DataContractSerializer serializer = new DataContractSerializer(typeof(Dictionary<string, object>), _knownTypes);
+                var sessionData = new MemoryStream();
+                var serializer = new DataContractSerializer(typeof(Dictionary<string, object>), knownTypes);
                 serializer.WriteObject(sessionData, _sessionState);
 
                 // Get an output stream for the SessionState file and write the state asynchronously
@@ -96,12 +93,12 @@ namespace Cloudsdale_Metro.Common {
                 StorageFile file = await ApplicationData.Current.LocalFolder.GetFileAsync(sessionStateFilename);
                 using (IInputStream inStream = await file.OpenSequentialReadAsync()) {
                     // Deserialize the Session State
-                    DataContractSerializer serializer = new DataContractSerializer(typeof(Dictionary<string, object>), _knownTypes);
+                    var serializer = new DataContractSerializer(typeof(Dictionary<string, object>), knownTypes);
                     _sessionState = (Dictionary<string, object>)serializer.ReadObject(inStream.AsStreamForRead());
                 }
 
                 // Restore any registered frames to their saved state
-                foreach (var weakFrameReference in _registeredFrames) {
+                foreach (var weakFrameReference in RegisteredFrames) {
                     Frame frame;
                     if (weakFrameReference.TryGetTarget(out frame)) {
                         frame.ClearValue(FrameSessionStateProperty);
@@ -113,11 +110,11 @@ namespace Cloudsdale_Metro.Common {
             }
         }
 
-        private static DependencyProperty FrameSessionStateKeyProperty =
+        private static readonly DependencyProperty FrameSessionStateKeyProperty =
             DependencyProperty.RegisterAttached("_FrameSessionStateKey", typeof(String), typeof(SuspensionManager), null);
-        private static DependencyProperty FrameSessionStateProperty =
+        private static readonly DependencyProperty FrameSessionStateProperty =
             DependencyProperty.RegisterAttached("_FrameSessionState", typeof(Dictionary<String, Object>), typeof(SuspensionManager), null);
-        private static List<WeakReference<Frame>> _registeredFrames = new List<WeakReference<Frame>>();
+        private static readonly List<WeakReference<Frame>> RegisteredFrames = new List<WeakReference<Frame>>();
 
         /// <summary>
         /// Registers a <see cref="Frame"/> instance to allow its navigation history to be saved to
@@ -143,7 +140,7 @@ namespace Cloudsdale_Metro.Common {
             // Use a dependency property to associate the session key with a frame, and keep a list of frames whose
             // navigation state should be managed
             frame.SetValue(FrameSessionStateKeyProperty, sessionStateKey);
-            _registeredFrames.Add(new WeakReference<Frame>(frame));
+            RegisteredFrames.Add(new WeakReference<Frame>(frame));
 
             // Check to see if navigation state can be restored
             RestoreFrameNavigationState(frame);
@@ -160,7 +157,7 @@ namespace Cloudsdale_Metro.Common {
             // Remove session state and remove the frame from the list of frames whose navigation
             // state will be saved (along with any weak references that are no longer reachable)
             SessionState.Remove((String)frame.GetValue(FrameSessionStateKeyProperty));
-            _registeredFrames.RemoveAll((weakFrameReference) => {
+            RegisteredFrames.RemoveAll(weakFrameReference => {
                 Frame testFrame;
                 return !weakFrameReference.TryGetTarget(out testFrame) || testFrame == frame;
             });

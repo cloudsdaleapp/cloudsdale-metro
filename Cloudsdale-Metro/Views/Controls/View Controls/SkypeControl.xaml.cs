@@ -1,14 +1,13 @@
 ﻿using System;
 using Windows.System;
 using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
 namespace Cloudsdale_Metro.Views.Controls.View_Controls {
-    public sealed partial class SkypeControl : UserControl {
+    public sealed partial class SkypeControl {
         public SkypeControl() {
-            this.InitializeComponent();
+            InitializeComponent();
         }
 
         public static readonly DependencyProperty SkypeNameProperty =

@@ -1,16 +1,12 @@
 ﻿using System;
-using Callisto.Controls;
 using Cloudsdale_Metro.Controllers;
 using Cloudsdale_Metro.Views;
 using Cloudsdale_Metro.Views.Controls;
 using Cloudsdale_Metro.Views.LoadPages;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
-using Windows.UI;
 using Windows.UI.ApplicationSettings;
 using Windows.UI.Xaml;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Media.Imaging;
 
 // The Blank Application template is documented at http://go.microsoft.com/fwlink/?LinkId=234227
 

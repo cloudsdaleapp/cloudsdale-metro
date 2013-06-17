@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Windows.UI.Xaml.Data;
 
 namespace Cloudsdale_Metro.Common {
     /// <summary>
@@ -27,10 +26,12 @@ namespace Cloudsdale_Metro.Common {
         /// <returns>True if the value was changed, false if the existing value matched the
         /// desired value.</returns>
         protected bool SetProperty<T>(ref T storage, T value, [CallerMemberName] String propertyName = null) {
-            if (object.Equals(storage, value)) return false;
+            if (Equals(storage, value)) return false;
 
             storage = value;
-            this.OnPropertyChanged(propertyName);
+// ReSharper disable ExplicitCallerInfoArgument
+            OnPropertyChanged(propertyName);
+// ReSharper restore ExplicitCallerInfoArgument
             return true;
         }
 
@@ -41,7 +42,7 @@ namespace Cloudsdale_Metro.Common {
         /// value is optional and can be provided automatically when invoked from compilers
         /// that support <see cref="CallerMemberNameAttribute"/>.</param>
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null) {
-            var eventHandler = this.PropertyChanged;
+            var eventHandler = PropertyChanged;
             if (eventHandler != null) {
                 eventHandler(this, new PropertyChangedEventArgs(propertyName));
             }

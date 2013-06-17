@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using CloudsdaleLib.Providers;
+﻿using CloudsdaleLib.Providers;
 
 namespace CloudsdaleLib {
     public class Cloudsdale {

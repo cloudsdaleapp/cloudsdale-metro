@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using CloudsdaleLib.Models;
 using Windows.UI.Xaml.Data;
 
@@ -16,7 +11,9 @@ namespace Cloudsdale_Metro.Views.ChatConverters {
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language) {
-            throw new NotImplementedException();
+            var messages = (string[])value;
+            messages[0] = "/me" + messages[0];
+            return messages;
         }
     }
 }

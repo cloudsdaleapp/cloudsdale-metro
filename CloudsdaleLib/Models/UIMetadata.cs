@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
-using CloudsdaleLib.Helpers;
 using CloudsdaleLib.Providers;
 
 namespace CloudsdaleLib.Models {
     public class UIMetadata {
         private readonly Dictionary<string, IMetadataObject> objects = new Dictionary<string, IMetadataObject>();
-        private CloudsdaleModel model;
+        private readonly CloudsdaleModel model;
         public UIMetadata(CloudsdaleModel model) {
             this.model = model;
         }

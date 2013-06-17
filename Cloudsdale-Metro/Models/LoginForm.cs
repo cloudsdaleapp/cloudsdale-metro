@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
+﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using CloudsdaleLib.Annotations;
 using CloudsdaleLib.Models;
-using Cloudsdale_Metro.Assets;
 
 namespace Cloudsdale_Metro.Models {
     public class LoginForm : INotifyPropertyChanged {

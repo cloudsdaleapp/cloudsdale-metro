@@ -8,7 +8,7 @@ namespace Cloudsdale_Metro.Views.LoadPages {
     /// </summary>
     public sealed partial class LoggingOut {
         public LoggingOut() {
-            this.InitializeComponent();
+            InitializeComponent();
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e) {
