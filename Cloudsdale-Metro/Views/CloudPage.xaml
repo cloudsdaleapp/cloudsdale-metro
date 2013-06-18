@@ -155,7 +155,7 @@
                 </ScrollViewer>
 
                 <TextBox Grid.Row="2" Margin="10" FontSize="20" IsTextPredictionEnabled="True" TextWrapping="Wrap" 
-                     MaxHeight="200" IsSpellCheckEnabled="True" KeyUp="SendBoxKeyDown" />
+                     MaxHeight="200" IsSpellCheckEnabled="True" KeyUp="SendBoxKeyDown" FontFamily="Verdana" />
             </Grid>
 
             <VisualStateManager.VisualStateGroups>

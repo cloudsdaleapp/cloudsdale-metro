@@ -71,7 +71,8 @@ namespace Cloudsdale_Metro.Controllers {
                 cloud.ForceValidate();
                 clouds[cloud.Id] = cloud;
             } else {
-                cloud.CopyTo(clouds[cloud.Id]);
+                var cacheCloud = clouds[cloud.Id];
+                cloud.CopyTo(cacheCloud);
             }
 
             return clouds[cloud.Id];

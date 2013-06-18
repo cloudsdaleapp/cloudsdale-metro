@@ -55,13 +55,16 @@ namespace Cloudsdale_Metro.Controllers {
                 lastSession.LastLogins = new Dictionary<string, DateTime>();
             }
 
-            
+
             var sessionFiles = (await sessionFolder.GetFilesAsync()).Where(file => userSessionPattern.IsMatch(file.Name));
             foreach (var sessionFile in sessionFiles) {
-                pastSessions.Add(await JsonConvert.DeserializeObjectAsync<Session>(await sessionFile.ReadAllText()));
+                var pastSessionObject =
+                    await JsonConvert.DeserializeObjectAsync<Session>(await sessionFile.ReadAllText());
+                if (pastSessionObject == null) continue;
+                pastSessions.Add(pastSessionObject);
             }
 
-            foreach (var pastSession in pastSessions.Where(pastSession => !lastSession.LastLogins.ContainsKey(pastSession.Id))) {
+            foreach (var pastSession in pastSessions.Where(pastSession => pastSession != null).Where(pastSession => !lastSession.LastLogins.ContainsKey(pastSession.Id))) {
                 lastSession.LastLogins[pastSession.Id] = new DateTime(1970, 1, 1);
             }
 

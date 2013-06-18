@@ -15,7 +15,7 @@
   </Resources>
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="Cloudsdale_Metro.App">
-      <VisualElements DisplayName="Cloudsdale" Logo="Assets\Logo.png" SmallLogo="Assets\SmallLogo.png" Description="Cloudsdale for Windows 8" ForegroundText="light" BackgroundColor="#1A91DB">
+      <VisualElements DisplayName="Cloudsdale" Logo="Assets\Logo.png" SmallLogo="Assets\SmallLogo.png" Description="Cloudsdale for Windows 8" ForegroundText="light" BackgroundColor="#1A91DB" ToastCapable="true">
         <DefaultTile ShowName="allLogos" />
         <SplashScreen Image="Assets\SplashScreen.png" BackgroundColor="#1A91DB" />
         <InitialRotationPreference>

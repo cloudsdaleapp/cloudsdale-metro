@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using CloudsdaleLib;
 using CloudsdaleLib.Annotations;
 using CloudsdaleLib.Helpers;
@@ -14,6 +15,9 @@ using Cloudsdale_Metro.Models;
 using MetroFaye;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Windows.Data.Xml.Dom;
+using Windows.UI.Notifications;
+using Windows.UI.Xaml;
 
 namespace Cloudsdale_Metro.Controllers {
     public class CloudController : IStatusProvider, IMessageReciever, INotifyPropertyChanged {
@@ -83,7 +87,7 @@ namespace Cloudsdale_Metro.Controllers {
 
             await Cloud.Validate();
 
-            var client = new HttpClient { DefaultRequestHeaders = { { "Accept", "application/json" } } };
+            var client = new HttpClient().AcceptsJson();
 
             // Load user list
             {
@@ -134,14 +138,45 @@ namespace Cloudsdale_Metro.Controllers {
             }
         }
 
-        private void OnChatMessage(JToken message) {
+        private void OnChatMessage(JToken jMessage) {
             AddUnread();
-            var messageModel = message.ToObject<Message>();
+            var message = jMessage.ToObject<Message>();
 
-            if (messageModel.ClientId == App.Connection.Faye.ClientId) return;
+            if (message.ClientId == App.Connection.Faye.ClientId) return;
 
-            messageModel.Author.CopyTo(messageModel.User);
-            messages.AddToEnd(messageModel);
+            SendToast(message);
+
+            message.Author.CopyTo(message.User);
+            messages.AddToEnd(message);
+        }
+
+        private void SendToast(Message message) {
+            if (App.Connection.MessageController.CurrentCloud == this
+                && Window.Current.Visible) {
+                return;
+            }
+
+            var notifier = ToastNotificationManager.CreateToastNotifier();
+            var template = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastImageAndText02);
+            var image = (XmlElement)template.GetElementsByTagName("image")[0];
+            image.SetAttribute("src", message.Author.Avatar.Normal.ToString());
+            image.SetAttribute("alt", message.Author.Name);
+            var textElements = template.GetElementsByTagName("text");
+            textElements[0].AppendChild
+                (template.CreateTextNode(Cloud.Name + " : " + message.Author.Name));
+            textElements[1].AppendChild
+                (template.CreateTextNode (Message.SlashMeFormat.Replace(message.Content, message.Author.Name)));
+            var toastNode = (XmlElement)template.SelectSingleNode("/toast");
+            toastNode.SetAttribute("launch", JObject.FromObject(new {
+                type = "toast",
+                cloudId = Cloud.Id
+            }).ToString(Formatting.None));
+            var audio = template.CreateElement("audio");
+            audio.SetAttribute("silent", "true");
+            toastNode.AppendChild(audio);
+
+            var toast = new ToastNotification(template);
+            notifier.Show(toast);
         }
 
         private async void OnUserMessage(string id, JToken jUser) {

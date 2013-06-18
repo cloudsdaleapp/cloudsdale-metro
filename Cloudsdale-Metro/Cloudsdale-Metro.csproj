@@ -202,6 +202,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\BackgroundClouds.png" />
+    <Content Include="Assets\BadgeLogo.scale-100.png" />
     <Content Include="Assets\BanIcon.png" />
     <Content Include="Assets\BanIconWhite.png" />
     <Content Include="Assets\cloudsdale-thin-bright-logo.png" />
@@ -211,6 +212,7 @@
     <Content Include="Assets\Logo.png" />
     <Content Include="Assets\SmallLogo.png" />
     <Content Include="Assets\SplashScreen.png" />
+    <Content Include="Assets\Sounds\squee.mp3" />
     <Content Include="Assets\StoreLogo.png" />
     <Content Include="Assets\Fallback\user.png" />
     <Content Include="Assets\Trollface.png" />

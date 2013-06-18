@@ -1,8 +1,13 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Linq;
+using CloudsdaleLib;
 using Cloudsdale_Metro.Controllers;
 using Cloudsdale_Metro.Views;
 using Cloudsdale_Metro.Views.Controls;
 using Cloudsdale_Metro.Views.LoadPages;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.UI.ApplicationSettings;
@@ -39,13 +44,30 @@ namespace Cloudsdale_Metro {
         /// </summary>
         /// <param name="args">Details about the launch request and process.</param>
         protected override async void OnLaunched(LaunchActivatedEventArgs args) {
+            ModelSettings.Dispatcher = Window.Current.Dispatcher;
             await ConnectionController.EnsureAppActivated();
-            if (args.PreviousExecutionState != ApplicationExecutionState.Running &&
-                args.PreviousExecutionState != ApplicationExecutionState.Suspended) {
-                ConnectionController.Navigate(typeof(LoginPage));
+            SettingsPane.GetForCurrentView().CommandsRequested += OnCommandsRequested;
+
+            try {
+                var launchData = JObject.Parse(args.Arguments);
+                if (launchData["type"] != null && (string)launchData["type"] == "toast" &&
+                    ConnectionController.SessionController.CurrentSession != null) {
+                    var cloudId = (string)launchData["cloudId"];
+                    var cloud = Connection.SessionController.CurrentSession.Clouds
+                        .FirstOrDefault(scloud => scloud.Id == cloudId);
+                    if (cloud == null) {
+                        throw new JsonException();
+                    }
+                    ConnectionController.MessageController.CurrentCloud = Connection.MessageController[cloud];
+                    ConnectionController.Navigate(typeof(CloudPage));
+                }
+            } catch (JsonException) {
             }
 
-            SettingsPane.GetForCurrentView().CommandsRequested += OnCommandsRequested;
+            if (args.PreviousExecutionState != ApplicationExecutionState.Running &&
+                args.PreviousExecutionState != ApplicationExecutionState.Suspended) {
+                    ConnectionController.Navigate(typeof(LoginPage));
+            }
         }
 
         private static void OnCommandsRequested(SettingsPane sender, SettingsPaneCommandsRequestedEventArgs args) {
@@ -60,7 +82,7 @@ namespace Cloudsdale_Metro {
 
         private static void OnSuspending(object sender, SuspendingEventArgs e) {
             var deferral = e.SuspendingOperation.GetDeferral();
-            CloudsdaleLib.ModelSettings.AppLastSuspended = DateTime.Now;
+            ModelSettings.AppLastSuspended = DateTime.Now;
             deferral.Complete();
         }
     }

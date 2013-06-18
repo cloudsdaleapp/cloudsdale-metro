@@ -21,6 +21,8 @@ namespace Cloudsdale_Metro.Views.Controls {
                 width += child.DesiredSize.Width;
                 height += child.DesiredSize.Height;
             }
+            width = Math.Max(width, 1);
+            height = Math.Max(height, 1);
             scale = Math.Min(availableSize.Width / width, availableSize.Height / height);
 
             foreach (var child in Children) {

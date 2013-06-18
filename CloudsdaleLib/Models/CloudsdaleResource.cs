@@ -53,7 +53,12 @@ namespace CloudsdaleLib.Models {
         protected internal virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) {
             var handler = PropertyChanged;
             if (handler == null) return;
-            handler(this, new PropertyChangedEventArgs(propertyName));
+            if (ModelSettings.Dispatcher != null && !ModelSettings.Dispatcher.HasThreadAccess) {
+                ModelSettings.Dispatcher.RunAsync(CoreDispatcherPriority.Low,
+                                                  () => handler(this, new PropertyChangedEventArgs(propertyName)));
+            } else {
+                handler(this, new PropertyChangedEventArgs(propertyName));
+            }
         }
     }
 
