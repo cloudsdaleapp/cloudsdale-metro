@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using Callisto.Controls;
 using CloudsdaleLib;
 using CloudsdaleLib.Helpers;
 using CloudsdaleLib.Models;
@@ -15,14 +14,11 @@ using Newtonsoft.Json;
 using WinRTXamlToolkit.AwaitableUI;
 using WinRTXamlToolkit.Controls.Extensions;
 using Windows.System;
-using Windows.UI;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
-using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
 
 namespace Cloudsdale_Metro.Views {
@@ -77,7 +73,7 @@ namespace Cloudsdale_Metro.Views {
                 if (lastContainer == null) return;
 
                 amountToScroll = lastContainer.ActualHeight;
-                scrollHeight = ChatScroll.VerticalOffset + amountToScroll*1.1;
+                scrollHeight = ChatScroll.VerticalOffset + amountToScroll;
                 scrollHeight = Math.Min(scrollHeight, ChatScroll.ScrollableHeight);
             } else {
                 scrollHeight = ChatScroll.ScrollableHeight;
@@ -91,12 +87,12 @@ namespace Cloudsdale_Metro.Views {
         }
 
         private void MessagesOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs args) {
-            //ScrollChat(true);
+            ScrollChat(true);
         }
 
         private void ChatList_OnSizeChanged(object sender, SizeChangedEventArgs e) {
-            var change = e.NewSize.Height - e.PreviousSize.Height;
-            ScrollChat(height: change);
+            //var change = e.NewSize.Height - e.PreviousSize.Height;
+            //ScrollChat(height: change);
         }
 
         #endregion

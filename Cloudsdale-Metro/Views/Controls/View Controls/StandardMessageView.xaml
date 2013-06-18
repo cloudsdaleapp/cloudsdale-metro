@@ -87,33 +87,55 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition />
                 </Grid.RowDefinitions>
-                <local:ViewboxPanel MaxHeight="32">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <Grid>
-                            <TextBlock Text="&#x25CF;" FontFamily="Segoe UI Symbol" FontSize="14" Margin="4"
-                               Foreground="{Binding Path=User.UIMetadata[Status].Value,
-                                                     Converter={StaticResource StatusColor}}"/>
-                        </Grid>
-                        <TextBlock Margin="3" Grid.Column="1" Foreground="#A0A0A0" FontSize="16">
-                            <Run Text="{Binding Path=User.Name}" FontSize="20" 
-                                 Foreground="{Binding Path=User, Converter={StaticResource NameColor}}"
-                                 FontWeight="SemiBold" />
-                            @<Run Text="{Binding Path=User.Username}" />
-                        </TextBlock>
-
-                        <TextBlock Grid.Column="3" FontSize="18" Margin="5,5,0,0"
-                               Text="{Binding Path=FinalTimestamp, Converter={StaticResource TimestampConverter}}"/>
-                        <TextBlock Grid.Column="4" FontSize="18" Margin="5,5,0,0"
-                               Text="{Binding Path=Device, Converter={StaticResource MessageDevice}}" />
-                    </Grid>
-                </local:ViewboxPanel>
+                <Grid x:Name="NormalTitle">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <local:ViewboxPanel Height="32">
+                        <RichTextBlock Foreground="#4d4d4d" FontSize="16">
+                            <Paragraph>
+                                <Run Text="&#x25CF;" FontFamily="Segoe UI Symbol" FontSize="14"
+                                 Foreground="{Binding Path=User.UIMetadata[Status].Value, 
+                                 Converter={StaticResource StatusColor}}"/>
+                                <Run Text="{Binding Path=User.Name}" FontSize="20" FontWeight="SemiBold"
+                                 Foreground="{Binding Path=User, Converter={StaticResource NameColor}}"/>
+                                <Span Foreground="DarkGray">
+                                    @<Run Text="{Binding Path=User.Username}" />
+                                </Span>
+                            </Paragraph>
+                        </RichTextBlock>
+                    </local:ViewboxPanel>
+                    <TextBlock FontSize="18" Foreground="Gray" Margin="3" Grid.Column="1">
+                        <Run Text="{Binding Path=FinalTimestamp, Converter={StaticResource TimestampConverter}}" />
+                        <Run Text="{Binding Path=Device, Converter={StaticResource MessageDevice}}" />
+                    </TextBlock>
+                </Grid>
+                <Grid x:Name="TinyTitle">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <local:ViewboxPanel Height="42">
+                        <RichTextBlock Foreground="#4d4d4d" FontSize="16">
+                            <Paragraph>
+                                <Run Text="&#x25CF;" FontFamily="Segoe UI Symbol" FontSize="14"
+                                     Foreground="{Binding Path=User.UIMetadata[Status].Value, 
+                                     Converter={StaticResource StatusColor}}"/>
+                                <Run Text="{Binding Path=User.Name}" FontSize="20" FontWeight="SemiBold"
+                                     Foreground="{Binding Path=User, Converter={StaticResource NameColor}}"/>
+                                <LineBreak />
+                                <Span Foreground="DarkGray">
+                                    @<Run Text="{Binding Path=User.Username}" />
+                                </Span>
+                            </Paragraph>
+                        </RichTextBlock>
+                    </local:ViewboxPanel>
+                    <TextBlock FontSize="14" Foreground="Gray" Margin="3" Grid.Column="1">
+                        <Run Text="{Binding Path=FinalTimestamp, Converter={StaticResource TimestampConverter}}" />
+                        <Run Text="{Binding Path=Device, Converter={StaticResource MessageDevice}}" />
+                    </TextBlock>
+                </Grid>
                 <Grid Grid.Row="1" Name="AltDropGrid" Visibility="Collapsed">
                     <GridView ItemsSource="{Binding Path=AllDrops}"
                               FlowDirection="LeftToRight"

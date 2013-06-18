@@ -18,12 +18,18 @@ namespace Cloudsdale_Metro.Views.Controls {
                 DropGrid.Visibility = Visibility.Collapsed;
                 AltDropGrid.Visibility = Visibility.Visible;
 
+                NormalTitle.Visibility = Visibility.Collapsed;
+                TinyTitle.Visibility = Visibility.Visible;
+
                 AvatarImage.Width = 40;
                 AvatarImage.Height = 40;
             } else {
                 DropGrid.Visibility = Visibility.Visible;
                 AltDropGrid.Visibility = Visibility.Collapsed;
                 DropGrid.MaxWidth = Math.Min(e.NewSize.Width - 320, 450);
+
+                NormalTitle.Visibility = Visibility.Visible;
+                TinyTitle.Visibility = Visibility.Collapsed;
 
                 AvatarImage.Width = 60;
                 AvatarImage.Height = 60;

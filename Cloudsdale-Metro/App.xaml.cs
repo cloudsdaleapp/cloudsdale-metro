@@ -37,6 +37,8 @@ namespace Cloudsdale_Metro {
             RequestedTheme = ApplicationTheme.Light;
         }
 
+        private bool hasRegisteredSettings;
+
         /// <summary>
         /// Invoked when the application is launched normally by the end user.  Other entry points
         /// will be used when the application is launched to open a specific file, to display
@@ -44,25 +46,15 @@ namespace Cloudsdale_Metro {
         /// </summary>
         /// <param name="args">Details about the launch request and process.</param>
         protected override async void OnLaunched(LaunchActivatedEventArgs args) {
+            if (!hasRegisteredSettings) {
+                hasRegisteredSettings = true;
+                SettingsPane.GetForCurrentView().CommandsRequested += OnCommandsRequested;
+            }
+
             ModelSettings.Dispatcher = Window.Current.Dispatcher;
             await ConnectionController.EnsureAppActivated();
-            SettingsPane.GetForCurrentView().CommandsRequested += OnCommandsRequested;
 
-            try {
-                var launchData = JObject.Parse(args.Arguments);
-                if (launchData["type"] != null && (string)launchData["type"] == "toast" &&
-                    ConnectionController.SessionController.CurrentSession != null) {
-                    var cloudId = (string)launchData["cloudId"];
-                    var cloud = Connection.SessionController.CurrentSession.Clouds
-                        .FirstOrDefault(scloud => scloud.Id == cloudId);
-                    if (cloud == null) {
-                        throw new JsonException();
-                    }
-                    ConnectionController.MessageController.CurrentCloud = Connection.MessageController[cloud];
-                    ConnectionController.Navigate(typeof(CloudPage));
-                }
-            } catch (JsonException) {
-            }
+            TryLaunchSpecial(args.Arguments);
 
             if (args.PreviousExecutionState != ApplicationExecutionState.Running &&
                 args.PreviousExecutionState != ApplicationExecutionState.Suspended) {
@@ -70,12 +62,34 @@ namespace Cloudsdale_Metro {
             }
         }
 
-        private static void OnCommandsRequested(SettingsPane sender, SettingsPaneCommandsRequestedEventArgs args) {
+        private void TryLaunchSpecial(string args) {
+            try {
+                var launchData = JObject.Parse(args);
+                if (launchData["type"] != null && (string)launchData["type"] == "toast" &&
+                    ConnectionController.SessionController.CurrentSession != null) {
+                    var cloudId = (string)launchData["cloudId"];
+                    var cloud = Connection.SessionController.CurrentSession.Clouds
+                        .FirstOrDefault(scloud => scloud.Id == cloudId);
+                    if (cloud == null) {
+                        return;
+                    }
+                    if (ConnectionController.MessageController.CurrentCloud == Connection.MessageController[cloud] &&
+                        ConnectionController.MainFrame.Content is CloudPage) {
+                        return;
+                    }
+                    ConnectionController.MessageController.CurrentCloud = Connection.MessageController[cloud];
+                    ConnectionController.Navigate(typeof(CloudPage));
+                }
+            } catch (JsonException) {
+            }
+        }
+
+        private void OnCommandsRequested(SettingsPane sender, SettingsPaneCommandsRequestedEventArgs args) {
             var accountSettings = new SettingsCommand(
                 "AccountSettings", "Account settings",
                 command => new AccountSettings().FlyOut());
 
-            if (Connection.SessionController.CurrentSession != null && !(Connection.MainFrame.Content is LoggingIn)) {
+            if (ConnectionController.SessionController.CurrentSession != null && !(ConnectionController.MainFrame.Content is LoggingIn)) {
                 args.Request.ApplicationCommands.Add(accountSettings);
             }
         }
