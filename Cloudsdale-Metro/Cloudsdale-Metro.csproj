@@ -150,9 +150,12 @@
     <Compile Include="Views\CloudPage.xaml.cs">
       <DependentUpon>CloudPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Controls\Flyout Panels\CloudPanel.xaml.cs">
+      <DependentUpon>CloudPanel.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Controls\Flyout Panels\CloudsdaleFlyout.cs" />
-    <Compile Include="Views\Controls\Flyout Panels\CloudUpdatePanel.xaml.cs">
-      <DependentUpon>CloudUpdatePanel.xaml</DependentUpon>
+    <Compile Include="Views\Controls\Flyout Panels\CloudSettings.xaml.cs">
+      <DependentUpon>CloudSettings.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Controls\View Controls\ActionMessageView.xaml.cs">
       <DependentUpon>ActionMessageView.xaml</DependentUpon>
@@ -235,7 +238,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Controls\Flyout Panels\CloudUpdatePanel.xaml">
+    <Page Include="Views\Controls\Flyout Panels\CloudPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Controls\Flyout Panels\CloudSettings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

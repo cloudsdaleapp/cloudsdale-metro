@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Windows.UI;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Media;
 
@@ -14,6 +15,9 @@ namespace Cloudsdale_Metro.Views.Controls {
         public static readonly Regex ItalicsRegex = new Regex(@"\B\/\b([^\/\n]+)\b\/\B");
         public static readonly Regex RedactedRegex = new Regex(@"\[REDACTED\]", RegexOptions.IgnoreCase);
 
+        public RichTextBlock RichTextBlock{
+            get { return RichText; }
+        }
 
         public MessageTextControl() {
             InitializeComponent();

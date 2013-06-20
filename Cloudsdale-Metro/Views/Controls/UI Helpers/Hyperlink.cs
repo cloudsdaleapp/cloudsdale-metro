@@ -35,7 +35,7 @@ namespace Cloudsdale_Metro.Views.Controls {
             hyperlink.Inlines.Add(hyperlink.marker);
         }
 
-        public void TriggerLink(bool directOpen) {
+        public async void TriggerLink(bool directOpen) {
             if (lastTriggered > DateTime.Now.AddMilliseconds(-500)) {
                 return;
             }
@@ -51,7 +51,7 @@ namespace Cloudsdale_Metro.Views.Controls {
             }
 
             if (directOpen) {
-                Launcher.LaunchUriAsync(uri);
+                await Launcher.LaunchUriAsync(uri);
                 return;
             }
 

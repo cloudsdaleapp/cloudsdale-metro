@@ -21,8 +21,7 @@ namespace Cloudsdale_Metro.Views.Controls {
                 NormalTitle.Visibility = Visibility.Collapsed;
                 TinyTitle.Visibility = Visibility.Visible;
 
-                AvatarImage.Width = 40;
-                AvatarImage.Height = 40;
+                TagGrid.Width = 40;
             } else {
                 DropGrid.Visibility = Visibility.Visible;
                 AltDropGrid.Visibility = Visibility.Collapsed;
@@ -31,8 +30,7 @@ namespace Cloudsdale_Metro.Views.Controls {
                 NormalTitle.Visibility = Visibility.Visible;
                 TinyTitle.Visibility = Visibility.Collapsed;
 
-                AvatarImage.Width = 60;
-                AvatarImage.Height = 60;
+                TagGrid.Width = 60;
             }
         }
 

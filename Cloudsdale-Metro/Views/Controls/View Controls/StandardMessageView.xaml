@@ -63,23 +63,21 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="15" />
             </Grid.ColumnDefinitions>
-            <Grid Margin="0,0,5,5" Grid.Row="1">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <Border BorderBrush="#3a3a3a" BorderThickness="1" VerticalAlignment="Top" Tapped="AvatarTapped">
-                    <Image Source="{Binding Path=User.Avatar.Normal}" Width="60" Height="60" Name="AvatarImage" />
-                </Border>
-                <Border DataContext="{Binding Path=User.Role}" BorderBrush="Gray" Grid.Row="1"
-                    BorderThickness="1" CornerRadius="2" Height="16" Margin="0,5,0,0"
-                    Visibility="{Binding Converter={StaticResource ShowTag}}"
-                    Background="{Binding Converter={StaticResource TagColor}}">
-                    <TextBlock Text="{Binding Converter={StaticResource TagText}}"
-                           FontSize="12" Foreground="White"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"/>
-                </Border>
+            <Grid Margin="0,0,5,5" Grid.Row="1" x:Name="TagGrid" Width="60">
+                <local:ViewboxPanel Orientation="Vertical">
+                    <Border BorderBrush="#3a3a3a" BorderThickness="1" VerticalAlignment="Top" Tapped="AvatarTapped">
+                        <Image Source="{Binding Path=User.Avatar.Normal}" Width="60" Height="60" />
+                    </Border>
+                    <Border DataContext="{Binding Path=User.Role}" BorderBrush="Gray"
+                            BorderThickness="1" CornerRadius="2" Height="16" Margin="0,5,0,0"
+                            Visibility="{Binding Converter={StaticResource ShowTag}}"
+                            Background="{Binding Converter={StaticResource TagColor}}">
+                        <TextBlock Text="{Binding Converter={StaticResource TagText}}"
+                                   FontSize="12" Foreground="White"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"/>
+                    </Border>
+                </local:ViewboxPanel>
             </Grid>
             <Grid Grid.Column="2">
                 <Grid.RowDefinitions>
@@ -96,10 +94,10 @@
                         <RichTextBlock Foreground="#4d4d4d" FontSize="16">
                             <Paragraph>
                                 <Run Text="&#x25CF;" FontFamily="Segoe UI Symbol" FontSize="14"
-                                 Foreground="{Binding Path=User.UIMetadata[Status].Value, 
-                                 Converter={StaticResource StatusColor}}"/>
+                                     Foreground="{Binding Path=User.UIMetadata[Status].Value, 
+                                     Converter={StaticResource StatusColor}}"/>
                                 <Run Text="{Binding Path=User.Name}" FontSize="20" FontWeight="SemiBold"
-                                 Foreground="{Binding Path=User, Converter={StaticResource NameColor}}"/>
+                                     Foreground="{Binding Path=User, Converter={StaticResource NameColor}}"/>
                                 <Span Foreground="DarkGray">
                                     @<Run Text="{Binding Path=User.Username}" />
                                 </Span>
@@ -116,7 +114,7 @@
                         <ColumnDefinition />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <local:ViewboxPanel Height="42">
+                    <local:ViewboxPanel Height="42" Orientation="Vertical">
                         <RichTextBlock Foreground="#4d4d4d" FontSize="16">
                             <Paragraph>
                                 <Run Text="&#x25CF;" FontFamily="Segoe UI Symbol" FontSize="14"
@@ -124,10 +122,11 @@
                                      Converter={StaticResource StatusColor}}"/>
                                 <Run Text="{Binding Path=User.Name}" FontSize="20" FontWeight="SemiBold"
                                      Foreground="{Binding Path=User, Converter={StaticResource NameColor}}"/>
-                                <LineBreak />
-                                <Span Foreground="DarkGray">
-                                    @<Run Text="{Binding Path=User.Username}" />
-                                </Span>
+                            </Paragraph>
+                        </RichTextBlock>
+                        <RichTextBlock Foreground="DarkGray" FontSize="16">
+                            <Paragraph>
+                                @<Run Text="{Binding Path=User.Username}" />
                             </Paragraph>
                         </RichTextBlock>
                     </local:ViewboxPanel>
@@ -146,7 +145,9 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <local:MessageTextControl Messages="{Binding Path=Messages}" FontSize="20" FontFamily="Verdana" />
+                    <local:MessageTextControl x:Name="MessageControl" 
+                                              Messages="{Binding Path=Messages}" 
+                                              FontSize="20" FontFamily="Verdana" />
                     <Grid Grid.Column="1" x:Name="DropGrid">
                         <GridView ItemsSource="{Binding Path=AllDrops}"
                                   FlowDirection="RightToLeft"
