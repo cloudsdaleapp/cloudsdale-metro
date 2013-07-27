@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Net.Http;
 using CloudsdaleLib;
 using CloudsdaleLib.Helpers;
@@ -62,10 +63,11 @@ namespace Cloudsdale_Metro.Views.Controls {
 
                 var resultData = await response.Content.ReadAsStringAsync();
 
-                var bans = await JsonConvert.DeserializeObjectAsync<WebResponse<Ban[]>>(resultData);
-
-                DefaultViewModel["BansLoading"] = false;
-                DefaultViewModel["Bans"] = bans.Result;
+                try {
+                    var bans = await JsonConvert.DeserializeObjectAsync<WebResponse<Ban[]>>(resultData);
+                    DefaultViewModel["BansLoading"] = false;
+                    DefaultViewModel["Bans"] = bans.Result;
+                } catch (JsonException) { }
             }
 
             DefaultViewModel["CanBan"] =

@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using CloudsdaleLib.Annotations;
 using CloudsdaleLib.Helpers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using Windows.UI.Core;
 
 namespace CloudsdaleLib.Models {
@@ -35,10 +38,10 @@ namespace CloudsdaleLib.Models {
                 if (attribute == null) continue;
 
                 var value = property.GetValue(this);
-                if (value != null) {
-                    var targetProperty = targetType.GetRuntimeProperty(property.Name);
-                    targetProperty.SetValue(other, value);
-                }
+                if (value == null) continue;
+
+                var targetProperty = targetType.GetRuntimeProperty(property.Name);
+                targetProperty.SetValue(other, value);
             }
         }
 
@@ -60,6 +63,21 @@ namespace CloudsdaleLib.Models {
                 handler(this, new PropertyChangedEventArgs(propertyName));
             }
         }
+
+        [OnError]
+        public void OnError(StreamingContext context, ErrorContext errorContext) {
+            errorContext.Handled = true;
+            Debugger.Break();
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false)]
+    public class JsonErrorValueAttribute : Attribute {
+        public JsonErrorValueAttribute(object defaultValue) {
+            DefaultValue = defaultValue;
+        }
+
+        public object DefaultValue { get; set; }
     }
 
     /// <summary>
@@ -125,11 +143,7 @@ namespace CloudsdaleLib.Models {
             var attribute = modelType.GetCustomAttribute<ResourceEndpointAttribute>();
 
             var requestUrl = attribute.Endpoint.Replace("[:id]", Id);
-            var client = new HttpClient {
-                DefaultRequestHeaders = {
-                        {"Accept", "application/json"}
-                    }
-            };
+            var client = new HttpClient().AcceptsJson();
             var response = await ValidationRequest(client, requestUrl);
 
             var responseObject = JObject.Parse(await response.Content.ReadAsStringAsync());

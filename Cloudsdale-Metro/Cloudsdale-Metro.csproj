@@ -135,6 +135,7 @@
     <Compile Include="Helpers\ModelHelpers.cs" />
     <Compile Include="Helpers\UICommands.cs" />
     <Compile Include="Helpers\UIHelpers.cs" />
+    <Compile Include="Models\AppSettings.cs" />
     <Compile Include="Models\BooleanMetadata.cs" />
     <Compile Include="Models\CloudControllerMetadata.cs" />
     <Compile Include="Models\LoginForm.cs" />
@@ -149,6 +150,9 @@
     <Compile Include="Views\ChatConverters\TimestampConverter.cs" />
     <Compile Include="Views\CloudPage.xaml.cs">
       <DependentUpon>CloudPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Controls\Flyout Panels\AppSettings.xaml.cs">
+      <DependentUpon>AppSettings.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Controls\Flyout Panels\CloudPanel.xaml.cs">
       <DependentUpon>CloudPanel.xaml</DependentUpon>
@@ -211,6 +215,7 @@
     <Content Include="Assets\BadgeLogo.scale-100.png" />
     <Content Include="Assets\BanIcon.png" />
     <Content Include="Assets\BanIconWhite.png" />
+    <Content Include="Assets\circle_info.png" />
     <Content Include="Assets\cloudsdale-thin-bright-logo.png" />
     <Content Include="Assets\drop.png" />
     <Content Include="Assets\icon_white.png" />
@@ -235,6 +240,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\CloudPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Controls\Flyout Panels\AppSettings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

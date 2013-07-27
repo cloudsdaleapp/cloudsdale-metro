@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using Callisto.Controls.SettingsManagement;
 using CloudsdaleLib;
 using Cloudsdale_Metro.Controllers;
 using Cloudsdale_Metro.Views;
@@ -12,6 +13,7 @@ using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.UI.ApplicationSettings;
 using Windows.UI.Xaml;
+using AppSettings = Cloudsdale_Metro.Views.Controls.Flyout_Panels.AppSettings;
 
 // The Blank Application template is documented at http://go.microsoft.com/fwlink/?LinkId=234227
 
@@ -46,6 +48,8 @@ namespace Cloudsdale_Metro {
         /// </summary>
         /// <param name="args">Details about the launch request and process.</param>
         protected override async void OnLaunched(LaunchActivatedEventArgs args) {
+            await Models.AppSettings.Load();
+
             if (!hasRegisteredSettings) {
                 hasRegisteredSettings = true;
                 SettingsPane.GetForCurrentView().CommandsRequested += OnCommandsRequested;
@@ -85,6 +89,10 @@ namespace Cloudsdale_Metro {
         }
 
         private void OnCommandsRequested(SettingsPane sender, SettingsPaneCommandsRequestedEventArgs args) {
+            var appSettings = new SettingsCommand("AppSettings", "App Settings",
+                command => new AppSettings().FlyOut());
+            args.Request.ApplicationCommands.Add(appSettings);
+
             var accountSettings = new SettingsCommand(
                 "AccountSettings", "Account settings",
                 command => new AccountSettings().FlyOut());

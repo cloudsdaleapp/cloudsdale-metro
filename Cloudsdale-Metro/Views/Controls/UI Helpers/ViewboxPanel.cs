@@ -43,6 +43,7 @@ namespace Cloudsdale_Metro.Views.Controls {
                 return size;
             }, size => {
                 size.Height *= scale;
+                size.Width *= scale;
                 return size;
             });
         }
@@ -57,6 +58,7 @@ namespace Cloudsdale_Metro.Views.Controls {
                 return size;
             }, size => {
                 size.Width *= scale;
+                size.Height *= scale;
                 return size;
             });
         }
@@ -65,6 +67,7 @@ namespace Cloudsdale_Metro.Views.Controls {
             Size availableSize,
             Func<UIElement, Size, Size> childMesaureCallback,
             Func<Size, Size> finalSize) {
+
             double requiredHeight = 0;
             double requiredWidth = 0;
 

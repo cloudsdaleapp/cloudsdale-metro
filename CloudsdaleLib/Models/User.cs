@@ -269,5 +269,9 @@ namespace CloudsdaleLib.Models {
         }
 
         #endregion
+
+        public override string ToString() {
+            return Id + " { " + Name + " @" + Username + " [" + Role + "] }";
+        }
     }
 }

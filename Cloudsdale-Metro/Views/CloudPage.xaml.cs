@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Threading;
 using System.Threading.Tasks;
 using CloudsdaleLib;
 using CloudsdaleLib.Helpers;
@@ -10,6 +12,7 @@ using CloudsdaleLib.Models;
 using Cloudsdale_Metro.Common;
 using Cloudsdale_Metro.Controllers;
 using Cloudsdale_Metro.Views.Controls;
+using Cloudsdale_Metro.Views.Controls.Flyout_Panels;
 using Newtonsoft.Json;
 using WinRTXamlToolkit.AwaitableUI;
 using WinRTXamlToolkit.Controls.Extensions;
@@ -39,10 +42,15 @@ namespace Cloudsdale_Metro.Views {
             cloudController = App.Connection.MessageController.CurrentCloud;
             cloudController.UnreadMessages = 0;
             DefaultViewModel["Clouds"] = App.Connection.SessionController.CurrentSession.Clouds;
+            CloudGrid.Visibility = Visibility.Collapsed;
+            CloudListView.ScrollIntoView(cloudController.Cloud);
+
             await CloudListView.WaitForLayoutUpdateAsync();
             CloudListView.SelectedItem = cloudController.Cloud;
+
             await cloudController.EnsureLoaded();
             DefaultViewModel["Items"] = cloudController.Messages;
+
             cloudController.Messages.CollectionChanged += MessagesOnCollectionChanged;
             ScrollChat();
 
@@ -57,9 +65,13 @@ namespace Cloudsdale_Metro.Views {
 
         #region Chat View
 
+        private readonly List<Task> scrollTasks = new List<Task>();
+
         private async void ScrollChat(bool byItem = false, double height = -1) {
             await Task.Delay(100);
             await ChatList.WaitForNonZeroSizeAsync();
+
+            await Task.Run(() => Task.WaitAll(scrollTasks.ToArray()));
 
             double scrollHeight;
             double amountToScroll;
@@ -79,7 +91,7 @@ namespace Cloudsdale_Metro.Views {
                 scrollHeight = ChatScroll.ScrollableHeight;
             }
 
-            await ChatScroll.ScrollToVerticalOffsetWithAnimation(scrollHeight, 0.5, new ExponentialEase());
+            scrollTasks.Add(ChatScroll.ScrollToVerticalOffsetWithAnimation(scrollHeight, 0.1, new ExponentialEase()));
         }
 
         private void ChatScroll_OnSizeChanged(object sender, SizeChangedEventArgs e) {
@@ -87,41 +99,52 @@ namespace Cloudsdale_Metro.Views {
         }
 
         private void MessagesOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs args) {
-            ScrollChat(true);
+            //ScrollChat(true);
         }
 
         private void ChatList_OnSizeChanged(object sender, SizeChangedEventArgs e) {
-            //var change = e.NewSize.Height - e.PreviousSize.Height;
-            //ScrollChat(height: change);
+            var change = e.NewSize.Height - e.PreviousSize.Height;
+            ScrollChat(height: change);
         }
 
         #endregion
 
         #region Messaging
 
-        private void SendBoxKeyDown(object sender, KeyRoutedEventArgs e) {
+        protected override void OnAcceleratorKey(AcceleratorKeyParams args) {
+            if (SendBox.FocusState != FocusState.Unfocused) {
+                SendBoxKey(args);
+            }
+        }
+
+        private void SendBoxKey(AcceleratorKeyParams args) {
+            if (args.Args.EventType != CoreAcceleratorKeyEventType.KeyDown) return;
             ScrollChat();
 
-            var sendBox = (TextBox)sender;
-            if (e.Key != VirtualKey.Enter) return;
-            var state = CoreWindow.GetForCurrentThread().GetKeyState(VirtualKey.Shift);
-            var text = sendBox.Text;
-            if ((state & CoreVirtualKeyStates.Down) == CoreVirtualKeyStates.Down) {
-                var index = sendBox.SelectionStart;
-                var length = sendBox.SelectionLength;
-
-                sendBox.Text = text.Substring(0, index) + "\r\n" + text.Substring(index + length);
-                sendBox.SelectionLength = 0;
-                sendBox.SelectionStart = index + 1;
-
-                return;
+            if (args.Key == VirtualKey.Enter) {
+                SendBoxEnter(args.ShiftKey);
             }
-            sendBox.Text = string.Empty;
-            SendMessage(text);
+        }
+
+        private void SendBoxEnter(bool shift) {
+            var text = SendBox.Text.Replace("\r\n", "\n");
+
+            if (shift) {
+                var index = SendBox.SelectionStart + SendBox.SelectionLength;
+
+                SendBox.Text = text.Substring(0, index) + "\n" + text.Substring(index);
+                SendBox.SelectionLength = 0;
+                SendBox.SelectionStart = index + 1;
+            } else {
+                SendBox.Text = string.Empty;
+                SendMessage(text);
+            }
         }
 
         private async void SendMessage(string message) {
             if (string.IsNullOrWhiteSpace(message)) return;
+
+            message = message.TrimEnd();
 
             var messageModel = new Message {
                 Content = message.EscapeMessage(),
@@ -210,6 +233,12 @@ namespace Cloudsdale_Metro.Views {
             new UserList(cloudController).FlyOut();
         }
 
+        #endregion
+
+        #region Cloud Info
+        private void CloudInfoClick(object sender, RoutedEventArgs e) {
+            new CloudPanel(cloudController).FlyOut();
+        }
         #endregion
 
     }

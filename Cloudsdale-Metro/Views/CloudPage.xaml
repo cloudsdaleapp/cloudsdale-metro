@@ -89,7 +89,11 @@
                 </Storyboard>
             </Grid.Resources>
 
-            <Grid Visibility="Collapsed" x:Name="CloudGrid">
+            <Grid x:Name="CloudGrid">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
                 <Grid.RenderTransform>
                     <TranslateTransform x:Name="CloudListTransform" X="-320" />
                 </Grid.RenderTransform>
@@ -123,6 +127,7 @@
                         <ColumnDefinition />
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="10" />
                     </Grid.ColumnDefinitions>
                     <Button Style="{StaticResource PortraitBackButtonStyle}" Click="GoBack" Margin="16" Padding="5">
@@ -146,6 +151,13 @@
                                        HorizontalAlignment="Center">Drops</TextBlock>
                         </StackPanel>
                     </Button>
+                    <Button Grid.Column="4" Margin="5" Width="70" Height="70" Padding="2" Click="CloudInfoClick">
+                        <StackPanel>
+                            <Image Source="/Assets/circle_info.png" Height="30" HorizontalAlignment="Center" />
+                            <TextBlock FontSize="16" Foreground="White"
+                                       HorizontalAlignment="Center">Info</TextBlock>
+                        </StackPanel>
+                    </Button>
                 </Grid>
                 <ScrollViewer Name="ChatScroll" SizeChanged="ChatScroll_OnSizeChanged" 
                           ZoomMode="Disabled" HorizontalScrollMode="Disabled" Grid.Row="1">
@@ -155,17 +167,8 @@
                 </ScrollViewer>
 
                 <TextBox Grid.Row="2" Margin="10" FontSize="20" IsTextPredictionEnabled="True" TextWrapping="Wrap" 
-                     MaxHeight="200" IsSpellCheckEnabled="True" KeyUp="SendBoxKeyDown" FontFamily="Verdana" />
+                     MaxHeight="200" IsSpellCheckEnabled="True" x:Name="SendBox" FontFamily="Verdana" />
             </Grid>
-
-            <VisualStateManager.VisualStateGroups>
-                <VisualStateGroup x:Name="ApplicationViewStates">
-                    <VisualState x:Name="FullScreenLandscape"/>
-                    <VisualState x:Name="Filled"/>
-                    <VisualState x:Name="FullScreenPortrait" />
-                    <VisualState x:Name="Snapped" />
-                </VisualStateGroup>
-            </VisualStateManager.VisualStateGroups>
         </Grid>
         <Grid Background="#2F000000" x:Name="OverlayGrid">
             <ProgressRing Height="100" Width="100" Foreground="#1a91db" IsActive="True" />

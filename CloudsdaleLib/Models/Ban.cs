@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace CloudsdaleLib.Models {
     public sealed class Ban : CloudsdaleResource {
@@ -84,5 +87,6 @@ namespace CloudsdaleLib.Models {
         public override bool CanValidate() {
             return false;
         }
+
     }
 }

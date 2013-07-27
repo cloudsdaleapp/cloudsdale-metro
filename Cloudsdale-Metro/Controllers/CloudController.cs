@@ -151,6 +151,10 @@ namespace Cloudsdale_Metro.Controllers {
         }
 
         private void SendToast(Message message) {
+            if (!AppSettings.Settings.DisplayNotifications) {
+                return;
+            }
+
             if (App.Connection.MessageController.CurrentCloud == this
                 && Window.Current.Visible) {
                 return;

@@ -10,6 +10,7 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 
 namespace Cloudsdale_Metro.Common {
+
     /// <summary>
     /// Typical implementation of Page that provides several important conveniences:
     /// <list type="bullet">
@@ -130,6 +131,58 @@ namespace Cloudsdale_Metro.Common {
             if (Frame != null && Frame.CanGoForward) Frame.GoForward();
         }
 
+        protected virtual void OnAcceleratorKey(AcceleratorKeyParams acceleratorKeyParams) {
+            
+        }
+        public class AcceleratorKeyParams {
+            private readonly AcceleratorKeyEventArgs _args;
+            private readonly bool _menuKey;
+            private readonly bool _controlKey;
+            private readonly bool _shiftKey;
+            private readonly bool _noModifiers;
+            private readonly bool _onlyAlt;
+            private readonly VirtualKey _key;
+
+            public AcceleratorKeyParams(AcceleratorKeyEventArgs args, VirtualKey key, bool menuKey,
+                bool controlKey, bool shiftKey, bool noModifiers, bool onlyAlt) {
+                _key = key;
+                _args = args;
+                _menuKey = menuKey;
+                _controlKey = controlKey;
+                _shiftKey = shiftKey;
+                _noModifiers = noModifiers;
+                _onlyAlt = onlyAlt;
+            }
+
+            public VirtualKey Key {
+                get { return _key; }
+            }
+
+            public AcceleratorKeyEventArgs Args {
+                get { return _args; }
+            }
+
+            public bool MenuKey {
+                get { return _menuKey; }
+            }
+
+            public bool ControlKey {
+                get { return _controlKey; }
+            }
+
+            public bool ShiftKey {
+                get { return _shiftKey; }
+            }
+
+            public bool NoModifiers {
+                get { return _noModifiers; }
+            }
+
+            public bool OnlyAlt {
+                get { return _onlyAlt; }
+            }
+        }
+
         /// <summary>
         /// Invoked on every keystroke, including system keys such as Alt key combinations, when
         /// this page is active and occupies the entire window.  Used to detect keyboard navigation
@@ -140,32 +193,33 @@ namespace Cloudsdale_Metro.Common {
         private void CoreDispatcher_AcceleratorKeyActivated(CoreDispatcher sender,
             AcceleratorKeyEventArgs args) {
             var virtualKey = args.VirtualKey;
+            var coreWindow = Window.Current.CoreWindow;
+            const CoreVirtualKeyStates downState = CoreVirtualKeyStates.Down;
+            var menuKey = (coreWindow.GetKeyState(VirtualKey.Menu) & downState) == downState;
+            var controlKey = (coreWindow.GetKeyState(VirtualKey.Control) & downState) == downState;
+            var shiftKey = (coreWindow.GetKeyState(VirtualKey.Shift) & downState) == downState;
+            var noModifiers = !menuKey && !controlKey && !shiftKey;
+            var onlyAlt = menuKey && !controlKey && !shiftKey;
+
+            OnAcceleratorKey(new AcceleratorKeyParams(args, virtualKey, menuKey, 
+                controlKey, shiftKey, noModifiers, onlyAlt));
 
             // Only investigate further when Left, Right, or the dedicated Previous or Next keys
             // are pressed
-            if ((args.EventType == CoreAcceleratorKeyEventType.SystemKeyDown ||
-                args.EventType == CoreAcceleratorKeyEventType.KeyDown) &&
-                (virtualKey == VirtualKey.Left || virtualKey == VirtualKey.Right ||
-                (int)virtualKey == 166 || (int)virtualKey == 167)) {
-                var coreWindow = Window.Current.CoreWindow;
-                const CoreVirtualKeyStates downState = CoreVirtualKeyStates.Down;
-                bool menuKey = (coreWindow.GetKeyState(VirtualKey.Menu) & downState) == downState;
-                bool controlKey = (coreWindow.GetKeyState(VirtualKey.Control) & downState) == downState;
-                bool shiftKey = (coreWindow.GetKeyState(VirtualKey.Shift) & downState) == downState;
-                bool noModifiers = !menuKey && !controlKey && !shiftKey;
-                bool onlyAlt = menuKey && !controlKey && !shiftKey;
-
-                if (((int)virtualKey == 166 && noModifiers) ||
-                    (virtualKey == VirtualKey.Left && onlyAlt)) {
-                    // When the previous key or Alt+Left are pressed navigate back
-                    args.Handled = true;
-                    GoBack(this, new RoutedEventArgs());
-                } else if (((int)virtualKey == 167 && noModifiers) ||
-                      (virtualKey == VirtualKey.Right && onlyAlt)) {
-                    // When the next key or Alt+Right are pressed navigate forward
-                    args.Handled = true;
-                    GoForward(this, new RoutedEventArgs());
-                }
+            if ((args.EventType != CoreAcceleratorKeyEventType.SystemKeyDown &&
+                 args.EventType != CoreAcceleratorKeyEventType.KeyDown) ||
+                (virtualKey != VirtualKey.Left && virtualKey != VirtualKey.Right && (int) virtualKey != 166 &&
+                 (int) virtualKey != 167)) return;
+            if (((int)virtualKey == 166 && noModifiers) ||
+                (virtualKey == VirtualKey.Left && onlyAlt)) {
+                // When the previous key or Alt+Left are pressed navigate back
+                args.Handled = true;
+                GoBack(this, new RoutedEventArgs());
+            } else if (((int)virtualKey == 167 && noModifiers) ||
+                       (virtualKey == VirtualKey.Right && onlyAlt)) {
+                // When the next key or Alt+Right are pressed navigate forward
+                args.Handled = true;
+                GoForward(this, new RoutedEventArgs());
             }
         }
 
@@ -185,8 +239,8 @@ namespace Cloudsdale_Metro.Common {
                 properties.IsMiddleButtonPressed) return;
 
             // If back or foward are pressed (but not both) navigate appropriately
-            bool backPressed = properties.IsXButton1Pressed;
-            bool forwardPressed = properties.IsXButton2Pressed;
+            var backPressed = properties.IsXButton1Pressed;
+            var forwardPressed = properties.IsXButton2Pressed;
             if (backPressed ^ forwardPressed) {
                 args.Handled = true;
                 if (backPressed) GoBack(this, new RoutedEventArgs());
@@ -279,7 +333,7 @@ namespace Cloudsdale_Metro.Common {
         /// </remarks>
         public void InvalidateVisualState() {
             if (_layoutAwareControls != null) {
-                string visualState = DetermineVisualState(ApplicationView.Value);
+                var visualState = DetermineVisualState(ApplicationView.Value);
                 foreach (var layoutAwareControl in _layoutAwareControls) {
                     VisualStateManager.GoToState(layoutAwareControl, visualState, false);
                 }
@@ -308,7 +362,7 @@ namespace Cloudsdale_Metro.Common {
                 // Clear existing state for forward navigation when adding a new page to the
                 // navigation stack
                 var nextPageKey = _pageKey;
-                int nextPageIndex = Frame.BackStackDepth;
+                var nextPageIndex = Frame.BackStackDepth;
                 while (frameState.Remove(nextPageKey)) {
                     nextPageIndex++;
                     nextPageKey = "Page-" + nextPageIndex;
@@ -466,7 +520,7 @@ namespace Cloudsdale_Metro.Common {
             }
 
             public void CopyTo(KeyValuePair<TK, TV>[] array, int arrayIndex) {
-                int arraySize = array.Length;
+                var arraySize = array.Length;
                 foreach (var pair in _dictionary) {
                     if (arrayIndex >= arraySize) break;
                     array[arrayIndex++] = pair;

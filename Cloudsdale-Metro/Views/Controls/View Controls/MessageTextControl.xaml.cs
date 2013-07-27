@@ -14,6 +14,7 @@ namespace Cloudsdale_Metro.Views.Controls {
         public static readonly Regex LinkRegex = new Regex(@"(?i)\b((?:[a-z][\w-]+:(?:/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'"".,<>?«»“”‘’]))", RegexOptions.IgnoreCase);
         public static readonly Regex ItalicsRegex = new Regex(@"\B\/\b([^\/\n]+)\b\/\B");
         public static readonly Regex RedactedRegex = new Regex(@"\[REDACTED\]", RegexOptions.IgnoreCase);
+        public static readonly Regex NonAsciiRegex = new Regex(@"[^\x00-\xFF]+");
 
         public RichTextBlock RichTextBlock{
             get { return RichText; }
@@ -34,6 +35,10 @@ namespace Cloudsdale_Metro.Views.Controls {
                     Processor(RedactedRegex, redacted => new Bold {
                         Foreground = new SolidColorBrush(Colors.Red),
                         Inlines = { new Run { Text = "[REDACTED]" } }
+                    }),
+                    Processor(NonAsciiRegex, nonascii => new Run {
+                        Text = nonascii,
+                        FontFamily = new FontFamily("Segoe UI")
                     })
                 };
         }
