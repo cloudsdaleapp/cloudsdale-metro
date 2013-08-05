@@ -6,9 +6,11 @@ using CloudsdaleLib.Helpers;
 using CloudsdaleLib.Models;
 using Cloudsdale_Metro.Common;
 using Cloudsdale_Metro.Helpers;
+using Cloudsdale_Metro.Views.Controls.Flyout_Panels;
 using Newtonsoft.Json;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
+using Newtonsoft.Json.Linq;
 
 namespace Cloudsdale_Metro.Views.Controls {
     public sealed partial class UserPanel {
@@ -16,18 +18,21 @@ namespace Cloudsdale_Metro.Views.Controls {
             = new LayoutAwarePage.ObservableDictionary<string, object>();
         public IObservableMap<string, object> DefaultViewModel { get { return _defaultViewModel; } }
 
-        public override string Header {
+        protected override string Header {
             get { return User.Name; }
         }
 
-        public override Uri Image {
+        protected override Uri Image {
             get { return null; }
         }
 
-        public User User { get; set; }
-        public Session Session { get; set; }
-        public Cloud Cloud { get; set; }
+        protected override bool IsSettings {
+            get { return false; }
+        }
 
+        private User User { get; set; }
+        private Session Session { get; set; }
+        private Cloud Cloud { get; set; }
         public UserPanel(User user) {
             User = user;
             Session = App.Connection.GetSession();
@@ -75,6 +80,14 @@ namespace Cloudsdale_Metro.Views.Controls {
                 && !User.IsModerator() || Session.IsOwner();
             DefaultViewModel["TrollBan"] =
                 User.Role == "founder" || User.Role == "developer";
+        }
+
+        private async void RevokeBan(object sender, RoutedEventArgs e) {
+            await ((Ban)((FrameworkElement)sender).DataContext).UpdateProperty<Ban>(false, "revoke".KeyOf<JToken>("true"));
+        }
+
+        private void BanClick(object sender, RoutedEventArgs e) {
+            new BanPanel((User)((FrameworkElement)sender).DataContext).FlyOut();
         }
     }
 }

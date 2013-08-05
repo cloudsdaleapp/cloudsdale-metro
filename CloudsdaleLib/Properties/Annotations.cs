@@ -354,7 +354,7 @@ namespace CloudsdaleLib.Annotations
   /// Indicates that the marked symbol is used implicitly (e.g. via reflection, in external library),
   /// so this symbol will not be marked as unused (as well as by other usage inspections)
   /// </summary>
-  [AttributeUsage(AttributeTargets.All, AllowMultiple = false, Inherited = true)]
+  [AttributeUsage(AttributeTargets.All, AllowMultiple = false, Inherited = true), MeansImplicitUse(ImplicitUseTargetFlags.WithMembers)]
   public sealed class UsedImplicitlyAttribute : Attribute
   {
     [UsedImplicitly] public UsedImplicitlyAttribute()

@@ -4,31 +4,27 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Windows.UI;
 using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Media;
+using Cloudsdale_Metro.Helpers;
 
 namespace Cloudsdale_Metro.Views.Controls {
     public sealed partial class MessageTextControl {
-        public static readonly Regex GreentextRegex = new Regex(@"^\>");
-        public static readonly Regex LinkRegex = new Regex(@"(?i)\b((?:[a-z][\w-]+:(?:/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'"".,<>?«»“”‘’]))", RegexOptions.IgnoreCase);
-        public static readonly Regex ItalicsRegex = new Regex(@"\B\/\b([^\/\n]+)\b\/\B");
-        public static readonly Regex RedactedRegex = new Regex(@"\[REDACTED\]", RegexOptions.IgnoreCase);
-        public static readonly Regex NonAsciiRegex = new Regex(@"[^\x00-\xFF]+");
-
-        public RichTextBlock RichTextBlock{
-            get { return RichText; }
-        }
+        private static readonly Regex GreentextRegex = new Regex(@"^\>");
+        private static readonly Regex LinkRegex = new Regex(@"(?i)\b((?:[a-z][\w-]+:(?:/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'"".,<>?«»“”‘’]))", RegexOptions.IgnoreCase);
+        private static readonly Regex ItalicsRegex = new Regex(@"\B\/\b([^\/\n]+)\b\/\B");
+        private static readonly Regex RedactedRegex = new Regex(@"\[REDACTED\]", RegexOptions.IgnoreCase);
+        private static readonly Regex NonAsciiRegex = new Regex(@"[^\x00-\xFF]+");
+        private static readonly Regex ExtraSpacesRegex = new Regex("[ ]+");
 
         public MessageTextControl() {
             InitializeComponent();
-            Parsers =
+            _parsers =
                 new List<Func<string, IEnumerable<TextGroup>>> {
                     Processor(LinkRegex, link => new Hyperlink {
                         FontSize = FontSize,
-                        Text = link,
-                        Target = link
-                    }),
+                        Inlines = { new Run { Text = link } }
+                    }.OnClickLaunch(link)),
                     Processor(ItalicsRegex, italics => new Italic {
                         Inlines = { new Run { Text = italics.Substring(1, italics.Length - 2) } }
                     }),
@@ -44,7 +40,8 @@ namespace Cloudsdale_Metro.Views.Controls {
         }
 
         #region Messages Property
-        public static readonly DependencyProperty MessagesProperty = DependencyProperty.Register("Messages",
+
+        private static readonly DependencyProperty MessagesProperty = DependencyProperty.Register("Messages",
             typeof(string[]), typeof(MessageTextControl),
             new PropertyMetadata(default(string[]), MessagesChanged));
 
@@ -56,36 +53,37 @@ namespace Cloudsdale_Metro.Views.Controls {
         }
 
         public string[] Messages {
-            get { return (string[])GetValue(MessagesProperty); }
+            private get { return (string[])GetValue(MessagesProperty); }
             set { SetValue(MessagesProperty, value); }
         }
         #endregion
 
         #region Prefix Inline Property
-        public static readonly DependencyProperty PrefixInlineProperty =
+
+        private static readonly DependencyProperty PrefixInlineProperty =
             DependencyProperty.Register("PrefixInline", typeof(Inline),
             typeof(MessageTextControl), new PropertyMetadata(default(Inline)));
 
         public Inline PrefixInline {
-            get { return (Inline)GetValue(PrefixInlineProperty); }
+            private get { return (Inline)GetValue(PrefixInlineProperty); }
             set { SetValue(PrefixInlineProperty, value); }
         }
         #endregion
 
         #region Linebreak Handling Property
 
-        public static readonly DependencyProperty LinebreakHandlingProperty =
+        private static readonly DependencyProperty LinebreakHandlingProperty =
             DependencyProperty.Register("LinebreakHandling", typeof(LinebreakHandling), typeof(MessageTextControl), new PropertyMetadata(LinebreakHandling.Mimic));
 
         public LinebreakHandling LinebreakHandling {
-            get { return (LinebreakHandling)GetValue(LinebreakHandlingProperty); }
+            private get { return (LinebreakHandling)GetValue(LinebreakHandlingProperty); }
             set { SetValue(LinebreakHandlingProperty, value); }
         }
         #endregion
 
         #region Text Alignment
 
-        public static readonly DependencyProperty TextAlignmentProperty =
+        private static readonly DependencyProperty TextAlignmentProperty =
             DependencyProperty.Register("TextAlignment", typeof(TextAlignment), typeof(MessageTextControl),
             new PropertyMetadata(TextAlignment.Left, AlignmentChanged));
 
@@ -95,8 +93,10 @@ namespace Cloudsdale_Metro.Views.Controls {
         }
 
         public TextAlignment TextAlignment {
+// ReSharper disable UnusedMember.Global
             get { return (TextAlignment)GetValue(TextAlignmentProperty); }
             set { SetValue(TextAlignmentProperty, value); }
+// ReSharper restore UnusedMember.Global
         }
 
         #endregion
@@ -118,9 +118,7 @@ namespace Cloudsdale_Metro.Views.Controls {
 
         #region Message Parsing
 
-        public readonly List<Func<string, IEnumerable<TextGroup>>> Parsers;
-
-        private static readonly Regex ExtraSpacesRegex = new Regex("[ ]+");
+        private readonly List<Func<string, IEnumerable<TextGroup>>> _parsers;
 
         private IEnumerable<Inline> ParseMessage(string message) {
             var first = true;
@@ -150,7 +148,7 @@ namespace Cloudsdale_Metro.Views.Controls {
         private IEnumerable<Inline> BuildLine(string line) {
             var groups = new List<TextGroup> { new TextGroup { Text = line } };
 
-            foreach (var processor in Parsers) {
+            foreach (var processor in _parsers) {
                 var nextList = new List<TextGroup>();
                 foreach (var item in groups) {
                     if (item.Inline != null) {
@@ -165,11 +163,11 @@ namespace Cloudsdale_Metro.Views.Controls {
             return groups.Select(item => item.Inline ?? new Run { Text = item.Text });
         }
 
-        public Func<string, IEnumerable<TextGroup>> Processor(Regex matcher, Func<string, Inline> processor) {
+        private static Func<string, IEnumerable<TextGroup>> Processor(Regex matcher, Func<string, Inline> processor) {
             return input => InternalProcessor(matcher, processor, input);
         }
 
-        private IEnumerable<TextGroup> InternalProcessor(Regex matcher, Func<string, Inline> processor, string input) {
+        private static IEnumerable<TextGroup> InternalProcessor(Regex matcher, Func<string, Inline> processor, string input) {
             var matches = matcher.Matches(input);
             var lastIndex = 0;
 

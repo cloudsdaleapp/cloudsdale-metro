@@ -14,7 +14,7 @@ namespace Cloudsdale_Metro.Views.Controls {
         private void StandardMessageView_OnSizeChanged(object sender, SizeChangedEventArgs e) {
             Separator.Width = e.NewSize.Width;
 
-            if (e.NewSize.Width < 470) {
+            if (e.NewSize.Width < 600) {
                 DropGrid.Visibility = Visibility.Collapsed;
                 AltDropGrid.Visibility = Visibility.Visible;
 

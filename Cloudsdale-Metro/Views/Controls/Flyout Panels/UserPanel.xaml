@@ -8,6 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewControls="using:Cloudsdale_Metro.Views.Controls.View_Controls"
     xmlns:flyoutPanels="using:Cloudsdale_Metro.Views.Controls.Flyout_Panels"
+    xmlns:models="using:CloudsdaleLib.Models"
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="400">
@@ -32,11 +33,27 @@
                             </TextBlock>
                         </Grid>
                     </Border>
-                    <Grid MinHeight="25" Grid.Row="1">
-                        <TextBlock FontSize="14" TextWrapping="Wrap" Margin="5">
+                    <StackPanel MinHeight="25" Grid.Row="1">
+                        <TextBlock FontSize="14" TextWrapping="Wrap" Margin="5,3,5,5">
                             Issued on <Run Text="{Binding Path=Issued}" /> by <Run Text="{Binding Path=Enforcer.Name}" />
                         </TextBlock>
-                    </Grid>
+                        <Grid Visibility="{Binding Path=Revoked, Converter={StaticResource BoolVis}, ConverterParameter=Inverse}">
+                            <TextBlock Visibility="{Binding Path=Expired, Converter={StaticResource BoolVis}}"
+                                   Foreground="Red" FontSize="14" FontWeight="Bold" Margin="5">
+                                Expired
+                            </TextBlock>
+                        </Grid>
+                        <TextBlock Visibility="{Binding Path=Revoked, Converter={StaticResource BoolVis}}"
+                                   Foreground="Gray" FontSize="14" FontWeight="Bold" Margin="5,0,5,5">
+                            Revoked
+                        </TextBlock>
+                        <StackPanel Margin="5" Visibility="{Binding Path=Active, Converter={StaticResource BoolVis}}">
+                            <TextBlock FontSize="14" TextWrapping="Wrap" Margin="5,0,5,5">
+                                Expires <Run Text="{Binding Path=Due}" />
+                            </TextBlock>
+                            <Button Click="RevokeBan">Revoke</Button>
+                        </StackPanel>
+                    </StackPanel>
                 </Grid>
             </Border>
         </DataTemplate>
@@ -68,6 +85,10 @@
 
         <!-- Moderation Tools -->
         <StackPanel Visibility="{Binding Path=IsModerator, Converter={StaticResource BoolVis}}">
+            <Button HorizontalAlignment="Stretch" Click="BanClick" DataContext="{Binding Path=User}">
+                Ban
+            </Button>
+            
             <TextBlock FontSize="24">Permanent Record</TextBlock>
             <Grid>
                 <ItemsControl ItemsSource="{Binding Path=Bans}" ItemTemplate="{StaticResource BanTemplate}" />

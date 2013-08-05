@@ -4,15 +4,17 @@ using Windows.UI;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
+using SettingsFlyout = Callisto.Controls.SettingsFlyout;
 
 namespace Cloudsdale_Metro.Views.Controls.Flyout_Panels {
     public abstract class CloudsdaleFlyout : UserControl {
         private SettingsFlyout flyout;
+        protected abstract string Header { get; }
+        protected abstract Uri Image { get; }
 
-        public abstract string Header { get; }
-        public abstract Uri Image { get; }
+        protected abstract bool IsSettings { get; }
 
-        public void InitializeFlyout() {
+        protected void InitializeFlyout() {
             flyout = new SettingsFlyout {
                 HeaderBrush = new SolidColorBrush(Color.FromArgb(0xFF, 0x1A, 0x91, 0xDB)),
                 HeaderText = Header,
@@ -22,10 +24,12 @@ namespace Cloudsdale_Metro.Views.Controls.Flyout_Panels {
                 Content = this
             };
 
-            flyout.BackClicked += (sender, args) => {
-                args.Cancel = true;
-                flyout.IsOpen = false;
-            };
+            if (!IsSettings) {
+                flyout.BackClicked += (sender, args) => {
+                    args.Cancel = true;
+                    flyout.IsOpen = false;
+                };
+            }
 
             if (Image != null) {
                 flyout.SmallLogoImageSource = new BitmapImage(Image);

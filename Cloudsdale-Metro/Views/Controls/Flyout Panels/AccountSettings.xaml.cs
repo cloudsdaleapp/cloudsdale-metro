@@ -14,6 +14,7 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using WinRTXamlToolkit.AwaitableUI;
+using SettingsFlyout = Callisto.Controls.SettingsFlyout;
 
 namespace Cloudsdale_Metro.Views.Controls {
     public sealed partial class AccountSettings {
@@ -166,12 +167,16 @@ namespace Cloudsdale_Metro.Views.Controls {
             InitializeFlyout();
         }
 
-        public override string Header {
+        protected override string Header {
             get { return "Account Settings"; }
         }
 
-        public override Uri Image {
+        protected override Uri Image {
             get { return session.Avatar.Preview; }
+        }
+
+        protected override bool IsSettings {
+            get { return true; }
         }
 
         #endregion

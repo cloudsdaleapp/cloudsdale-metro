@@ -25,12 +25,16 @@ namespace Cloudsdale_Metro.Views.Controls {
             new UserPanel((User)e.ClickedItem).FlyOut();
         }
 
-        public override string Header {
+        protected override string Header {
             get { return "Users"; }
         }
 
-        public override Uri Image {
+        protected override Uri Image {
             get { return _controller.Cloud.Avatar.Preview; }
+        }
+
+        protected override bool IsSettings {
+            get { return false; }
         }
     }
 }

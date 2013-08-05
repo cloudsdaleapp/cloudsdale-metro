@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using Windows.System;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Documents;
@@ -24,6 +27,22 @@ namespace Cloudsdale_Metro.Helpers {
                 element = element.ElementStart.Parent as TextElement;
             }
             return element as T;
+        }
+
+        public static Hyperlink OnClickLaunch(this Hyperlink link, string uri) {
+            if (!Uri.IsWellFormedUriString(uri, UriKind.Absolute)) {
+                uri = "http://" + uri;
+            }
+
+            link.Click += async delegate {
+                if (!Uri.IsWellFormedUriString(uri, UriKind.Absolute)) {
+                    var dialog = new MessageDialog("That's a bad link D:");
+                    await dialog.ShowAsync();
+                    return;
+                }
+                await Launcher.LaunchUriAsync(new Uri(uri));
+            };
+            return link;
         }
 
         public static IEnumerable<T> Children<T>(this DependencyObject parent) where T : DependencyObject {

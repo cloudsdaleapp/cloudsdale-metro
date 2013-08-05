@@ -90,7 +90,7 @@ namespace Cloudsdale_Metro.Views.Controls {
             scale = Math.Min(availableWidth / requiredWidth, availableHeight / requiredHeight);
 
             foreach (var child in Children) {
-                child.Measure(new Size(availableWidth, availableHeight));
+                child.Measure(new Size(availableWidth / scale, availableHeight / scale));
             }
 
             return finalSize(new Size(requiredWidth, requiredHeight));

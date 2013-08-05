@@ -28,12 +28,16 @@ namespace Cloudsdale_Metro.Views.Controls.Flyout_Panels {
             DefaultViewModel["Cloud"] = Cloud;
         }
 
-        public override string Header {
+        protected override string Header {
             get { return controller.Cloud.Name; }
         }
 
-        public override Uri Image {
+        protected override Uri Image {
             get { return null; }
+        }
+
+        protected override bool IsSettings {
+            get { return false; }
         }
     }
 }
