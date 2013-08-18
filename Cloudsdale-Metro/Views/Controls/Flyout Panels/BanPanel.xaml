@@ -10,10 +10,10 @@
     d:DesignHeight="300"
     d:DesignWidth="400">
     
-    <StackPanel>
-        <TextBlock>Date</TextBlock>
-        <DatePicker Date="{Binding Path=Due}" />
-        <TextBlock>Time</TextBlock>
+    <StackPanel Margin="-10,0">
+        <TextBlock FontSize="16" Margin="3">Date</TextBlock>
+        <DatePicker Date="{Binding Path=Due}" Margin="0,0,-20,0" />
+        <TextBlock FontSize="16" Margin="3">Time</TextBlock>
         <TimePicker Time="{Binding Path=Due}" />
     </StackPanel>
 </local:CloudsdaleFlyout>

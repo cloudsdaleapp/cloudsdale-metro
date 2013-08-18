@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using System.Xml.Linq;
+using Windows.UI.Core;
 using CloudsdaleLib;
 using CloudsdaleLib.Annotations;
 using CloudsdaleLib.Helpers;
@@ -25,57 +27,94 @@ namespace Cloudsdale_Metro.Controllers {
         private readonly Dictionary<string, Status> userStatuses = new Dictionary<string, Status>();
         private readonly ModelCache<Message> messages = new ModelCache<Message>(50);
         private DateTime? _validatedFayeClient;
+        private Window _window;
 
         public CloudController(Cloud cloud) {
             Cloud = cloud;
             FixSessionStatus();
+            _window = Window.Current;
         }
 
         public Cloud Cloud { get; private set; }
 
         public ModelCache<Message> Messages { get { return messages; } }
 
-        public List<User> OnlineModerators {
+        public IList<User> OnlineModerators {
             get {
-                var list =
-                    userStatuses.Where(kvp => kvp.Value != Status.offline)
-                                .Where(kvp => Cloud.ModeratorIds.Contains(kvp.Key))
-                                .Select(kvp => App.Connection.ModelController.GetUser(kvp.Key))
-                                .ToList();
-                list.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.Ordinal));
+                var list = new ObservableCollection<User>();
+                Task.Run(async () => {
+                    var list2 = userStatuses
+                        .Where(kvp => kvp.Value != Status.offline)
+                        .Where(kvp => Cloud.ModeratorIds.Contains(kvp.Key))
+                        .Select(kvp => App.Connection.ModelController.GetUser(kvp.Key))
+                        .ToList();
+                    list2.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.Ordinal));
+                    await _window.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () => {
+                        foreach (var user in list2) {
+                            list.Add(user);
+                            await Task.Yield();
+                        }
+                    });
+                });
                 return list;
             }
         }
 
-        public List<User> AllModerators {
+        public IList<User> AllModerators {
             get {
-                var list =
-                    Cloud.ModeratorIds
-                                .Select(mid => App.Connection.ModelController.GetUser(mid))
-                                .ToList();
-                list.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.Ordinal));
+                var list = new ObservableCollection<User>();
+                Task.Run(async () => {
+                    var list2 = Cloud.ModeratorIds
+                                    .Select(mid => App.Connection.ModelController.GetUser(mid))
+                                    .ToList();
+                    list2.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.Ordinal));
+                    await _window.Dispatcher.RunAsync(CoreDispatcherPriority.Low, async () => {
+                        foreach (var user in list2) {
+                            list.Add(user);
+                            await Task.Yield();
+                        }
+                    });
+                });
                 return list;
             }
         }
 
-        public List<User> OnlineUsers {
+        public IList<User> OnlineUsers {
             get {
-                var list =
-                    userStatuses.Where(kvp => kvp.Value != Status.offline)
-                                .Where(kvp => !Cloud.ModeratorIds.Contains(kvp.Key))
-                                .Select(kvp => App.Connection.ModelController.GetUser(kvp.Key))
-                                .ToList();
-                list.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.Ordinal));
+                var list = new ObservableCollection<User>();
+                Task.Run(async () => {
+                    var list2 =
+                        userStatuses.Where(kvp => kvp.Value != Status.offline)
+                                    .Where(kvp => !Cloud.ModeratorIds.Contains(kvp.Key))
+                                    .Select(kvp => App.Connection.ModelController.GetUser(kvp.Key))
+                                    .ToList();
+                    list2.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.Ordinal));
+                    await _window.Dispatcher.RunAsync(CoreDispatcherPriority.Low, async () => {
+                        foreach (var user in list2) {
+                            list.Add(user);
+                            await Task.Yield();
+                        }
+                    });
+                });
                 return list;
             }
         }
-        public List<User> AllUsers {
+        public IList<User> AllUsers {
             get {
-                var list =
-                    userStatuses.Where(kvp => !Cloud.ModeratorIds.Contains(kvp.Key))
-                                .Select(kvp => App.Connection.ModelController.GetUser(kvp.Key))
-                                .ToList();
-                list.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.Ordinal));
+                var list = new ObservableCollection<User>();
+                Task.Run(async () => {
+                    var list2 =
+                        userStatuses.Where(kvp => !Cloud.ModeratorIds.Contains(kvp.Key))
+                                    .Select(kvp => App.Connection.ModelController.GetUser(kvp.Key))
+                                    .ToList();
+                    list2.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.Ordinal));
+                    await _window.Dispatcher.RunAsync(CoreDispatcherPriority.Low, async () => {
+                        foreach (var user in list2) {
+                            list.Add(user);
+                            await Task.Yield();
+                        }
+                    });
+                });
                 return list;
             }
         }
@@ -169,7 +208,7 @@ namespace Cloudsdale_Metro.Controllers {
             textElements[0].AppendChild
                 (template.CreateTextNode(Cloud.Name + " : " + message.Author.Name));
             textElements[1].AppendChild
-                (template.CreateTextNode (Message.SlashMeFormat.Replace(message.Content, message.Author.Name)));
+                (template.CreateTextNode(Message.SlashMeFormat.Replace(message.Content, message.Author.Name)));
             var toastNode = (XmlElement)template.SelectSingleNode("/toast");
             toastNode.SetAttribute("launch", JObject.FromObject(new {
                 type = "toast",
@@ -238,7 +277,11 @@ namespace Cloudsdale_Metro.Controllers {
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) {
             PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
+            try {
+                if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
+            } catch {
+                Debug.WriteLine("Property error .-.");
+            }
         }
     }
 }
