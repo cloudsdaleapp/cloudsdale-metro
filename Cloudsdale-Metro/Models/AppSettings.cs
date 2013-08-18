@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Windows.Storage;
 using CloudsdaleLib.Models;
+using Cloudsdale_Metro.Common;
 using Cloudsdale_Metro.Helpers;
 using Newtonsoft.Json;
 using WinRTXamlToolkit.IO.Extensions;
@@ -11,6 +13,8 @@ namespace Cloudsdale_Metro.Models {
     public class AppSettings : CloudsdaleModel {
         public static readonly AppSettings Settings = new AppSettings();
         private bool _displayNotifications;
+        private LayoutAwarePage.ObservableDictionary<string, int> _unreadMessages = 
+            new LayoutAwarePage.ObservableDictionary<string, int>();
 
         private AppSettings() {
             PropertyChanged += async delegate { await Save(); };
@@ -26,13 +30,24 @@ namespace Cloudsdale_Metro.Models {
             }
         }
 
+        [JsonProperty]
+        public LayoutAwarePage.ObservableDictionary<string, int> UnreadMessages {
+            get { return _unreadMessages; }
+            set {
+                if (Equals(value, _unreadMessages)) return;
+                _unreadMessages = value;
+                OnPropertyChanged();
+            }
+        }
+
         public static async Task Load() {
             var storage = ApplicationData.Current.RoamingFolder;
-            if (!await storage.FileExists("settings.json")) {
+            var settingsFolder = await storage.EnsureFolderExists("settings");
+            if (!await settingsFolder.FileExists("settings.json")) {
                 return;
             }
 
-            var settingsFile = await storage.GetFileAsync("settings.json");
+            var settingsFile = await settingsFolder.GetFileAsync("settings.json");
             var settingsData = await settingsFile.ReadAllText();
             var settings = await JsonConvert.DeserializeObjectAsync<AppSettings>(settingsData);
             if (settings == null) return;
