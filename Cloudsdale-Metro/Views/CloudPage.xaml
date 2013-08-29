@@ -9,6 +9,7 @@
     xmlns:controls="using:Cloudsdale_Metro.Views.Controls" 
     xmlns:views="using:Cloudsdale_Metro.Views" 
     xmlns:chatConverters="using:Cloudsdale_Metro.Views.ChatConverters"
+    SizeChanged="CloudPage_OnSizeChanged"
     mc:Ignorable="d">
 
     <Page.Resources>
@@ -27,10 +28,10 @@
         <chatConverters:TagColor x:Key="TagColor" />
 
         <DataTemplate x:Key="StandardChatTemplate">
-            <controls:StandardMessageView DataContext="{Binding}" />
+            <controls:StandardMessageView />
         </DataTemplate>
         <DataTemplate x:Key="ActionChatTemplate">
-            <controls:ActionMessageView DataContext="{Binding}" />
+            <controls:ActionMessageView />
         </DataTemplate>
         <Visibility x:Key="DropVisibility">Visible</Visibility>
     </Page.Resources>
@@ -63,8 +64,8 @@
                         </DoubleAnimation.EasingFunction>
                     </DoubleAnimation>
                     <ObjectAnimationUsingKeyFrames Storyboard.TargetName="CloudGrid" Duration="0:0:0.7"
-                                               Storyboard.TargetProperty="Visibility">
-                        <DiscreteObjectKeyFrame KeyTime="0" Value="Visible" />
+                                               Storyboard.TargetProperty="Width">
+                        <DiscreteObjectKeyFrame KeyTime="0" Value="320" />
                     </ObjectAnimationUsingKeyFrames>
                 </Storyboard>
                 <Storyboard x:Name="CloudListCollapse">
@@ -83,8 +84,8 @@
                         </DoubleAnimation.EasingFunction>
                     </DoubleAnimation>
                     <ObjectAnimationUsingKeyFrames Storyboard.TargetName="CloudGrid" 
-                                               Storyboard.TargetProperty="Visibility" Duration="0:0:0.7">
-                        <DiscreteObjectKeyFrame KeyTime="0:0:0.7" Value="Collapsed" />
+                                               Storyboard.TargetProperty="Width" Duration="0:0:0.7">
+                        <DiscreteObjectKeyFrame KeyTime="0:0:0.7" Value="1" />
                     </ObjectAnimationUsingKeyFrames>
                 </Storyboard>
             </Grid.Resources>
@@ -97,6 +98,11 @@
                 <Grid.RenderTransform>
                     <TranslateTransform x:Name="CloudListTransform" X="-320" />
                 </Grid.RenderTransform>
+                
+                <StackPanel Orientation="Horizontal" Height="70" Margin="5">
+                    <Button Click="GoHome">Home</Button>
+                </StackPanel>
+                
                 <ListView
                     x:Name="CloudListView"
                     AutomationProperties.AutomationId="CloudListView"
@@ -119,7 +125,6 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition />
-                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <Grid Background="#1A91DB">
                     <Grid.ColumnDefinitions>
@@ -130,7 +135,8 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="10" />
                     </Grid.ColumnDefinitions>
-                    <Button Style="{StaticResource PortraitBackButtonStyle}" Click="GoBack" Margin="16" Padding="5">
+                    <Button x:Name="BackButton" Style="{StaticResource PortraitBackButtonStyle}" 
+                            Click="GoBack" Margin="16" Padding="5">
                         <Button.Projection>
                             <PlaneProjection x:Name="BackButtonProjection" CenterOfRotationX="0.5" 
                                          CenterOfRotationY="0.5" RotationZ="180" />
@@ -159,19 +165,27 @@
                         </StackPanel>
                     </Button>
                 </Grid>
-                <ScrollViewer Name="ChatScroll" SizeChanged="ChatScroll_OnSizeChanged" 
-                          ZoomMode="Disabled" HorizontalScrollMode="Disabled" Grid.Row="1">
-                    <ItemsControl ItemsSource="{Binding Source={StaticResource ItemsViewSource}}"
+
+                <Grid Grid.Row="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <ScrollViewer Name="ChatScroll" SizeChanged="ChatScroll_OnSizeChanged" 
+                          ZoomMode="Disabled" HorizontalScrollMode="Disabled" Grid.Row="0">
+                        <ItemsControl ItemsSource="{Binding Source={StaticResource ItemsViewSource}}"
                               ItemTemplateSelector="{StaticResource MessageTemplateSelector}"
                               x:Name="ChatList" SizeChanged="ChatList_OnSizeChanged"/>
-                </ScrollViewer>
+                    </ScrollViewer>
 
-                <TextBox Grid.Row="2" Margin="10" FontSize="20" IsTextPredictionEnabled="True" TextWrapping="Wrap" 
+                    <TextBox Grid.Row="1" Margin="10" FontSize="20" IsTextPredictionEnabled="True" TextWrapping="Wrap" 
                      MaxHeight="200" IsSpellCheckEnabled="True" x:Name="SendBox" FontFamily="Verdana" />
+                </Grid>
+                
+                <Grid Background="#2F000000" x:Name="OverlayGrid" Grid.Row="1">
+                    <ProgressRing Height="100" Width="100" Foreground="#1a91db" IsActive="True" />
+                </Grid>
             </Grid>
-        </Grid>
-        <Grid Background="#2F000000" x:Name="OverlayGrid">
-            <ProgressRing Height="100" Width="100" Foreground="#1a91db" IsActive="True" />
         </Grid>
     </controls:RootGrid>
 </common:LayoutAwarePage>

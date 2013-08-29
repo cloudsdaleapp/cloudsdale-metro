@@ -49,12 +49,12 @@ namespace Cloudsdale_Metro.Controllers {
             }
 
             var lastSessionFile = await sessionFolder.GetFileAsync("session.json");
-            lastSession = await JsonConvert.DeserializeObjectAsync<LastSession>(await lastSessionFile.ReadAllText());
+            lastSession = await JsonConvert.DeserializeObjectAsync<LastSession>(await lastSessionFile.ReadAllText()) ??
+                          new LastSession();
 
             if (lastSession.LastLogins == null) {
                 lastSession.LastLogins = new Dictionary<string, DateTime>();
             }
-
 
             var sessionFiles = (await sessionFolder.GetFilesAsync()).Where(file => userSessionPattern.IsMatch(file.Name));
             foreach (var sessionFile in sessionFiles) {
@@ -80,11 +80,19 @@ namespace Cloudsdale_Metro.Controllers {
             var sessionFolder = await storage.EnsureFolderExists("session");
 
             var lastSessionFile = await sessionFolder.CreateFileAsync("session.json", CreationCollisionOption.ReplaceExisting);
-            await lastSessionFile.SaveAllText(await JsonConvert.SerializeObjectAsync(lastSession));
+            await lastSessionFile.SaveAllText(await JsonConvert.SerializeObjectAsync(lastSession
+#if DEBUG
+, Formatting.Indented
+#endif
+));
 
             foreach (var pastSession in pastSessions) {
                 var sessionFile = await sessionFolder.CreateFileAsync("session_" + pastSession.Id + ".json", CreationCollisionOption.ReplaceExisting);
-                await sessionFile.SaveAllText(await JsonConvert.SerializeObjectAsync(pastSession));
+                await sessionFile.SaveAllText(await JsonConvert.SerializeObjectAsync(pastSession
+#if DEBUG
+, Formatting.Indented
+#endif
+));
             }
         }
 

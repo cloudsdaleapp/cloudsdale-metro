@@ -1,4 +1,6 @@
-﻿namespace CloudsdaleLib {
+﻿using System;
+
+namespace CloudsdaleLib {
     /// <summary>
     /// All the endpoints you'll ever need for v1
     /// </summary>
@@ -58,11 +60,16 @@
         /// The asset for an avatar of a given ID of a resource Type at the given Size.
         /// Use the following replacements: [:type], [:id], [:size]
         /// </summary>
-        public const string Avatar = AssetBase + "/[:type]/[:id].png?s=[:size]";
+        public const string Avatar = AssetBase + "/[:type]/[:id].png?s=[:size]&mtime=[:mtime]";
 
         /// <summary>
         /// The websocket address to connect to the Push server at
         /// </summary>
         public const string PushAddress = "wss://push.cloudsdale.org/push";
+
+        /// <summary>
+        /// A new mtime to make sure images aren't cached between app restarts :I
+        /// </summary>
+        public static DateTime ImageMTime = DateTime.Now;
     }
 }

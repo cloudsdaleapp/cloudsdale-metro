@@ -109,7 +109,10 @@ namespace MetroFaye {
                 socket = new MessageWebSocket(),
                 subbedChannels = new List<string>()
             };
-            _state.socket.Closed += (sender, args) => _state.closed = true;
+            _state.socket.Closed += (sender, args) => {
+                _state.closed = true;
+                OnDisconnect();
+            };
             _state.socket.MessageReceived += (sender, args) => {
                 try {
                     JArray messages;

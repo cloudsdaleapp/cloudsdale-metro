@@ -40,13 +40,10 @@
                                   HorizontalAlignment="Stretch" TextAlignment="Center">
             <local:MessageTextControl.PrefixInline>
                 <Span>
-                    <!--<InlineUIContainer>
-                        <HyperlinkButton Content="{Binding Path=User.Name}" Margin="0,0,0,-10"
-                                         Click="UserNameClick" FontSize="22" Padding="0"
-                                         Foreground="{Binding Path=User.Role, Converter={StaticResource NameColor}}"/>
-                    </InlineUIContainer>-->
-                    <Run Text="{Binding Path=User.Name}" 
-                         Foreground="{Binding Path=User, Converter={StaticResource NameColor}}" />
+                    <Hyperlink Click="OnNameClick">
+                        <Run Text="{Binding Path=User.Name}" 
+                             Foreground="{Binding Path=User, Converter={StaticResource NameColor}}" />
+                    </Hyperlink>
                 </Span>
             </local:MessageTextControl.PrefixInline>
         </local:MessageTextControl>

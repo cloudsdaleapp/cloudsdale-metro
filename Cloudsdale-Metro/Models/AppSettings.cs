@@ -16,6 +16,8 @@ namespace Cloudsdale_Metro.Models {
         private LayoutAwarePage.ObservableDictionary<string, int> _unreadMessages = 
             new LayoutAwarePage.ObservableDictionary<string, int>();
 
+        private static bool _isSaving = false;
+
         private AppSettings() {
             PropertyChanged += async delegate { await Save(); };
         }
@@ -54,12 +56,25 @@ namespace Cloudsdale_Metro.Models {
             settings.CopyTo(Settings);
         }
 
-        private static async Task Save() {
-            var storage = ApplicationData.Current.RoamingFolder;
-            var settingsFolder = await storage.EnsureFolderExists("settings");
-            var settingsFile = await settingsFolder.CreateFileAsync("settings.json", CreationCollisionOption.ReplaceExisting);
-            var settingsData = await JsonConvert.SerializeObjectAsync(Settings);
-            await settingsFile.SaveAllText(settingsData);
+        public static async Task Save() {
+            while (_isSaving) {
+                await Task.Delay(20);
+            }
+            _isSaving = true;
+
+            try {
+                var storage = ApplicationData.Current.RoamingFolder;
+                var settingsFolder = await storage.EnsureFolderExists("settings");
+                var settingsFile = await settingsFolder.CreateFileAsync("settings.json", CreationCollisionOption.ReplaceExisting);
+                var settingsData = await JsonConvert.SerializeObjectAsync(Settings
+#if DEBUG
+                    , Formatting.Indented
+#endif
+                    );
+                await settingsFile.SaveAllText(settingsData);
+            } finally {
+                _isSaving = false;
+            }
         }
     }
 }

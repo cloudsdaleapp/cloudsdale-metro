@@ -4,12 +4,10 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Threading;
 using System.Threading.Tasks;
 using CloudsdaleLib;
 using CloudsdaleLib.Helpers;
 using CloudsdaleLib.Models;
-using Cloudsdale_Metro.Common;
 using Cloudsdale_Metro.Controllers;
 using Cloudsdale_Metro.Views.Controls;
 using Cloudsdale_Metro.Views.Controls.Flyout_Panels;
@@ -20,12 +18,13 @@ using Windows.System;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 
 namespace Cloudsdale_Metro.Views {
     public sealed partial class CloudPage {
+        private const int AutoCloudListThreshhold = 1360;
+
         #region Fields
 
         private CloudController cloudController;
@@ -42,8 +41,11 @@ namespace Cloudsdale_Metro.Views {
             cloudController = App.Connection.MessageController.CurrentCloud;
             cloudController.UnreadMessages = 0;
             DefaultViewModel["Clouds"] = App.Connection.SessionController.CurrentSession.Clouds;
-            CloudGrid.Visibility = Visibility.Collapsed;
-            CloudListView.ScrollIntoView(cloudController.Cloud);
+            CloudGrid.Width = 1;
+            ScrollCloudIn();
+
+            await this.WaitForLayoutUpdateAsync();
+            AutoShowCloudList();
 
             await CloudListView.WaitForLayoutUpdateAsync();
             CloudListView.SelectedItem = cloudController.Cloud;
@@ -52,9 +54,34 @@ namespace Cloudsdale_Metro.Views {
             DefaultViewModel["Items"] = cloudController.Messages;
 
             cloudController.Messages.CollectionChanged += MessagesOnCollectionChanged;
-            ScrollChat();
 
             OverlayGrid.Visibility = Visibility.Collapsed;
+
+            await this.WaitForLayoutUpdateAsync();
+            ScrollChat();
+        }
+
+        private void CloudPage_OnSizeChanged(object sender, SizeChangedEventArgs e) {
+            AutoShowCloudList();
+        }
+
+        private void AutoShowCloudList() {
+            ScrollCloudIn();
+            if (ActualWidth > AutoCloudListThreshhold && BackButton.Visibility == Visibility.Visible) {
+                BackButton.Visibility = Visibility.Collapsed;
+                if (CloudGrid.Width < 320) {
+                    CloudListExpand.Begin();
+                }
+            } else if (ActualWidth < AutoCloudListThreshhold && BackButton.Visibility == Visibility.Collapsed) {
+                BackButton.Visibility = Visibility.Visible;
+                if (CloudGrid.Width > 1) {
+                    CloudListCollapse.Begin();
+                }
+            }
+        }
+
+        protected override void GoHome(object sender, RoutedEventArgs e) {
+            App.Connection.NavigateHome();
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e) {
@@ -67,39 +94,59 @@ namespace Cloudsdale_Metro.Views {
 
         private readonly List<Task> scrollTasks = new List<Task>();
 
-        private async void ScrollChat(bool byItem = false, double height = -1) {
-            await Task.Delay(100);
+        private async void ScrollChat(bool byItem = false, double? height = null) {
             await ChatList.WaitForNonZeroSizeAsync();
+            await ChatList.WaitForLayoutUpdateAsync();
 
             await Task.Run(() => Task.WaitAll(scrollTasks.ToArray()));
 
+            await ChatList.WaitForNonZeroSizeAsync();
+            await ChatList.WaitForLayoutUpdateAsync();
+            await Task.Delay(100);
+
+            scrollTasks.Add(InternalScrollChat(byItem, height));
+        }
+
+        private async Task InternalScrollChat(bool byItem, double? height) {
             double scrollHeight;
             double amountToScroll;
 
-            if (height > 0) {
-                amountToScroll = height;
-                scrollHeight = ChatScroll.VerticalOffset + amountToScroll;
-            } else if (byItem) {
+            if (byItem) {
                 var lastContainer = ChatList.ItemContainerGenerator.
                     ContainerFromItem(cloudController.Messages.Last()) as ContentPresenter;
                 if (lastContainer == null) return;
 
-                amountToScroll = lastContainer.ActualHeight;
+                var multiplier = 1.0;
+                if (height != null) {
+                    multiplier = (double)height;
+                }
+
+                amountToScroll = lastContainer.ActualHeight * multiplier;
                 scrollHeight = ChatScroll.VerticalOffset + amountToScroll;
                 scrollHeight = Math.Min(scrollHeight, ChatScroll.ScrollableHeight);
+            } else if (height != null) {
+                amountToScroll = (double)height;
+                amountToScroll = Math.Max(amountToScroll, 0);
+                scrollHeight = ChatScroll.VerticalOffset + amountToScroll;
             } else {
                 scrollHeight = ChatScroll.ScrollableHeight;
             }
 
-            scrollTasks.Add(ChatScroll.ScrollToVerticalOffsetWithAnimation(scrollHeight, 0.1, new ExponentialEase()));
+            if (scrollHeight <= ChatScroll.VerticalOffset) {
+                return;
+            }
+
+            await ChatScroll.ScrollToVerticalOffsetWithAnimation(scrollHeight, 0.1, new ExponentialEase());
         }
 
         private void ChatScroll_OnSizeChanged(object sender, SizeChangedEventArgs e) {
-            ScrollChat();
+            if (Math.Abs(e.NewSize.Width - e.PreviousSize.Width) > 10) {
+                ScrollChat();
+            }
         }
 
         private void MessagesOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs args) {
-            //ScrollChat(true);
+            //ScrollChat(height: 0.3, byItem: true);
         }
 
         private void ChatList_OnSizeChanged(object sender, SizeChangedEventArgs e) {
@@ -194,7 +241,9 @@ namespace Cloudsdale_Metro.Views {
 
         private void CloudItemClicked(object sender, ItemClickEventArgs e) {
             if (e.ClickedItem == cloudController.Cloud) {
-                CloudListCollapse.Begin();
+                if (ActualWidth < AutoCloudListThreshhold) {
+                    CloudListCollapse.Begin();
+                }
                 return;
             }
 
@@ -205,24 +254,50 @@ namespace Cloudsdale_Metro.Views {
 
         private void CloudListView_OnSelectionChanged(object sender, SelectionChangedEventArgs e) {
             var view = (ListView)sender;
-// ReSharper disable RedundantCheckBeforeAssignment
+            // ReSharper disable RedundantCheckBeforeAssignment
             if (view.SelectedItem != cloudController.Cloud) {
                 view.SelectedItem = cloudController.Cloud;
             }
-// ReSharper restore RedundantCheckBeforeAssignment
+            // ReSharper restore RedundantCheckBeforeAssignment
         }
 
         private async void CloudListExpand_OnCompleted(object sender, object e) {
             await CloudListView.WaitForLayoutUpdateAsync();
-            CloudListView.ScrollIntoView(cloudController.Cloud);
+            ScrollCloudIn();
         }
 
         protected override void GoBack(object sender, RoutedEventArgs e) {
-            if (CloudGrid.Visibility == Visibility.Collapsed) {
+            if (CloudGrid.Width < 320) {
+                ScrollCloudIn();
                 CloudListExpand.Begin();
             } else {
                 CloudListCollapse.Begin();
             }
+        }
+
+        private void ScrollCloudIn() {
+            var scrollViewer = CloudListView.GetFirstDescendantOfType<ScrollViewer>();
+            if (scrollViewer == null) return;
+            if (CloudListView.Items == null) return;
+
+            double scrollOffset;
+
+            var totalHeight = scrollViewer.ExtentHeight;
+            double itemIndex = CloudListView.Items.IndexOf(cloudController.Cloud);
+            double itemCount = CloudListView.Items.Count;
+            var indexRatio = itemIndex / itemCount;
+            var viewportCenter = scrollViewer.ViewportHeight / 2.0;
+
+            scrollOffset = (totalHeight * indexRatio) - (viewportCenter * .9);
+
+            // If offset happens to be bigger than scrollable height use the scrollable height
+            // Possible for items from the end of the list
+            if (scrollOffset > scrollViewer.ScrollableHeight) {
+                scrollOffset = scrollViewer.ScrollableHeight;
+            }
+
+            // scroll to calculated offset
+            scrollViewer.ScrollToVerticalOffset(scrollOffset);
         }
 
         #endregion
@@ -240,7 +315,6 @@ namespace Cloudsdale_Metro.Views {
             new CloudPanel(cloudController).FlyOut();
         }
         #endregion
-
     }
 
     #region Helper Classes
@@ -249,10 +323,12 @@ namespace Cloudsdale_Metro.Views {
         protected override DataTemplate SelectTemplateCore(object item, DependencyObject container) {
             var message = (Message)item;
             var element = (FrameworkElement)container;
+            var page = element.GetFirstAncestorOfType<Page>() ?? App.Connection.MainFrame.GetFirstDescendantOfType<CloudPage>();
+
             if (Message.SlashMeFormat.IsMatch(message.Content)) {
-                return (DataTemplate)element.GetFirstAncestorOfType<LayoutAwarePage>().Resources["ActionChatTemplate"];
+                return (DataTemplate)page.Resources["ActionChatTemplate"];
             }
-            return (DataTemplate)element.GetFirstAncestorOfType<LayoutAwarePage>().Resources["StandardChatTemplate"];
+            return (DataTemplate)page.Resources["StandardChatTemplate"];
         }
     }
 

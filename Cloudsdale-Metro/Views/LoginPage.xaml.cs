@@ -3,6 +3,7 @@ using System.Linq;
 using CloudsdaleLib.Models;
 using Cloudsdale_Metro.Models;
 using Cloudsdale_Metro.Views.LoadPages;
+using Newtonsoft.Json;
 using WinRTXamlToolkit.AwaitableUI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -21,7 +22,15 @@ namespace Cloudsdale_Metro.Views {
 
         protected override async void OnNavigatedTo(NavigationEventArgs e) {
             CloudCanvas.StartLoop();
-            await DoLastLogin();
+            var loginSuccessful = false;
+            do {
+                try {
+                    await DoLastLogin();
+                    loginSuccessful = true;
+                } catch (JsonException) {
+
+                }
+            } while (!loginSuccessful);
             LoginForm.Session = App.Connection.SessionController.CurrentSession;
         }
 

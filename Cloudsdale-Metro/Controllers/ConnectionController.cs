@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using CloudsdaleLib;
 using CloudsdaleLib.Models;
 using Cloudsdale_Metro.Models;
+using Cloudsdale_Metro.Views;
 using Cloudsdale_Metro.Views.LoadPages;
 using MetroFaye;
 using Windows.UI.Core;
@@ -111,6 +112,11 @@ namespace Cloudsdale_Metro.Controllers {
                 Faye.Subscribe("/clouds/" + cloud.Id);
                 Faye.Subscribe("/clouds/" + cloud.Id + "/chat/messages");
             }
+        }
+
+        public void NavigateHome() {
+            Navigate(typeof(Home));
+            MessageController.CurrentCloud = null;
         }
     }
 }

@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.Linq;
-using Callisto.Controls.SettingsManagement;
 using CloudsdaleLib;
 using Cloudsdale_Metro.Controllers;
 using Cloudsdale_Metro.Views;
 using Cloudsdale_Metro.Views.Controls;
 using Cloudsdale_Metro.Views.LoadPages;
+using MetroLog;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Windows.ApplicationModel;
@@ -35,6 +36,8 @@ namespace Cloudsdale_Metro {
         public App() {
             InitializeComponent();
             Suspending += OnSuspending;
+
+            GlobalCrashHandler.Configure();
 
             RequestedTheme = ApplicationTheme.Light;
         }
@@ -99,6 +102,10 @@ namespace Cloudsdale_Metro {
 
             if (ConnectionController.SessionController.CurrentSession != null && !(ConnectionController.MainFrame.Content is LoggingIn)) {
                 args.Request.ApplicationCommands.Add(accountSettings);
+
+                if (ConnectionController.MessageController.CurrentCloud != null) {
+
+                }
             }
         }
 

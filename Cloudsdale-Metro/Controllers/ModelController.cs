@@ -1,12 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using CloudsdaleLib.Models;
 using CloudsdaleLib.Providers;
 
 namespace Cloudsdale_Metro.Controllers {
     public class ModelController : IUserProvider, ICloudProvider {
-        private readonly Dictionary<string, User> users = new Dictionary<string, User>();
-        private readonly Dictionary<string, Cloud> clouds = new Dictionary<string, Cloud>();
+        private readonly Dictionary<string, WeakReference<User>> users = new Dictionary<string, WeakReference<User>>();
+        private readonly Dictionary<string, WeakReference<Cloud>> clouds = new Dictionary<string, WeakReference<Cloud>>();
         private SessionController sessionController { get { return App.Connection.SessionController; } }
 
         public async Task<User> GetUserAsync(string id) {
@@ -14,14 +15,15 @@ namespace Cloudsdale_Metro.Controllers {
                 return sessionController.CurrentSession;
             }
 
-            if (!users.ContainsKey(id)) {
-                var user = new User(id);
+            var user = GetUserRef(id);
+            if (user == null) {
+                user = new User(id);
                 await user.ForceValidate();
-                users[id] = user;
+                users[id] = MakeUserRef(user);
             } else {
-                await users[id].Validate();
+                await user.Validate();
             }
-            return users[id];
+            return user;
         }
 
         public User GetUser(string id) {
@@ -29,65 +31,118 @@ namespace Cloudsdale_Metro.Controllers {
                 return sessionController.CurrentSession;
             }
 
-            if (!users.ContainsKey(id)) {
-                var user = new User(id);
+            var user = GetUserRef(id);
+            if (user == null) {
+                user = new User(id);
                 user.ForceValidate();
-                users[id] = user;
+                users[id] = MakeUserRef(user);
             } else {
-                users[id].Validate();
+                user.Validate();
             }
-            return users[id];
+            return user;
         }
 
-        public async Task<User> UpdateDataAsync(User user) {
-            if (user.Id == sessionController.CurrentSession.Id) {
+        public async Task<User> UpdateUserAsync(User data) {
+            if (data.Id == sessionController.CurrentSession.Id) {
                 var session = sessionController.CurrentSession;
-                user.CopyTo(session);
+                data.CopyTo(session);
                 return session;
             }
 
-            if (!users.ContainsKey(user.Id)) {
+            var user = GetUserRef(data.Id);
+            if (user == null) {
+                user = data;
                 await user.ForceValidate();
-                users[user.Id] = user;
+                users[user.Id] = MakeUserRef(user);
             } else {
-                user.CopyTo(users[user.Id]);
+                data.CopyTo(user);
             }
-            return users[user.Id];
+            return user;
         }
 
-        public async Task<Cloud> UpdateCloudAsync(Cloud cloud) {
-            if (!clouds.ContainsKey(cloud.Id)) {
+        public User UpdateUser(User data) {
+            if (data.Id == sessionController.CurrentSession.Id) {
+                var session = sessionController.CurrentSession;
+                data.CopyTo(session);
+                return session;
+            }
+
+            var user = GetUserRef(data.Id);
+            if (user == null) {
+                user = data;
+                user.ForceValidate();
+                users[user.Id] = MakeUserRef(user);
+            } else {
+                data.CopyTo(user);
+            }
+            return user;
+        }
+
+        public async Task<Cloud> UpdateCloudAsync(Cloud data) {
+            var cloud = GetCloudRef(data.Id);
+            if (cloud == null) {
+                cloud = data;
                 await cloud.ForceValidate();
-                clouds[cloud.Id] = cloud;
+                clouds[data.Id] = MakeCloudRef(cloud);
             } else {
-                cloud.CopyTo(clouds[cloud.Id]);
+                data.CopyTo(cloud);
             }
 
-            return clouds[cloud.Id];
+            return cloud;
         }
 
-        public Cloud UpdateCloud(Cloud cloud) {
-            if (!clouds.ContainsKey(cloud.Id)) {
+        public Cloud UpdateCloud(Cloud data) {
+            var cloud = GetCloudRef(data.Id);
+            if (cloud == null) {
+                cloud = data;
                 cloud.ForceValidate();
-                clouds[cloud.Id] = cloud;
+                clouds[data.Id] = MakeCloudRef(cloud);
             } else {
-                var cacheCloud = clouds[cloud.Id];
-                cloud.CopyTo(cacheCloud);
+                data.CopyTo(cloud);
             }
 
-            return clouds[cloud.Id];
+            return cloud;
         }
 
         public Cloud GetCloud(string cloudId) {
-            if (!clouds.ContainsKey(cloudId)) {
-                var cloud = new Cloud(cloudId);
+            var cloud = GetCloudRef(cloudId);
+            if (cloud == null) {
+                cloud = new Cloud(cloudId);
                 cloud.ForceValidate();
-                clouds[cloud.Id] = cloud;
+                clouds[cloud.Id] = MakeCloudRef(cloud);
             } else {
-                clouds[cloudId].Validate();
+                cloud.Validate();
             }
 
-            return clouds[cloudId];
+            return cloud;
         }
+
+        private User GetUserRef(string id) {
+            if (!users.ContainsKey(id)) return null;
+            var weakRef = users[id];
+            User user;
+            if (!weakRef.TryGetTarget(out user)) {
+                return null;
+            }
+            return user;
+        }
+
+        private WeakReference<User> MakeUserRef(User user) {
+            return new WeakReference<User>(user);
+        }
+
+        private Cloud GetCloudRef(string id) {
+            if (!clouds.ContainsKey(id)) return null;
+            var weakRef = clouds[id];
+            Cloud cloud;
+            if (!weakRef.TryGetTarget(out cloud)) {
+                return null;
+            }
+            return cloud;
+        }
+
+        private WeakReference<Cloud> MakeCloudRef(Cloud cloud) {
+            return new WeakReference<Cloud>(cloud);
+        } 
     }
 }

@@ -146,9 +146,15 @@ namespace CloudsdaleLib.Models {
             var client = new HttpClient().AcceptsJson();
             var response = await ValidationRequest(client, requestUrl);
 
+            if (response.StatusCode != HttpStatusCode.OK) {
+                await Task.Delay(20);
+                return await Validate(force);
+            }
+
             var responseObject = JObject.Parse(await response.Content.ReadAsStringAsync());
             var responseModel = (CloudsdaleModel)ObjectFromWebResult(responseObject).ToObject(GetType());
             responseModel.CopyTo(this);
+
             return true;
         }
 

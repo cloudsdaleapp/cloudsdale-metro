@@ -1,4 +1,5 @@
 ﻿using System;
+using Windows.UI.Xaml.Documents;
 using CloudsdaleLib.Models;
 using Windows.System;
 using Windows.UI.Xaml;
@@ -40,6 +41,10 @@ namespace Cloudsdale_Metro.Views.Controls {
         }
 
         private void AvatarTapped(object sender, TappedRoutedEventArgs e) {
+            new UserPanel(((Message)DataContext).User).FlyOut();
+        }
+
+        private void OnNameClick(Hyperlink sender, HyperlinkClickEventArgs args) {
             new UserPanel(((Message)DataContext).User).FlyOut();
         }
     }

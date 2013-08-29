@@ -42,6 +42,12 @@ namespace Cloudsdale_Metro.Helpers {
                 }
                 await Launcher.LaunchUriAsync(new Uri(uri));
             };
+
+            return link;
+        }
+
+        public static Hyperlink OnClickLaunch(this Hyperlink link, Action onClick) {
+            link.Click += delegate { onClick(); };
             return link;
         }
 

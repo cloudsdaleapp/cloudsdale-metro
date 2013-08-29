@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -23,13 +24,14 @@ using Windows.UI.Xaml;
 
 namespace Cloudsdale_Metro.Controllers {
     public class CloudController : IStatusProvider, IMessageReciever, INotifyPropertyChanged {
-        private int _unreadMessages;
         private readonly Dictionary<string, Status> userStatuses = new Dictionary<string, Status>();
         private readonly ModelCache<Message> messages = new ModelCache<Message>(50);
         private DateTime? _validatedFayeClient;
-        private Window _window;
+        private readonly Window _window;
+        private readonly string _id;
 
         public CloudController(Cloud cloud) {
+            _id = cloud.Id;
             Cloud = cloud;
             FixSessionStatus();
             _window = Window.Current;
@@ -122,48 +124,68 @@ namespace Cloudsdale_Metro.Controllers {
         public async Task EnsureLoaded() {
             if (_validatedFayeClient == null || _validatedFayeClient < App.Connection.Faye.CreationDate) {
                 App.Connection.Faye.Subscribe("/clouds/" + Cloud.Id + "/users/*");
+            } else {
+                return;
             }
 
             await Cloud.Validate();
 
-            var client = new HttpClient().AcceptsJson();
-
             // Load user list
-            {
-                var response = await client.GetStringAsync((
-                    Cloud.UserIds.Length > 100
-                    ? Endpoints.CloudOnlineUsers
-                    : Endpoints.CloudUsers)
-                    .Replace("[:id]", Cloud.Id));
-                var userData = await JsonConvert.DeserializeObjectAsync<WebResponse<User[]>>(response);
-                var users = new List<User>();
-                foreach (var user in userData.Result) {
-                    if (user.Status != null) {
-                        SetStatus(user.Id, (Status)user.Status);
-                    }
-                    users.Add(await App.Connection.ModelController.UpdateDataAsync(user));
-                }
-
-            }
+            _window.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, LoadUsers);
 
             // Load messages
-            {
-                var response = await client.GetStringAsync(Endpoints.CloudMessages.Replace("[:id]", Cloud.Id));
-                var responseMessages = await JsonConvert.DeserializeObjectAsync<WebResponse<Message[]>>(response);
-                var newMessages = new List<Message>(messages
-                    .Where(message => message.Timestamp > responseMessages.Result.Last().Timestamp));
-                messages.Clear();
-                foreach (var message in responseMessages.Result) {
-                    StatusForUser(message.Author.Id);
-                    messages.AddToEnd(message);
-                }
-                foreach (var message in newMessages) {
-                    StatusForUser(message.Author.Id);
-                    messages.AddToEnd(message);
-                }
-            }
+            await LoadMessages();
 
             _validatedFayeClient = App.Connection.Faye.CreationDate;
+        }
+
+        private async void LoadUsers() {
+            var client = new HttpClient().AcceptsJson();
+
+            var response = await client.GetAsync((
+                Cloud.UserIds.Length > 100
+                    ? Endpoints.CloudOnlineUsers
+                    : Endpoints.CloudUsers)
+                .Replace("[:id]", Cloud.Id));
+
+            if (response.StatusCode != HttpStatusCode.OK) {
+                _window.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, LoadUsers);
+                return;
+            }
+
+            var responseData = await response.Content.ReadAsStringAsync();
+            var userData = await JsonConvert.DeserializeObjectAsync<WebResponse<User[]>>(responseData);
+            foreach (var user in userData.Result) {
+                if (user.Status != null) {
+                    SetStatus(user.Id, (Status)user.Status);
+                }
+                App.Connection.ModelController.UpdateUser(user);
+            }
+        }
+
+        private async Task LoadMessages() {
+            var client = new HttpClient().AcceptsJson();
+
+            var response = await client.GetAsync(Endpoints.CloudMessages.Replace("[:id]", Cloud.Id));
+
+            if (response.StatusCode != HttpStatusCode.OK) {
+                await LoadMessages();
+                return;
+            }
+
+            var responseData = await response.Content.ReadAsStringAsync();
+            var responseMessages = await JsonConvert.DeserializeObjectAsync<WebResponse<Message[]>>(responseData);
+            var newMessages = new List<Message>(messages
+                .Where(message => message.Timestamp > responseMessages.Result.Last().Timestamp));
+            messages.Clear();
+            foreach (var message in responseMessages.Result) {
+                StatusForUser(message.Author.Id);
+                messages.AddToEnd(message);
+            }
+            foreach (var message in newMessages) {
+                StatusForUser(message.Author.Id);
+                messages.AddToEnd(message);
+            }
         }
 
         public void OnMessage(JObject message) {
@@ -210,13 +232,15 @@ namespace Cloudsdale_Metro.Controllers {
             textElements[1].AppendChild
                 (template.CreateTextNode(Message.SlashMeFormat.Replace(message.Content, message.Author.Name)));
             var toastNode = (XmlElement)template.SelectSingleNode("/toast");
-            toastNode.SetAttribute("launch", JObject.FromObject(new {
-                type = "toast",
-                cloudId = Cloud.Id
-            }).ToString(Formatting.None));
-            var audio = template.CreateElement("audio");
-            audio.SetAttribute("silent", "true");
-            toastNode.AppendChild(audio);
+            if (toastNode != null) {
+                toastNode.SetAttribute("launch", JObject.FromObject(new {
+                    type = "toast",
+                    cloudId = Cloud.Id
+                }).ToString(Formatting.None));
+                var audio = template.CreateElement("audio");
+                audio.SetAttribute("silent", "true");
+                toastNode.AppendChild(audio);
+            }
 
             var toast = new ToastNotification(template);
             notifier.Show(toast);
@@ -228,7 +252,7 @@ namespace Cloudsdale_Metro.Controllers {
             if (user.Status != null) {
                 SetStatus(user.Id, (Status)user.Status);
             }
-            await App.Connection.ModelController.UpdateDataAsync(user);
+            await App.Connection.ModelController.UpdateUserAsync(user);
         }
 
         private void OnCloudData(JToken cloudData) {
@@ -244,11 +268,17 @@ namespace Cloudsdale_Metro.Controllers {
         }
 
         public int UnreadMessages {
-            get { return _unreadMessages; }
+            get {
+                if (!AppSettings.Settings.UnreadMessages.ContainsKey(_id)) {
+                    return AppSettings.Settings.UnreadMessages[_id] = 0;
+                }
+                return AppSettings.Settings.UnreadMessages[_id];
+            }
             set {
-                if (value == _unreadMessages) return;
-                _unreadMessages = value;
+                if (value == AppSettings.Settings.UnreadMessages[_id]) return;
+                AppSettings.Settings.UnreadMessages[_id] = value;
                 OnPropertyChanged();
+                Task.Run(async () => await AppSettings.Save());
             }
         }
 
@@ -270,6 +300,10 @@ namespace Cloudsdale_Metro.Controllers {
         private void FixSessionStatus() {
             userStatuses[App.Connection.SessionController.CurrentSession.Id] =
                 App.Connection.SessionController.CurrentSession.PreferredStatus;
+        }
+
+        public void LeaveCloud() {
+            
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

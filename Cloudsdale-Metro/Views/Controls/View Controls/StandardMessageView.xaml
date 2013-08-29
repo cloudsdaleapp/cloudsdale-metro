@@ -22,8 +22,9 @@
 
         <DataTemplate x:Key="DropTemplate">
             <Border Background="White" BorderBrush="Gray"
-                                        BorderThickness="1" CornerRadius="1">
-                <Border BorderBrush="Gray" BorderThickness="1" Margin="4">
+                    BorderThickness="1" CornerRadius="1">
+                <Border BorderBrush="Gray" BorderThickness="1" Margin="4" 
+                        ToolTipService.ToolTip="{Binding Path=Title}">
                     <Image Source="{Binding Path=Preview}" Width="120" Height="90" />
                 </Border>
             </Border>
@@ -94,8 +95,10 @@
                                 <Run Text="&#x25CF;" FontFamily="Segoe UI Symbol" FontSize="14"
                                      Foreground="{Binding Path=User.UIMetadata[Status].Value, 
                                      Converter={StaticResource StatusColor}}"/>
-                                <Run Text="{Binding Path=User.Name}" FontSize="20" FontWeight="SemiBold"
-                                     Foreground="{Binding Path=User, Converter={StaticResource NameColor}}"/>
+                                <Hyperlink Click="OnNameClick">
+                                    <Run Text="{Binding Path=User.Name}" FontSize="20" FontWeight="SemiBold"
+                                         Foreground="{Binding Path=User, Converter={StaticResource NameColor}}"/>
+                                </Hyperlink>
                                 <Span Foreground="DarkGray">
                                     @<Run Text="{Binding Path=User.Username}" />
                                 </Span>
@@ -118,8 +121,10 @@
                                 <Run Text="&#x25CF;" FontFamily="Segoe UI Symbol" FontSize="14"
                                      Foreground="{Binding Path=User.UIMetadata[Status].Value, 
                                      Converter={StaticResource StatusColor}}"/>
-                                <Run Text="{Binding Path=User.Name}" FontSize="20" FontWeight="SemiBold"
-                                     Foreground="{Binding Path=User, Converter={StaticResource NameColor}}"/>
+                                <Hyperlink Click="OnNameClick">
+                                    <Run Text="{Binding Path=User.Name}" FontSize="20" FontWeight="SemiBold"
+                                         Foreground="{Binding Path=User, Converter={StaticResource NameColor}}"/>
+                                </Hyperlink>
                             </Paragraph>
                         </RichTextBlock>
                         <RichTextBlock Foreground="DarkGray" FontSize="16">
