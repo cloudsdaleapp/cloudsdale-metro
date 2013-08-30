@@ -54,6 +54,17 @@
             <TextBlock Foreground="Red" FontSize="14" Name="NameModelError" />
         </StackPanel>
 
+        <!-- Change username panel -->
+        <StackPanel>
+            <TextBlock FontSize="18" Margin="5,5,5,0">Username</TextBlock>
+            <StackPanel Orientation="Horizontal">
+                <ProgressRing Foreground="Gray" IsActive="True" Visibility="Collapsed" Name="UsernameProgress" />
+                <TextBox Width="250" Text="{Binding Path=Username}" Margin="5" 
+                         LostFocus="UsernameBox_OnLostFocus" KeyDown="UIElement_OnKeyDown" />
+            </StackPanel>
+            <TextBlock Foreground="Red" FontSize="14" Name="UsernameModelError" />
+        </StackPanel>
+
         <!-- Change email panel -->
         <StackPanel>
             <TextBlock FontSize="18" Margin="5,5,5,0">Email Address</TextBlock>

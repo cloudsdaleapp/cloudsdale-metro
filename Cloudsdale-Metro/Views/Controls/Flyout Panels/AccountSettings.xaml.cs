@@ -32,11 +32,26 @@ namespace Cloudsdale_Metro.Views.Controls {
 
         private async void NameBox_OnLostFocus(object sender, RoutedEventArgs e) {
             var nameBox = sender as TextBox;
+            if (nameBox == null) return;
             if (string.IsNullOrWhiteSpace(nameBox.Text)) {
                 DataContext = session;
                 return;
             }
             await DoUpdate("name", nameBox.Text, nameBox, NameModelError, NameProgress);
+        }
+
+        #endregion
+
+        #region Username
+
+        private async void UsernameBox_OnLostFocus(object sender, RoutedEventArgs e) {
+            var usernameBox = sender as TextBox;
+            if (usernameBox == null) return;
+            if (string.IsNullOrWhiteSpace(usernameBox.Text)) {
+                DataContext = session;
+                return;
+            }
+            await DoUpdate("username", usernameBox.Text, usernameBox, UsernameModelError, UsernameProgress);
         }
 
         #endregion
