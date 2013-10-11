@@ -27,7 +27,7 @@
                 <Setter Property="Background" Value="#1A91DB" />
             </Style>
             <DataTemplate x:Key="CloudSnappedTemplate">
-                <Grid Height="70" Width="280" Background="#7FF0F0F0">
+                <Grid Height="70" Width="280" Background="#AFF0F0F0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition />

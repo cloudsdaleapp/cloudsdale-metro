@@ -41,7 +41,7 @@
         </TransitionCollection>
     </Page.Transitions>
 
-    <controls:RootGrid>
+    <controls:RootGrid Background="#404b52">
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
@@ -90,7 +90,7 @@
                 </Storyboard>
             </Grid.Resources>
 
-            <Grid x:Name="CloudGrid">
+            <Grid x:Name="CloudGrid" Background="#404b52">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition />
@@ -126,7 +126,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition />
                 </Grid.RowDefinitions>
-                <Grid Background="#1A91DB">
+                <Grid Background="#404b52">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition />
