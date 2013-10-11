@@ -64,8 +64,11 @@
             </Grid.ColumnDefinitions>
             <Grid Margin="0,0,5,5" x:Name="TagGrid" Width="60">
                 <local:ViewboxPanel Orientation="Vertical">
-                    <Border BorderBrush="#3a3a3a" BorderThickness="1" VerticalAlignment="Top" Tapped="AvatarTapped">
-                        <Image Source="{Binding Path=User.Avatar.Normal}" Width="60" Height="60" />
+                    <Border BorderBrush="#3a3a3a" BorderThickness="1" VerticalAlignment="Top" 
+                            Tapped="AvatarTapped" Width="60" Height="60" CornerRadius="30">
+                        <Border.Background>
+                            <ImageBrush ImageSource="{Binding Path=User.Avatar.Normal}" />
+                        </Border.Background>
                     </Border>
                     <Border DataContext="{Binding Path=User.Role}" BorderBrush="Gray"
                             BorderThickness="1" CornerRadius="2" Height="16" Margin="0,5,0,0"
